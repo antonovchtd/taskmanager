@@ -11,34 +11,37 @@
 
 #include "Task.h"
 
-class IDGenerator{};
-
 class TaskID{
 public:
     explicit TaskID(unsigned int val) : value_(val) { };
-    unsigned int value() const {return value_;};
+    unsigned int value() const { return value_; };
 private:
     unsigned int value_;
 };
 
-bool Validate(TaskID){
-
-}
-
-
+class IDGenerator{
+public:
+    IDGenerator() : last_(0) {};
+    explicit IDGenerator(unsigned int last) : last_(last) {};
+    TaskID genID(){ return TaskID(last_++); }
+private:
+    unsigned int last_;
+};
 
 class TaskManager {
 public:
-    int Add(Task t);
-    void Edit(int, Task t);
-    void Complete(int);
-    void Delete(int);
-    std::map<int, Task> getTasks();
+    unsigned int Add(Task t);
+    void Edit(unsigned int, Task t);
+    void Complete(unsigned int);
+    void Delete(unsigned int);
+    std::map<unsigned int, Task> getTasks();
     void Show();
+    bool Validate(TaskID id){
+        return tasks_.find(id.value()) != tasks_.end();
+    }
 private:
-    std::map<int, Task> tasks_;
-    size_t counter_ = 0;
-    // IDGenerator gen_;
+    std::map<unsigned int, Task> tasks_;
+    IDGenerator gen_;
 };
 
 

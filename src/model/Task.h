@@ -22,7 +22,10 @@ public:
     static Task Create(const std::string& title, Task::Priority p);
     static Task Create(const std::string& title, time_t due_date);
     void setComplete(bool);
-    friend std::ostream & operator<<(std::ostream &os, std::map<int, Task>& tasks);
+    time_t due_date() const { return due_date_; };
+    std::string title() const { return title_; };
+    Priority priority() const { return priority_; };
+    bool isComplete() const { return isComplete_; };
     Task() : Task("", Priority::NONE, 0) { };
 
 private:

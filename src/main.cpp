@@ -12,10 +12,30 @@
 #include "model/Task.h"
 #include "model/TaskManager.h"
 
+std::ostream & operator<<(std::ostream &os, std::map<unsigned int, Task>& tasks){
+    const std::string priorityName[] = {"High", "Medium", "Low", "None"};
+    for (const auto &t : tasks){
+        os << t.first << " — " << t.second.title() << ", Priority: " <<
+           priorityName[static_cast<int>(t.second.priority())];
+        if (t.second.due_date() < time(nullptr))
+            os << " [overdue] ";
+        else {
+            time_t dd = t.second.due_date();
+            os << ", Due: " << asctime(localtime(&dd));
+        }
+        if (t.second.isComplete()){
+            os << " [completed] ";
+        }
+        os << std::endl;
+
+    }
+    return os;
+}
+
 int main() {
     TaskManager tm;
-    int id1 = tm.Add(Task::Create("My First Task",Task::Priority::HIGH,3600));
-    int id2 = tm.Add(Task::Create("Second Task",3600));
+    unsigned int id1 = tm.Add(Task::Create("My First Task",Task::Priority::HIGH,3600));
+    unsigned int id2 = tm.Add(Task::Create("Second Task",3600));
 
     auto currTasks = tm.getTasks();
     std::cout << "First call ------\n";
