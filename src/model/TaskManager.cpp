@@ -7,8 +7,8 @@
 #include "TaskManager.h"
 
 int TaskManager::Add(Task t) {
-    tasks_[counter] = std::move(t);
-    return counter++;
+    tasks_[counter_] = std::move(t);
+    return counter_++;
 }
 
 std::map<int, Task> TaskManager::getTasks() {

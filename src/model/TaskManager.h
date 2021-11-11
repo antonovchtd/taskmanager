@@ -11,6 +11,22 @@
 
 #include "Task.h"
 
+class IDGenerator{};
+
+class TaskID{
+public:
+    explicit TaskID(unsigned int val) : value_(val) { };
+    unsigned int value() const {return value_;};
+private:
+    unsigned int value_;
+};
+
+bool Validate(TaskID){
+
+}
+
+
+
 class TaskManager {
 public:
     int Add(Task t);
@@ -21,7 +37,8 @@ public:
     void Show();
 private:
     std::map<int, Task> tasks_;
-    int counter = 0;
+    size_t counter_ = 0;
+    // IDGenerator gen_;
 };
 
 
