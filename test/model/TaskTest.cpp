@@ -90,7 +90,7 @@ TEST_F(TaskTest, shouldAddTask)
 {
     TaskManager tm;
     auto id = tm.Add(Task::Create("TestTitle"));
-    ASSERT_TRUE(tm.Validate(TaskID(id)));
+    EXPECT_TRUE(tm.Validate(TaskID(id)));
 }
 
 TEST_F(TaskTest, shouldDeleteTask)
@@ -98,7 +98,7 @@ TEST_F(TaskTest, shouldDeleteTask)
     TaskManager tm;
     auto id = tm.Add(Task::Create("TestTitle"));
     tm.Delete(id);
-    ASSERT_FALSE(tm.Validate(TaskID(id)));
+    EXPECT_FALSE(tm.Validate(TaskID(id)));
 }
 
 TEST_F(TaskTest, shouldCompleteTask)
@@ -107,5 +107,5 @@ TEST_F(TaskTest, shouldCompleteTask)
     auto id = tm.Add(Task::Create("TestTitle"));
     tm.Complete(id);
     auto tasks = tm.getTasks();
-    ASSERT_TRUE(tasks.find(id)->second.isComplete());
+    EXPECT_TRUE(tasks.find(id)->second.isComplete());
 }
