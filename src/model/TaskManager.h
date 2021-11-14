@@ -15,6 +15,8 @@ class TaskID{
 public:
     explicit TaskID(unsigned int val) : value_(val) { };
     unsigned int value() const { return value_; };
+    bool operator==(const TaskID&) const;
+    bool operator<(const TaskID&) const;
 private:
     unsigned int value_;
 };
@@ -30,17 +32,15 @@ private:
 
 class TaskManager {
 public:
-    unsigned int Add(Task t);
-    void Edit(unsigned int, Task t);
-    void Complete(unsigned int);
-    void Delete(unsigned int);
-    std::map<unsigned int, Task> getTasks();
-    void Show();
-    bool Validate(TaskID id){
-        return tasks_.find(id.value()) != tasks_.end();
-    }
+    TaskID Add(Task t);
+    void Edit(TaskID, Task t);
+    void Complete(TaskID);
+    void Delete(TaskID);
+    std::map<TaskID, Task> getTasks();
+    void Show(std::ostream &os);
+    bool Validate(TaskID id) const;
 private:
-    std::map<unsigned int, Task> tasks_;
+    std::map<TaskID, Task> tasks_;
     IDGenerator gen_;
 };
 
