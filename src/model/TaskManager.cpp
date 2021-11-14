@@ -37,7 +37,9 @@ std::ostream & operator<<(std::ostream &os, TaskManager tm){
             os << " [overdue] ";
         else {
             time_t dd = t.second.due_date();
-            os << ", Due: " << asctime(localtime(&dd));
+            std::string str_time = std::string(asctime(localtime(&dd)));
+            str_time.pop_back();
+            os << ", Due: " << str_time;
         }
         if (t.second.isComplete()){
             os << " [completed] ";
