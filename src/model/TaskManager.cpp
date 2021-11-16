@@ -11,7 +11,7 @@ TaskID TaskManager::Add(Task t) {
     return id;
 }
 
-std::map<TaskID, Task> TaskManager::getTasks() {
+std::map<TaskID, Task> TaskManager::getTasks() const {
     return tasks_;
 }
 
@@ -27,7 +27,7 @@ void TaskManager::Complete(TaskID k) {
     tasks_[k].setComplete(true);
 }
 
-std::ostream & operator<<(std::ostream &os, TaskManager tm){
+std::ostream & operator<<(std::ostream &os, const TaskManager& tm){
     auto tasks = tm.getTasks();
     const std::string priorityName[] = {"High", "Medium", "Low", "None"};
     for (const auto &t : tasks){
@@ -50,18 +50,10 @@ std::ostream & operator<<(std::ostream &os, TaskManager tm){
     return os;
 }
 
-void TaskManager::Show(std::ostream &os) {
+void TaskManager::Show(std::ostream &os) const{
     os << *this;
 }
 
 bool TaskManager::Validate(TaskID id) const{
     return tasks_.find(id) != tasks_.end();
-}
-
-bool TaskID::operator==(const TaskID& rhs) const{
-    return value_ == rhs.value();
-}
-
-bool TaskID::operator<(const TaskID& rhs) const{
-    return value_ < rhs.value();
 }
