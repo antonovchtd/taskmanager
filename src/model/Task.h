@@ -24,11 +24,13 @@ public:
     static Task Create(const std::string& title);
     static Task Create(const std::string& title, Task::Priority p, const std::string& due_date);
     static Task Create(const std::string& title, const std::string& due_date);
-    void setComplete(bool);
+
+public:
     time_t due_date() const { return due_date_; };
     std::string title() const { return title_; };
     Priority priority() const { return priority_; };
     bool isComplete() const { return isComplete_; };
+    void setComplete(bool);
     Task() : Task("Default", Priority::NONE, 0) { };
     bool operator==(const Task&) const;
 
@@ -40,6 +42,7 @@ private:
 //    };
 //    Task(const std::string& title, Task::Priority p) : title_(title), priority_(p), due_date_(time(nullptr)) { };
 
+private:
     std::string title_;
     Priority priority_;
     time_t due_date_; // Example of strong typing
