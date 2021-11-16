@@ -11,6 +11,7 @@
 
 #include "Task.h"
 #include "TaskID.h"
+#include "IDGenerator.h"
 
 class TaskManager {
 public:
