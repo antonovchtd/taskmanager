@@ -16,7 +16,7 @@ set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
-add_executable(taskmanager src/main.cpp src/model/Task.cpp src/model/Task.h src/model/TaskManager.cpp src/model/TaskManager.h)
+add_executable(taskmanager src/main.cpp src/model/Task.cpp src/model/Task.h src/model/TaskManager.cpp src/model/TaskManager.h src/model/TaskID.h src/model/TaskID.cpp src/model/IDGenerator.cpp src/model/IDGenerator.h)
 add_executable(test_taskmanager src/model/Task.cpp src/model/Task.h src/model/TaskManager.cpp src/model/TaskManager.h test/model/TaskTest.cpp)
 target_link_libraries(test_taskmanager GTest::GTest GTest::Main)
 target_link_libraries(test_taskmanager ${Boost_LIBRARIES})
