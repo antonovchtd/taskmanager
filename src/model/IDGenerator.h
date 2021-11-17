@@ -11,8 +11,11 @@ class IDGenerator{
 public:
     IDGenerator() : last_(0) {};
     explicit IDGenerator(unsigned int last) : last_(last) {};
-    TaskID genID();
-private:
+    IDGenerator(const IDGenerator&) = default;
+    virtual TaskID genID();
+    virtual ~IDGenerator() = default;
+
+protected:
     unsigned int last_;
 };
 
