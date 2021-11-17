@@ -15,6 +15,8 @@
 
 class TaskManager {
 public:
+    TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator)) {};
+    TaskManager(std::shared_ptr<IDGenerator> generator) : gen_(generator) { };
     TaskID Add(Task);
     void Edit(TaskID, Task);
     void Complete(TaskID);
@@ -23,10 +25,11 @@ public:
 
     std::map<TaskID, Task> getTasks() const;
     bool Validate(TaskID id) const;
+    size_t size() const;
 
 private:
     std::map<TaskID, Task> tasks_;
-    IDGenerator gen_;
+    std::shared_ptr<IDGenerator> gen_;
 };
 
 

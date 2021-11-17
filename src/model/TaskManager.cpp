@@ -6,7 +6,7 @@
 #include "TaskManager.h"
 
 TaskID TaskManager::Add(Task t) {
-    TaskID id = gen_.genID();
+    TaskID id = gen_->genID();
     tasks_[id] = std::move(t);
     return id;
 }
@@ -56,4 +56,8 @@ void TaskManager::Show(std::ostream &os) const{
 
 bool TaskManager::Validate(TaskID id) const{
     return tasks_.find(id) != tasks_.end();
+}
+
+size_t TaskManager::size() const {
+    return tasks_.size();
 }
