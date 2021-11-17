@@ -3,7 +3,6 @@
 //
 
 #include "../../src/model/Task.h"
-#include "../../src/model/TaskManager.h"
 
 #include <gtest/gtest.h>
 
