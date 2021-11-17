@@ -30,16 +30,6 @@ TEST_F(TaskTest, shouldCreate)
     EXPECT_EQ(p, t.priority());
 }
 
-TEST_F(TaskTest, shouldEdit)
-{
-    Task t = Task::Create("My Test Task", Task::Priority::MEDIUM, "16/11/2021 19:00");
-    TaskManager tm;
-    TaskID id = tm.Add(Task{});
-    tm.Edit(id, t);
-    auto tasks = tm.getTasks();
-    EXPECT_EQ(t, tasks[id]);
-}
-
 TEST_F(TaskTest, shouldCreateAtSpecificDate)
 {
     struct tm timeinfo{};
@@ -86,26 +76,3 @@ TEST_F(TaskTest, shouldSetComplete)
     EXPECT_EQ(status, t.isComplete());
 }
 
-TEST_F(TaskTest, shouldAddTask)
-{
-    TaskManager tm;
-    auto id = tm.Add(Task::Create("TestTitle"));
-    EXPECT_TRUE(tm.Validate(TaskID(id)));
-}
-
-TEST_F(TaskTest, shouldDeleteTask)
-{
-    TaskManager tm;
-    auto id = tm.Add(Task::Create("TestTitle"));
-    tm.Delete(id);
-    EXPECT_FALSE(tm.Validate(TaskID(id)));
-}
-
-TEST_F(TaskTest, shouldCompleteTask)
-{
-    TaskManager tm;
-    auto id = tm.Add(Task::Create("TestTitle"));
-    tm.Complete(id);
-    auto tasks = tm.getTasks();
-    EXPECT_TRUE(tasks.find(id)->second.isComplete());
-}
