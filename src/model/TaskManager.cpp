@@ -7,6 +7,8 @@
 
 TaskID TaskManager::Add(Task t) {
     TaskID id = gen_->genID();
+    if (Validate(id))
+        throw std::runtime_error("TaskManager::Add attempts to overwrite task");
     tasks_[id] = std::move(t);
     return id;
 }
