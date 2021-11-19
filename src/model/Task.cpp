@@ -1,6 +1,7 @@
 //
 // Created by Anton Ovcharenko on 08.11.2021.
 //
+#include <iostream>
 #include <regex>
 
 #include "Task.h"
@@ -84,4 +85,23 @@ bool Task::operator==(const Task& rhs) const{
     return title_ == rhs.title()
         && priority_ == rhs.priority()
         && due_date_ == rhs.due_date();
+}
+
+std::ostream & operator<<(std::ostream &os, const Task& t) {
+    const std::string priorityName[] = {"High", "Medium", "Low", "None"};
+    os << t.title() << ", Priority: " <<
+       priorityName[static_cast<int>(t.priority())];
+    if (t.due_date() < time(nullptr))
+        os << " [overdue] ";
+    else {
+        time_t dd = t.due_date();
+        std::string str_time = std::string(asctime(localtime(&dd)));
+        str_time.pop_back();
+        os << ", Due: " << str_time;
+    }
+    if (t.isComplete()) {
+        os << " [completed] ";
+    }
+    os << std::endl;
+    return os;
 }
