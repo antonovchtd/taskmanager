@@ -6,17 +6,18 @@
 
 #include "Task.h"
 
-Task::Task(std::string title, Task::Priority p, time_t due_date) :
-title_{std::move(title)},
-priority_{p},
-due_date_{time(nullptr) + due_date}
+Task::Task(std::string title, Task::Priority p, time_t due_date, bool complete_flag) :
+    title_{std::move(title)},
+    priority_{p},
+    due_date_{due_date},
+    isComplete_(complete_flag)
 {
     if (title_.empty())
         throw std::runtime_error("Empty title string.");
 };
 
-Task::Task(std::string title, Task::Priority p, const std::string &due_date) :
-        Task(std::move(title),p,0)
+Task::Task(std::string title, Task::Priority p, const std::string &due_date, bool complete_flag) :
+        Task(std::move(title), p, 0, complete_flag)
 {
     std::smatch matches;
     if (std::regex_search(due_date, matches, std::regex(R"(in (\d+:)?(\d+):(\d)+)"))){
@@ -53,28 +54,12 @@ Task::Task(std::string title, Task::Priority p, const std::string &due_date) :
 
 };
 
-Task Task::Create(const std::string &title, Task::Priority p, time_t due_date) {
-    return {title, p, due_date};
+Task Task::Create(const std::string &title, Task::Priority p, time_t due_date, bool complete_flag) {
+    return {title, p, due_date, complete_flag};
 }
 
-Task Task::Create(const std::string &title, Task::Priority p) {
-    return {title, p, 0};
-}
-
-Task Task::Create(const std::string &title, time_t due_date) {
-    return {title, Task::Priority::NONE, due_date};
-}
-
-Task Task::Create(const std::string &title) {
-    return {title, Task::Priority::NONE, 0};
-}
-
-Task Task::Create(const std::string &title, Task::Priority p, const std::string &due_date) {
-    return {title, p, due_date};
-}
-
-Task Task::Create(const std::string &title, const std::string &due_date) {
-    return {title, Task::Priority::NONE, due_date};
+Task Task::Create(const std::string &title, Task::Priority p, const std::string &due_date, bool complete_flag) {
+    return {title, p, due_date, complete_flag};
 }
 
 bool Task::operator==(const Task& rhs) const{
