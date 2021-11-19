@@ -21,6 +21,9 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks() const {
 }
 
 void TaskManager::Delete(TaskID id) {
+    TaskID ancestor = tasks_[id].second.parent();
+    if (Validate(ancestor))
+        tasks_[ancestor].second.removeChild(id);
     tasks_.erase(id);
 }
 
