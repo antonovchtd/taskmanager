@@ -10,6 +10,7 @@ public:
     explicit TaskID(unsigned int val) : value_(val) { };
     unsigned int value() const;
     bool operator==(const TaskID&) const;
+    bool operator!=(const TaskID&) const;
     bool operator<(const TaskID&) const;
 
 private:
