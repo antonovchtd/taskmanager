@@ -2,11 +2,18 @@
 
 /*
  * Task:
- * - create <title> [priority] [due date]
+ * - add <title> [priority] [due date]
  * - edit <id> <title> [priority] [due date]
  * - delete <id>
  * - complete <id>
- * - show
+ * - show (filter) (sort) (subtasks)
+ * - label
+ * - subtask <id>
+ * UI:
+ *  > help
+ *  > add [Enter]
+ *  add Task >
+ *      title: ...
  */
 
 #include "model/Task.h"
@@ -16,8 +23,8 @@ int main() {
     TaskManager tm;
     TaskID id1 = tm.Add(Task::Create("My First Task",Task::Priority::HIGH,"in 01:10:05"));
     TaskID id2 = tm.Add(Task::Create("Second Task","16/11/21 19:00"));
+    TaskID id12 = tm.Add(Task::Create("First Task's subtask","in 02:00:00"), id1);
 
-    auto currTasks = tm.getTasks();
     std::cout << "First call ------\n";
     tm.Show(std::cout);
 
