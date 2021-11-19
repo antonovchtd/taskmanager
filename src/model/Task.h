@@ -13,10 +13,10 @@
 class Task {
 public:
     enum class Priority {
-        HIGH = 0,
+        NONE = 0,
         LOW,
         MEDIUM,
-        NONE
+        HIGH
     };
     static Task Create(const std::string& title, Task::Priority p, time_t due_date, bool complete_flag);
     static Task Create(const std::string& title, Task::Priority p, const std::string& due_date, bool complete_flag);
