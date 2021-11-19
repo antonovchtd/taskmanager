@@ -13,6 +13,7 @@ public:
     Node() : ancestor_(TaskID(0)) { };
     Node(TaskID ancestor) : ancestor_(ancestor) { };
     void AddChild(const TaskID&);
+    void removeChild(const TaskID&);
     TaskID parent();
     std::vector<TaskID> children();
 
