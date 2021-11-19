@@ -14,15 +14,15 @@ class Task {
 public:
     enum class Priority {
         HIGH = 0,
-        MEDIUM,
         LOW,
+        MEDIUM,
         NONE
     };
     static Task Create(const std::string& title, Task::Priority p, time_t due_date, bool complete_flag);
     static Task Create(const std::string& title, Task::Priority p, const std::string& due_date, bool complete_flag);
 
 public:
-    Task() : Task("Default", Priority::NONE, 0) { };
+    Task() : Task("Default", Priority::NONE, 0, false) { };
     time_t due_date() const { return due_date_; };
     std::string title() const { return title_; };
     Priority priority() const { return priority_; };
@@ -30,8 +30,8 @@ public:
     bool operator==(const Task&) const;
 
 private:
-    Task(std::string title, Task::Priority p, time_t due_date);
-    Task(std::string title, Task::Priority p, const std::string &due_date);
+    Task(std::string title, Task::Priority p, time_t due_date, bool complete_flag);
+    Task(std::string title, Task::Priority p, const std::string &due_date, bool complete_flag);
 
 private:
     std::string title_;
