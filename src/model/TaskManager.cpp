@@ -5,15 +5,17 @@
 
 #include "TaskManager.h"
 
-TaskID TaskManager::Add(Task t) {
+TaskID TaskManager::Add(Task t, TaskID ancestor) {
     TaskID id = gen_->genID();
     if (Validate(id))
         throw std::runtime_error("TaskManager::Add attempts to overwrite task");
-    tasks_[id] = std::move(t);
+    tasks_[id] = std::make_pair(std::move(t), Node(ancestor));
+    if (ancestor.value())
+        tasks_[ancestor].second.AddChild(id);
     return id;
 }
 
-std::map<TaskID, Task> TaskManager::getTasks() const {
+std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks() const {
     return tasks_;
 }
 
@@ -22,32 +24,34 @@ void TaskManager::Delete(TaskID k) {
 }
 
 void TaskManager::Edit(TaskID k, Task t) {
-    tasks_[k] = std::move(t);
+    tasks_[k].first = std::move(t);
 }
 
 void TaskManager::Complete(TaskID k) {
-    tasks_[k].setComplete(true);
+    tasks_[k].first.setComplete(true);
+}
+
+std::pair<Task, Node> TaskManager::operator[](TaskID id) {
+    return tasks_[id];
+}
+
+std::ostream & operator<<(std::ostream &os, const TaskID& id);
+std::ostream & operator<<(std::ostream &os, const Task& t);
+
+void TaskManager::recursivePrint(std::ostream &os, TaskID id, std::string prefix) const {
+    auto value = tasks_.at(id);
+    os << prefix << id << " — " << value.first;
+    for (const auto &ch : value.second.children())
+        recursivePrint(os, ch, prefix + "    ");
 }
 
 std::ostream & operator<<(std::ostream &os, const TaskManager& tm){
     auto tasks = tm.getTasks();
-    const std::string priorityName[] = {"High", "Medium", "Low", "None"};
     for (const auto &t : tasks){
-        os << t.first.value() << " — " << t.second.title() << ", Priority: " <<
-           priorityName[static_cast<int>(t.second.priority())];
-        if (t.second.due_date() < time(nullptr))
-            os << " [overdue] ";
-        else {
-            time_t dd = t.second.due_date();
-            std::string str_time = std::string(asctime(localtime(&dd)));
-            str_time.pop_back();
-            os << ", Due: " << str_time;
-        }
-        if (t.second.isComplete()){
-            os << " [completed] ";
-        }
-        os << std::endl;
-
+        TaskID id = t.first;
+        auto value = t.second;
+        if (value.second.parent() == TaskID(0))
+            tm.recursivePrint(os, id, "");
     }
     return os;
 }
