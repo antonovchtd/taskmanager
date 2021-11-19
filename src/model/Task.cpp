@@ -20,7 +20,7 @@ Task::Task(std::string title, Task::Priority p, const std::string &due_date, boo
         Task(std::move(title), p, 0, complete_flag)
 {
     std::smatch matches;
-    if (std::regex_search(due_date, matches, std::regex(R"(in (\d+:)?(\d+):(\d)+)"))){
+    if (std::regex_search(due_date, matches, std::regex(R"(in (\d+:)?(\d+):(\d+))"))){
         due_date_ = time(nullptr) + std::atoi(matches.str(1).c_str())*24*3600
                 + std::atoi(matches.str(2).c_str())*3600
                 + std::atoi(matches.str(3).c_str())*60;
