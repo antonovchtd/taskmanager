@@ -18,7 +18,7 @@
 class TaskManager {
 public:
     TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator)) {};
-    TaskManager(std::shared_ptr<IDGenerator> generator) : gen_(generator) { };
+    explicit TaskManager(std::shared_ptr<IDGenerator> generator) : gen_(generator) { };
     TaskID Add(Task, TaskID ancestor = TaskID::invalidID());
     void Edit(TaskID, Task);
     void Complete(TaskID);
