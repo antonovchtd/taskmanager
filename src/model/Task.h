@@ -30,7 +30,6 @@ public:
     std::string title() const { return title_; };
     Priority priority() const { return priority_; };
     bool isComplete() const { return isComplete_; };
-    void setComplete(bool);
     Task() : Task("Default", Priority::NONE, 0) { };
     bool operator==(const Task&) const;
 

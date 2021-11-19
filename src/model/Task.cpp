@@ -77,10 +77,6 @@ Task Task::Create(const std::string &title, const std::string &due_date) {
     return {title, Task::Priority::NONE, due_date};
 }
 
-void Task::setComplete(bool status) {
-    isComplete_ = status;
-}
-
 bool Task::operator==(const Task& rhs) const{
     return title_ == rhs.title()
         && priority_ == rhs.priority()
