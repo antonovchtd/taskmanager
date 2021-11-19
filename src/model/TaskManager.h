@@ -19,13 +19,13 @@ class TaskManager {
 public:
     TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator)) {};
     TaskManager(std::shared_ptr<IDGenerator> generator) : gen_(generator) { };
-    TaskID Add(Task, TaskID ancestor = TaskID(0));
+    TaskID Add(Task, TaskID ancestor = TaskID::invalidID());
     void Edit(TaskID, Task);
     void Complete(TaskID);
     void Delete(TaskID);
     void Show(std::ostream &os) const;
     std::pair<Task, Node> operator[](TaskID);
-    void recursivePrint(std::ostream &, TaskID, std::string) const;
+    void recursivePrint(std::ostream &, TaskID, const std::string&) const;
 
     std::map<TaskID, std::pair<Task, Node>> getTasks() const;
     bool Validate(TaskID id) const;
