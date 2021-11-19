@@ -9,6 +9,7 @@ class TaskID{
 public:
     explicit TaskID(unsigned int val) : value_(val) { };
     unsigned int value() const;
+    static TaskID invalidID();
     bool operator==(const TaskID&) const;
     bool operator!=(const TaskID&) const;
     bool operator<(const TaskID&) const;

@@ -9,6 +9,10 @@ unsigned int TaskID::value() const {
     return value_;
 }
 
+TaskID TaskID::invalidID() {
+    return TaskID(0);
+}
+
 bool TaskID::operator==(const TaskID& rhs) const{
     return value_ == rhs.value();
 }
