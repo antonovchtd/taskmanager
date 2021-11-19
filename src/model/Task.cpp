@@ -69,7 +69,7 @@ bool Task::operator==(const Task& rhs) const{
 }
 
 std::ostream & operator<<(std::ostream &os, const Task& t) {
-    const std::string priorityName[] = {"High", "Medium", "Low", "None"};
+    const std::string priorityName[] = { "None", "Low", "Medium", "High"};
     os << t.title() << ", Priority: " <<
        priorityName[static_cast<int>(t.priority())];
     if (t.due_date() < time(nullptr))
