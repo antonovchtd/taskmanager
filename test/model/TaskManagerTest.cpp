@@ -30,13 +30,13 @@ public:
 TEST_F(TaskManagerTest, shouldAddTask)
 {
     TaskManager tm;
-    auto id = tm.Add(Task::Create("TestTitle"));
+    auto id = tm.Add(Task::Create("TestTitle", Task::Priority::NONE, "in 00:00", false));
     EXPECT_TRUE(tm.Validate(TaskID(id)));
 }
 
 TEST_F(TaskManagerTest, shouldEdit)
 {
-    Task t = Task::Create("My Test Task", Task::Priority::MEDIUM, "16/11/2021 19:00");
+    Task t = Task::Create("My Test Task", Task::Priority::MEDIUM, "16/11/2021 19:00", false);
     TaskManager tm;
     TaskID id = tm.Add(Task{});
     tm.Edit(id, t);
@@ -47,7 +47,7 @@ TEST_F(TaskManagerTest, shouldEdit)
 TEST_F(TaskManagerTest, shouldDeleteTask)
 {
     TaskManager tm;
-    auto id = tm.Add(Task::Create("TestTitle"));
+    auto id = tm.Add(Task::Create("TestTitle", Task::Priority::NONE, "in 00:00", false));
     tm.Delete(id);
     EXPECT_FALSE(tm.Validate(TaskID(id)));
 }
@@ -55,10 +55,10 @@ TEST_F(TaskManagerTest, shouldDeleteTask)
 TEST_F(TaskManagerTest, shouldCompleteTask)
 {
     TaskManager tm;
-    auto id = tm.Add(Task::Create("TestTitle"));
+    auto id = tm.Add(Task::Create("TestTitle", Task::Priority::NONE, "in 00:00", false));
     tm.Complete(id);
     auto tasks = tm.getTasks();
-    EXPECT_TRUE(tasks.find(id)->second.isComplete());
+    EXPECT_TRUE(tasks.find(id)->second.first.isComplete());
 }
 
 TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtAddingTasksSameID)
@@ -71,8 +71,8 @@ TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtAddingTasksSameID)
         .WillOnce(Return(TaskID(2)));
 
     TaskManager tm(generator);
-    Task t1 = Task::Create("My Test Task 1", Task::Priority::MEDIUM, "30/11/2021 19:00");
-    Task t2 = Task::Create("My Test Task 2", Task::Priority::MEDIUM, "in 02:00:00");
+    Task t1 = Task::Create("My Test Task 1", Task::Priority::MEDIUM, "30/11/2021 19:00", false);
+    Task t2 = Task::Create("My Test Task 2", Task::Priority::MEDIUM, "in 02:00:00", false);
     TaskID id1 = tm.Add(t1);
     TaskID id2 = tm.Add(t2);
 //    TaskID id3 = tm.Add(t2);
