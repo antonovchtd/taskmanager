@@ -23,12 +23,13 @@ void TaskManager::Delete(TaskID k) {
     tasks_.erase(k);
 }
 
-void TaskManager::Edit(TaskID k, Task t) {
-    tasks_[k].first = std::move(t);
+void TaskManager::Edit(TaskID id, Task t) {
+    tasks_[id].first = std::move(t);
 }
 
-void TaskManager::Complete(TaskID k) {
-    tasks_[k].first.setComplete(true);
+void TaskManager::Complete(TaskID id) {
+    Task t = tasks_[id].first;
+    this->Edit(id, Task::Create(t.title(), t.priority(), t.due_date(), true));
 }
 
 std::pair<Task, Node> TaskManager::operator[](TaskID id) {
