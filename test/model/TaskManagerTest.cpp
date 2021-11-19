@@ -61,20 +61,21 @@ TEST_F(TaskManagerTest, shouldCompleteTask)
     EXPECT_TRUE(tasks.find(id)->second.isComplete());
 }
 
-TEST_F(TaskManagerTest, shouldAddMultipleTasks)
+TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtAddingTasksSameID)
 {
     std::shared_ptr<MockIDGenerator> generator = std::shared_ptr<MockIDGenerator>(new MockIDGenerator);
     EXPECT_CALL(*generator, genID())
         .Times(3)
         .WillOnce(Return(TaskID(1)))
         .WillOnce(Return(TaskID(2)))
-        .WillOnce(Return(TaskID(3)));
+        .WillOnce(Return(TaskID(2)));
 
     TaskManager tm(generator);
     Task t1 = Task::Create("My Test Task 1", Task::Priority::MEDIUM, "30/11/2021 19:00");
     Task t2 = Task::Create("My Test Task 2", Task::Priority::MEDIUM, "in 02:00:00");
     TaskID id1 = tm.Add(t1);
     TaskID id2 = tm.Add(t2);
-    TaskID id3 = tm.Add(t2);
-    EXPECT_EQ(3,tm.size());
+//    TaskID id3 = tm.Add(t2);
+//    EXPECT_EQ(3,tm.size());
+    EXPECT_THROW(tm.Add(t2), std::runtime_error);
 }
