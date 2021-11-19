@@ -9,7 +9,7 @@
 
 class IDGenerator{
 public:
-    IDGenerator() : last_(0) {};
+    IDGenerator() : last_(1) {};
     explicit IDGenerator(unsigned int last) : last_(last) {};
     IDGenerator(const IDGenerator&) = default;
     virtual TaskID genID();
