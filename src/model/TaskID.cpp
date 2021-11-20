@@ -1,7 +1,6 @@
 //
 // Created by Anton O. on 11/16/21.
 //
-#include <iostream>
 
 #include "TaskID.h"
 
@@ -28,4 +27,9 @@ bool TaskID::operator<(const TaskID& rhs) const{
 std::ostream & operator<<(std::ostream &os, const TaskID& id){
     os << id.value();
     return os;
+}
+
+std::istream& operator>>(std::istream& is, TaskID& id){
+    is >> id.value_;
+    return is;
 }

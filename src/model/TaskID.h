@@ -5,8 +5,12 @@
 #ifndef TASKMANAGER_SRC_MODEL_TASKID_H_
 #define TASKMANAGER_SRC_MODEL_TASKID_H_
 
+#include <iostream>
+
 class TaskID{
 public:
+    friend std::istream& operator>>(std::istream& is, TaskID& id);
+
     explicit TaskID(unsigned int val) : value_(val) { };
     unsigned int value() const;
     static TaskID invalidID();
