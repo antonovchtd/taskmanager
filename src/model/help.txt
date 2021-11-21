@@ -1,0 +1,31 @@
+    The following lists and describes commands to be used with the current TaskManager
+    program.
+
+    add     enters a wizard that prompts you to enter in succession: the new task's title,
+            priority and due date in the format dd/mm/yy (or yyyy) + optionally time in the
+            format hh:mm. Alternatively, the due date can be set relatively to the current
+            time by typing "in dd:hh:mm" (days are optional). If nothing is entered,
+            priority defaults to NONE, and due date to now.
+
+    edit <id>   enters the same wizard as "add", but overwrites the existing entry with
+                the ID given by <id>.
+
+    subtask <id>    enters the same wizard as "add", but the new task is generated as a
+                    subtask of the one given by <id>.
+
+    delete <id>     deletes (sub)task with the ID <id>.
+
+    complete <id>   marks the (sub)task with the ID <id> as complete.
+
+    label <id>      prompts the user to enter a label to be assigned to the task with ID
+                    <id>.
+
+    show <label>    when used with no argument, displays all tasks and their subtasks in a
+                    hierarchy, along with their IDs. When a label is given, shows only
+                    (sub)tasks with this label.
+
+    help    shows this help.
+
+    By default, all commands that require an <id> argument, use the last generated
+    (or used) ID number.
+
