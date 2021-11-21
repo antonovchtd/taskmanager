@@ -14,13 +14,15 @@ public:
     Node(TaskID ancestor) : ancestor_(ancestor) { };
     void AddChild(const TaskID&);
     void removeChild(const TaskID&);
-    TaskID parent();
-    std::vector<TaskID> children();
+    TaskID parent() const;
+    std::string label() const;
+    std::vector<TaskID> children() const;
+    void SetLabel(const std::string &);
 
 private:
     TaskID ancestor_;
     std::vector<TaskID> children_;
-
+    std::string label_;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_NODE_H_

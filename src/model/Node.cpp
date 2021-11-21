@@ -18,10 +18,18 @@ void Node::removeChild(const TaskID& id){
         children_.erase(ch);
 }
 
-TaskID Node::parent(){
+TaskID Node::parent() const{
     return ancestor_;
 }
 
-std::vector<TaskID> Node::children(){
+std::string Node::label() const{
+    return label_;
+}
+
+std::vector<TaskID> Node::children() const{
     return children_;
+}
+
+void Node::SetLabel(const std::string & s) {
+    label_ = s;
 }
