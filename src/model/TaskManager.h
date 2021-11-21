@@ -24,8 +24,9 @@ public:
     void Complete(TaskID);
     void Delete(TaskID);
     void Show(std::ostream &os) const;
-    std::pair<Task, Node> operator[](TaskID);
-    void recursivePrint(std::ostream &, TaskID, const std::string&) const;
+    void Show(std::ostream &os, std::string &s) const;
+    std::pair<Task, Node>& operator[](TaskID);
+    void recursivePrint(std::ostream &, const std::pair<TaskID, std::pair<Task, Node>>&, const std::string&) const;
 
     std::map<TaskID, std::pair<Task, Node>> getTasks() const;
     bool Validate(TaskID id) const;

@@ -21,6 +21,8 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks() const {
 }
 
 void TaskManager::Delete(TaskID id) {
+    if (!tasks_[id].second.children().empty())
+        throw std::runtime_error("TaskManager::Delete attempts to delete task with subtasks");
     TaskID ancestor = tasks_[id].second.parent();
     if (Validate(ancestor))
         tasks_[ancestor].second.removeChild(id);
@@ -36,33 +38,38 @@ void TaskManager::Complete(TaskID id) {
     this->Edit(id, Task::Create(t.title(), t.priority(), t.due_date(), true));
 }
 
-std::pair<Task, Node> TaskManager::operator[](TaskID id) {
+std::pair<Task, Node>& TaskManager::operator[](TaskID id) {
     return tasks_[id];
 }
 
 std::ostream & operator<<(std::ostream &os, const TaskID& id);
 std::ostream & operator<<(std::ostream &os, const Task& t);
 
-void TaskManager::recursivePrint(std::ostream &os, TaskID id, const std::string& prefix) const {
-    auto value = tasks_.at(id);
-    os << prefix << id << " — " << value.first;
-    for (const auto &ch : value.second.children())
-        recursivePrint(os, ch, prefix + "    ");
-}
-
-std::ostream & operator<<(std::ostream &os, const TaskManager& tm){
-    auto tasks = tm.getTasks();
-    for (const auto &t : tasks){
-        TaskID id = t.first;
-        auto value = t.second;
-        if (value.second.parent() == TaskID::invalidID())
-            tm.recursivePrint(os, id, "");
-    }
+std::ostream & operator<<(std::ostream &os, const std::pair<TaskID, std::pair<Task, Node>>& kv){
+    os << kv.first << " — " << kv.second.first;
     return os;
 }
 
+void TaskManager::recursivePrint(std::ostream &os, const std::pair<TaskID, std::pair<Task, Node>>& kv, const std::string& prefix) const {
+    os << prefix << kv;
+    for (const auto &id : kv.second.second.children()) {
+        auto ch = std::make_pair(id, tasks_.at(id));
+        recursivePrint(os, ch, prefix + "    ");
+    }
+}
+
 void TaskManager::Show(std::ostream &os) const{
-    os << *this;
+    for (const auto &kv : tasks_){
+        if (kv.second.second.parent() == TaskID::invalidID())
+            recursivePrint(os, kv, "");
+    }
+}
+
+void TaskManager::Show(std::ostream &os, std::string &label) const{
+    for (const auto &kv : tasks_){
+        if (kv.second.second.label() == label)
+            os << kv;
+    }
 }
 
 bool TaskManager::Validate(TaskID id) const{
