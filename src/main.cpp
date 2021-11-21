@@ -40,6 +40,7 @@ int main() {
     std::cout << "------ Third call ------\n";
     tm.Show(std::cout);
 
+    tm.Delete(id12);
     tm.Delete(id1);
     tm.Add(Task::Create("The Third Task",static_cast<Task::Priority>(1), "in 00:30", false));
     std::cout << "------ Fourth call ------\n";
