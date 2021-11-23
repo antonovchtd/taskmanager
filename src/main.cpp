@@ -19,6 +19,8 @@
 #include "model/Task.h"
 #include "model/TaskManager.h"
 #include "model/Prompt.h"
+#include "model/Context.h"
+#include "model/State.h"
 
 int main() {
     TaskManager tm;
@@ -46,12 +48,18 @@ int main() {
     std::cout << "------ Fourth call ------\n";
     tm.Show(std::cout);
 
-    Prompt prompt;
-    TaskManager tm2;
-    while (!prompt.quit_flag()){
-        prompt.ask(std::cout);
-        prompt.input(std::cout, std::cin);
-        prompt.act(std::cout, std::cin, tm2);
+//    Prompt prompt;
+//    TaskManager tm2;
+//    while (!prompt.quit_flag()){
+//        prompt.ask(std::cout);
+//        prompt.input(std::cout, std::cin);
+//        prompt.act(std::cout, std::cin, tm2);
+//    }
+
+    Context c;
+    c.changeState(std::shared_ptr<State>{new HomeState});
+    while (c.getState()){
+        c.execute();
     }
 
     return 0;
