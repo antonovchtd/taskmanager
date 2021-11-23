@@ -13,7 +13,7 @@
 class Context{
 public:
     virtual void execute();
-    void changeState(std::shared_ptr<State>);
+    void changeState(const std::shared_ptr<State> &);
     std::shared_ptr<State> getState () { return state_; };
 
 private:

@@ -8,6 +8,6 @@ void Context::execute(){
     state_->execute(*this);
 }
 
-void Context::changeState(std::shared_ptr<State> s) {
+void Context::changeState(const std::shared_ptr<State> &s) {
     state_ = s;
 }
