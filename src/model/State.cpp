@@ -16,7 +16,7 @@ std::string State::readline(const std::string &prompt) {
     return input;
 }
 
-void HomeState::execute(Context *c) {
+void HomeState::execute(Context & c) {
     std::string input = readline(" > ");
     std::shared_ptr<State> nextState;
     if (input == "add"){
@@ -32,18 +32,22 @@ void HomeState::execute(Context *c) {
         std::cout << "Wrong command. Try again. Type `help` for help.\n";
         nextState = std::shared_ptr<State>{new HomeState};
     }
-    c->changeState(nextState);
+    c.changeState(nextState);
 }
 
-void HelpState::execute(Context *c){
+void HelpState::execute(Context &c){
     std::ifstream f("../src/model/help.txt");
     if (f.is_open()) {
         std::cout << f.rdbuf();
         f.close();
     }
-    c->changeState(std::shared_ptr<State>{new HomeState});
+    c.changeState(std::shared_ptr<State>{new HomeState});
 }
 
-void QuitState::execute(Context *c){
-    c->changeState(nullptr);
+void QuitState::execute(Context &c){
+    c.changeState(nullptr);
+}
+
+void AddState::execute(Context &c) {
+
 }

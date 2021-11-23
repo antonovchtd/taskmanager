@@ -14,7 +14,7 @@ class Context;
 
 class State{
 public:
-    virtual void execute(Context* c) = 0;
+    virtual void execute(Context &c) = 0;
     std::string readline(const std::string &prompt);
 
 protected:
@@ -22,19 +22,20 @@ protected:
 };
 
 class HomeState : public State{
-    virtual void execute(Context* c) override;
+    virtual void execute(Context &c) override;
 };
 
 class HelpState : public State{
-    virtual void execute(Context* c) override;
+    virtual void execute(Context &c) override;
 };
 
 class AddState : public State{
-    virtual void execute(Context* c) override;
+    virtual void execute(Context &c) override;
+
 };
 
 class QuitState : public State{
-    virtual void execute(Context* c) override;
+    virtual void execute(Context &c) override;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_STATE_H_
