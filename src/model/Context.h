@@ -16,21 +16,20 @@ class Context{
 public:
     virtual void execute(StateFactory &f);
     void changeState(const std::shared_ptr<State> &);
+
     std::shared_ptr<State> getState () { return state_; };
-//    void setTask(const Task &);
-//    Task getTask() const;
     void setTitle(const std::string &);
     void setDueDate(const std::string &);
     void setPriority(const Task::Priority &);
 
 private:
+    //TODO for testing/development
     friend class AddTaskState;
     friend class ShowState;
+
+    Task::Data data_;
     std::shared_ptr<State> state_;
-//    Task task_ = Task{};
-    std::string title_;
-    std::string due_date_;
-    Task::Priority priority_;
+    //TODO TaskManager has to be removed from context
     std::shared_ptr<TaskManager> man_ = std::shared_ptr<TaskManager>{new TaskManager};
 };
 
