@@ -21,11 +21,11 @@ void Context::changeState(const std::shared_ptr<State> &s) {
 //}
 
 void Context::setTitle(const std::string &title){
-    title_ = title;
+    data_.title = title;
 }
 void Context::setDueDate(const std::string & dd){
-    due_date_ = dd;
+    data_.due_date = dd;
 }
 void Context::setPriority(const Task::Priority &p){
-    priority_ = p;
+    data_.priority = p;
 }
