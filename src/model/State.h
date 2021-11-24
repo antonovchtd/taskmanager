@@ -10,15 +10,17 @@
 #include <iostream>
 #include <fstream>
 
+#include "StateFactory.h"
+
 class Context;
 
 class State{
 public:
     virtual void execute(Context &c) = 0;
-    std::string readline(const std::string &prompt);
+    static std::string readline(const std::string &prompt);
 
 protected:
-    void changeState(std::shared_ptr<Context>, std::shared_ptr<State>);
+    void changeState(const std::shared_ptr<Context> &, std::shared_ptr<State>);
 };
 
 class HomeState : public State{
@@ -34,7 +36,30 @@ class AddState : public State{
 
 };
 
+class ReadTitleState : public State{
+    virtual void execute(Context &c) override;
+
+};
+
+class ReadPriorityState : public State{
+    virtual void execute(Context &c) override;
+
+};
+
+class ReadDueDateState : public State{
+    virtual void execute(Context &c) override;
+
+};
+
 class QuitState : public State{
+    virtual void execute(Context &c) override;
+};
+
+class AddTaskState : public State{
+    virtual void execute(Context &c) override;
+};
+
+class ShowState : public State{
     virtual void execute(Context &c) override;
 };
 
