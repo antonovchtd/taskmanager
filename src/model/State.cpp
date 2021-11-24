@@ -13,7 +13,7 @@ void State::changeState(const std::shared_ptr<Context> &c, std::shared_ptr<State
 std::string State::readline(const std::string &prompt) {
     std::cout << prompt;
     std::string input;
-    std::cin >> input;
+    getline(std::cin, input);
     return input;
 }
 
@@ -75,7 +75,7 @@ void ReadDueDateState::execute(Context &c, StateFactory &f) {
 }
 
 void AddTaskState::execute(Context &c, StateFactory &f) {
-    c.man_->Add(Task::Create(c.title_, c.priority_, c.due_date_, false));
+    c.man_->Add(Task::Create(c.data_));
     c.changeState(f.create("HomeState"));
 }
 
