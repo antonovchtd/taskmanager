@@ -9,11 +9,12 @@
 #include <iostream>
 
 #include "State.h"
+#include "StateFactory.h"
 #include "TaskManager.h"
 
 class Context{
 public:
-    virtual void execute();
+    virtual void execute(StateFactory &f);
     void changeState(const std::shared_ptr<State> &);
     std::shared_ptr<State> getState () { return state_; };
 //    void setTask(const Task &);

@@ -16,51 +16,61 @@ class Context;
 
 class State{
 public:
-    virtual void execute(Context &c) = 0;
+    virtual void execute(Context &c, StateFactory &f) = 0;
     static std::string readline(const std::string &prompt);
+    virtual std::string classname() const { return "State"; }
 
 protected:
     void changeState(const std::shared_ptr<Context> &, std::shared_ptr<State>);
 };
 
 class HomeState : public State{
-    virtual void execute(Context &c) override;
+    void execute(Context &c, StateFactory &f) override;
+    std::string classname() const override { return "HomeState"; }
 };
 
 class HelpState : public State{
-    virtual void execute(Context &c) override;
+    void execute(Context &c, StateFactory &f) override;
+    std::string classname() const override { return "HelpState"; }
 };
 
 class AddState : public State{
-    virtual void execute(Context &c) override;
+    void execute(Context &c, StateFactory &f) override;
+    std::string classname() const override { return "AddState"; }
 
 };
 
 class ReadTitleState : public State{
-    virtual void execute(Context &c) override;
+    void execute(Context &c, StateFactory &f) override;
+    std::string classname() const override { return "ReadTitleState"; }
 
 };
 
 class ReadPriorityState : public State{
-    virtual void execute(Context &c) override;
+    void execute(Context &c, StateFactory &f) override;
+    std::string classname() const override { return "ReadPriorityState"; }
 
 };
 
 class ReadDueDateState : public State{
-    virtual void execute(Context &c) override;
+    void execute(Context &c, StateFactory &f) override;
+    std::string classname() const override { return "ReadDueDateState"; }
 
 };
 
 class QuitState : public State{
-    virtual void execute(Context &c) override;
+    void execute(Context &c, StateFactory &f) override;
+    std::string classname() const override { return "QuitState"; }
 };
 
 class AddTaskState : public State{
-    virtual void execute(Context &c) override;
+    void execute(Context &c, StateFactory &f) override;
+    std::string classname() const override { return "AddTaskState"; }
 };
 
 class ShowState : public State{
-    virtual void execute(Context &c) override;
+    void execute(Context &c, StateFactory &f) override;
+    std::string classname() const override { return "ShowState"; }
 };
 
 #endif //TASKMANAGER_SRC_MODEL_STATE_H_

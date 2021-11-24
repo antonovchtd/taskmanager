@@ -18,9 +18,10 @@
 
 #include "model/Task.h"
 #include "model/TaskManager.h"
-#include "model/Prompt.h"
+//#include "model/Prompt.h"
 #include "model/Context.h"
 #include "model/State.h"
+#include "model/StateFactory.h"
 
 int main() {
     TaskManager tm;
@@ -57,9 +58,10 @@ int main() {
 //    }
 
     Context c;
-    c.changeState(std::shared_ptr<State>{new HomeState});
+    StateFactory f;
+    c.changeState(f.create("HomeState"));
     while (c.getState()){
-        c.execute();
+        c.execute(f);
     }
 
     return 0;

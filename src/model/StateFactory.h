@@ -7,13 +7,16 @@
 
 #include <memory>
 #include <string>
-#include "State.h"
+#include <map>
+//#include "State.h"
 
 class State;
 
 class StateFactory{
 public:
-    static std::shared_ptr<State> create(const std::string &);
+    std::shared_ptr<State> create(const std::string &) ;
+private:
+    std::map<std::string, std::shared_ptr<State>> steps_;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_STATEFACTORY_H_

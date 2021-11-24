@@ -4,8 +4,8 @@
 
 #include "Context.h"
 
-void Context::execute(){
-    state_->execute(*this);
+void Context::execute(StateFactory &f) {
+    state_->execute(*this, f);
 }
 
 void Context::changeState(const std::shared_ptr<State> &s) {

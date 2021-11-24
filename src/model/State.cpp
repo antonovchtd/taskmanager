@@ -4,6 +4,7 @@
 
 #include "Context.h"
 #include "State.h"
+#include "StateFactory.h"
 
 void State::changeState(const std::shared_ptr<Context> &c, std::shared_ptr<State> s) {
     c->changeState(s);
@@ -16,31 +17,30 @@ std::string State::readline(const std::string &prompt) {
     return input;
 }
 
-void HomeState::execute(Context & c) {
+void HomeState::execute(Context &c, StateFactory &f) {
     std::string command = State::readline(" > ");
-    std::shared_ptr<State> nextState = StateFactory::create(command);
-    c.changeState(nextState);
+    c.changeState(f.create(command));
 }
 
-void HelpState::execute(Context &c){
-    std::ifstream f("../src/model/help.txt");
-    if (f.is_open()) {
-        std::cout << f.rdbuf();
-        f.close();
+void HelpState::execute(Context &c, StateFactory &f) {
+    std::ifstream file("../src/model/help.txt");
+    if (file.is_open()) {
+        std::cout << file.rdbuf();
+        file.close();
     }
-    c.changeState(std::shared_ptr<State>{new HomeState});
+    c.changeState(f.create("HomeState"));
 }
 
-void QuitState::execute(Context &c){
+void QuitState::execute(Context &c, StateFactory &f) {
     c.changeState(nullptr);
 }
 
-void AddState::execute(Context &c) {
+void AddState::execute(Context &c, StateFactory &f) {
     std::cout << "[Add Task]\n";
-    c.changeState(std::shared_ptr<State>{new ReadTitleState});
+    c.changeState(f.create("ReadTitleState"));
 }
 
-void ReadTitleState::execute(Context &c) {
+void ReadTitleState::execute(Context &c, StateFactory &f) {
     std::string title;
     while (true){
         title = State::readline("    Title > ");
@@ -50,10 +50,10 @@ void ReadTitleState::execute(Context &c) {
             break;
     }
     c.setTitle(title);
-    c.changeState(std::shared_ptr<State>{new ReadPriorityState});
+    c.changeState(f.create("ReadPriorityState"));
 }
 
-void ReadPriorityState::execute(Context &c) {
+void ReadPriorityState::execute(Context &c, StateFactory &f) {
     std::string p;
     int pint;
     while (true){
@@ -65,21 +65,21 @@ void ReadPriorityState::execute(Context &c) {
             std::cout << "    Wrong priority option. Try again.\n";
     }
     c.setPriority(static_cast<Task::Priority>(pint));
-    c.changeState(std::shared_ptr<State>{new ReadDueDateState});
+    c.changeState(f.create("ReadDueDateState"));
 }
 
-void ReadDueDateState::execute(Context &c) {
+void ReadDueDateState::execute(Context &c, StateFactory &f) {
     std::string dd = State::readline("    Due > ");
     c.setDueDate(dd);
-    c.changeState(std::shared_ptr<State>{new AddTaskState});
+    c.changeState(f.create("AddTaskState"));
 }
 
-void AddTaskState::execute(Context &c) {
+void AddTaskState::execute(Context &c, StateFactory &f) {
     c.man_->Add(Task::Create(c.title_, c.priority_, c.due_date_, false));
-    c.changeState(std::shared_ptr<State>{new HomeState});
+    c.changeState(f.create("HomeState"));
 }
 
-void ShowState::execute(Context &c) {
+void ShowState::execute(Context &c, StateFactory &f) {
     c.man_->Show(std::cout);
-    c.changeState(std::shared_ptr<State>{new HomeState});
+    c.changeState(f.create("HomeState"));
 }
