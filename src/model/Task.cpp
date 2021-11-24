@@ -54,6 +54,10 @@ Task::Task(std::string title, Task::Priority p, const std::string &due_date, boo
 
 };
 
+Task Task::Create(const Task::Data &d) {
+    return Task::Create(d.title, d.priority, d.due_date, false);
+}
+
 Task Task::Create(const std::string &title, Task::Priority p, time_t due_date, bool complete_flag) {
     return {title, p, due_date, complete_flag};
 }
