@@ -8,7 +8,6 @@
 #include <string>
 #include <ctime>
 #include <map>
-#include <optional>
 
 //Value Type
 class Task {
@@ -25,7 +24,6 @@ public:
         time_t due_date;
     };
     static Task Create(const std::string& title, Task::Priority p, time_t due_date, bool complete_flag);
-    static Task Create(const std::string& title, Task::Priority p, const std::string& due_date, bool complete_flag);
     static Task Create(const Task::Data&);
 
 public:
@@ -38,7 +36,6 @@ public:
 
 private:
     Task(std::string title, Task::Priority p, time_t due_date, bool complete_flag);
-    Task(std::string title, Task::Priority p, const std::string &due_date, bool complete_flag);
 
 private:
     std::string title_;
