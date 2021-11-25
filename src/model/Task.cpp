@@ -2,7 +2,6 @@
 // Created by Anton Ovcharenko on 08.11.2021.
 //
 #include <iostream>
-#include <regex>
 
 #include "Task.h"
 
@@ -12,66 +11,15 @@ Task::Task(std::string title, Task::Priority p, time_t due_date, bool complete_f
     due_date_{due_date},
     isComplete_(complete_flag)
 {
-    if (title_.empty())
-        throw std::runtime_error("Empty title string.");
 };
-
-Task::Task(std::string title, Task::Priority p, const std::string &due_date, bool complete_flag) :
-        Task(std::move(title), p, 0, complete_flag)
-{
-    auto dd = Task::stringToTime(due_date);
-    if (dd)
-        due_date_ = dd.value();
-    else
-        throw std::runtime_error("Wrong date format.");
-};
-
-std::optional<time_t> Task::stringToTime(std::string datestring) {
-    std::smatch matches;
-    if (std::regex_search(datestring, matches, std::regex(R"(in (\d+:)?(\d+):(\d+))"))){
-        return time(nullptr) + std::atoi(matches.str(1).c_str())*24*3600
-                    + std::atoi(matches.str(2).c_str())*3600
-                    + std::atoi(matches.str(3).c_str())*60;
-    }
-    else if (std::regex_search(datestring, matches, std::regex(R"((\d+)/(\d+)(/(\d+))?( (\d+):(\d+))?)"))){
-        time_t rawtime;
-        time(&rawtime);
-        struct tm * timeinfo = localtime(&rawtime);
-        timeinfo->tm_mday = std::atoi(matches.str(1).c_str());
-        timeinfo->tm_mon = std::atoi(matches.str(2).c_str())-1;
-        if (!matches.str(3).empty()){
-            int year = std::atoi(matches.str(4).c_str());
-            if (year > 1900)
-                year -= 1900;
-            else
-                year += 100;
-            timeinfo->tm_year = year;
-        }
-        if (!matches.str(5).empty()) {
-            timeinfo->tm_hour = std::atoi(matches.str(6).c_str());
-            timeinfo->tm_min = std::atoi(matches.str(7).c_str());
-        }
-        else
-        {
-            timeinfo->tm_hour = 0;
-            timeinfo->tm_min = 0;
-        }
-        timeinfo->tm_sec = 0;
-        return mktime(timeinfo);
-    }
-    else
-        return std::nullopt;
-}
 
 Task Task::Create(const Task::Data &d) {
     return Task::Create(d.title, d.priority, d.due_date, false);
 }
 
 Task Task::Create(const std::string &title, Task::Priority p, time_t due_date, bool complete_flag) {
-    return {title, p, due_date, complete_flag};
-}
-
-Task Task::Create(const std::string &title, Task::Priority p, const std::string &due_date, bool complete_flag) {
+    if (title.empty())
+        throw std::runtime_error("Empty title string.");
     return {title, p, due_date, complete_flag};
 }
 

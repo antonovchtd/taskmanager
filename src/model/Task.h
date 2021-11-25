@@ -36,8 +36,6 @@ public:
     bool isComplete() const { return isComplete_; };
     bool operator==(const Task&) const;
 
-    static std::optional<time_t> stringToTime(std::string);
-
 private:
     Task(std::string title, Task::Priority p, time_t due_date, bool complete_flag);
     Task(std::string title, Task::Priority p, const std::string &due_date, bool complete_flag);
