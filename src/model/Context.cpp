@@ -23,7 +23,7 @@ void Context::changeState(const std::shared_ptr<State> &s) {
 void Context::setTitle(const std::string &title){
     data_.title = title;
 }
-void Context::setDueDate(const std::string & dd){
+void Context::setDueDate(const time_t & dd){
     data_.due_date = dd;
 }
 void Context::setPriority(const Task::Priority &p){

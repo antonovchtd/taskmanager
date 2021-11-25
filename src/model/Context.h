@@ -19,7 +19,7 @@ public:
 
     std::shared_ptr<State> getState () { return state_; };
     void setTitle(const std::string &);
-    void setDueDate(const std::string &);
+    void setDueDate(const time_t &);
     void setPriority(const Task::Priority &);
 
 private:
