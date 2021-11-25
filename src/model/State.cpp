@@ -6,12 +6,16 @@
 #include "State.h"
 #include "StateFactory.h"
 
-void State::changeState(const std::shared_ptr<Context> &c, std::shared_ptr<State> s) {
+void State::changeState(const std::shared_ptr<Context> &c, const std::shared_ptr<State> &s) {
     c->changeState(s);
 }
 
+void State::printline(const std::string &line){
+    std::cout << line;
+}
+
 std::string State::readline(const std::string &prompt) {
-    std::cout << prompt;
+    State::printline(prompt);
     std::string input;
     getline(std::cin, input);
     return input;
@@ -24,8 +28,10 @@ void HomeState::execute(Context &c, StateFactory &f) {
 
 void HelpState::execute(Context &c, StateFactory &f) {
     std::ifstream file("../src/model/help.txt");
+    std::string line;
     if (file.is_open()) {
-        std::cout << file.rdbuf();
+        while (getline(file, line))
+            State::printline(line + "\n");
         file.close();
     }
     c.changeState(f.create("HomeState"));
@@ -36,7 +42,7 @@ void QuitState::execute(Context &c, StateFactory &f) {
 }
 
 void AddState::execute(Context &c, StateFactory &f) {
-    std::cout << "[Add Task]\n";
+    State::printline("[Add Task]\n");
     c.changeState(f.create("ReadTitleState"));
 }
 
@@ -45,7 +51,7 @@ void ReadTitleState::execute(Context &c, StateFactory &f) {
     while (true){
         title = State::readline("    Title > ");
         if (title.empty())
-            std::cout << "Title cannot be empty!\n";
+            State::printline("Title cannot be empty!\n");
         else
             break;
     }
@@ -62,15 +68,23 @@ void ReadPriorityState::execute(Context &c, StateFactory &f) {
         if (pint >= 0 && pint <= 3)
             break;
         else
-            std::cout << "    Wrong priority option. Try again.\n";
+            State::printline("    Wrong priority option. Try again.\n");
     }
     c.setPriority(static_cast<Task::Priority>(pint));
     c.changeState(f.create("ReadDueDateState"));
 }
 
 void ReadDueDateState::execute(Context &c, StateFactory &f) {
-    std::string dd = State::readline("    Due > ");
-    c.setDueDate(dd);
+    std::optional<time_t> due_date;
+    while (true) {
+        std::string datestring = State::readline("    Due > ");
+        due_date = Task::stringToTime(datestring);
+        if (due_date)
+            break;
+        else
+            State::printline("    Wrong date format. Try again.\n");
+    }
+    c.setDueDate(due_date.value());
     c.changeState(f.create("AddTaskState"));
 }
 
