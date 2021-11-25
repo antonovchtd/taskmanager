@@ -8,6 +8,7 @@
 #include <string>
 #include <ctime>
 #include <map>
+#include <optional>
 
 //Value Type
 class Task {
@@ -21,7 +22,7 @@ public:
     struct Data{
         std::string title;
         Priority priority;
-        std::string due_date;
+        time_t due_date;
     };
     static Task Create(const std::string& title, Task::Priority p, time_t due_date, bool complete_flag);
     static Task Create(const std::string& title, Task::Priority p, const std::string& due_date, bool complete_flag);
@@ -34,6 +35,8 @@ public:
     Priority priority() const { return priority_; };
     bool isComplete() const { return isComplete_; };
     bool operator==(const Task&) const;
+
+    static std::optional<time_t> stringToTime(std::string);
 
 private:
     Task(std::string title, Task::Priority p, time_t due_date, bool complete_flag);
