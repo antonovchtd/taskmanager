@@ -21,7 +21,7 @@ public:
     void setTitle(const std::string &);
     void setDueDate(const time_t &);
     void setPriority(const Task::Priority &);
-    virtual ~Context() {};
+    virtual ~Context() = default;
 
 private:
     //TODO for testing/development
