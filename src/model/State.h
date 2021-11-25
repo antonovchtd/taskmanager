@@ -9,6 +9,7 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
+#include <regex>
 
 #include "StateFactory.h"
 
@@ -17,11 +18,11 @@ class Context;
 class State{
 public:
     virtual void execute(Context &c, StateFactory &f) = 0;
-    static std::string readline(const std::string &prompt);
-    static void printline(const std::string &line);
-    virtual ~State() {};
+    static std::string read(const std::string &prompt);
+    static void print(const std::string &line);
+    virtual ~State() = default;
 
-protected:
+public:
     void changeState(const std::shared_ptr<Context> &, const std::shared_ptr<State> &);
 };
 
@@ -47,6 +48,7 @@ class ReadPriorityState : public State{
 };
 
 class ReadDueDateState : public State{
+    static std::optional<time_t> stringToTime(std::string);
     void execute(Context &c, StateFactory &f) override;
 };
 
