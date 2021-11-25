@@ -19,6 +19,7 @@ public:
     virtual void execute(Context &c, StateFactory &f) = 0;
     static std::string readline(const std::string &prompt);
     static void printline(const std::string &line);
+    virtual ~State() {};
 
 protected:
     void changeState(const std::shared_ptr<Context> &, const std::shared_ptr<State> &);
