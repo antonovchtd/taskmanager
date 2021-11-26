@@ -8,8 +8,8 @@ unsigned int TaskID::value() const {
     return value_;
 }
 
-TaskID TaskID::invalidID() {
-    return TaskID(0);
+std::optional<TaskID> TaskID::invalidID() {
+    return std::nullopt;
 }
 
 bool TaskID::operator==(const TaskID& rhs) const{

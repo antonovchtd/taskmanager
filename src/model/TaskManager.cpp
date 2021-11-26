@@ -1,18 +1,17 @@
 //
 // Created by Anton Ovcharenko on 08.11.2021.
 //
-#include <iostream>
 
 #include "TaskManager.h"
 
-TaskID TaskManager::Add(Task t, TaskID ancestor) {
+TaskID TaskManager::Add(Task t, std::optional<TaskID> ancestor) {
     TaskID id = gen_->genID();
     if (Validate(id))
         throw std::runtime_error("TaskManager::Add attempts to overwrite task");
 
-    tasks_[id] = std::make_pair(std::move(t), Node(ancestor));
-    if (ancestor.value())
-        tasks_[ancestor].second.AddChild(id);
+    tasks_[id] = std::make_pair(std::move(t), Node(ancestor.value()));
+    if (ancestor)
+        tasks_[ancestor.value()].second.AddChild(id);
     return id;
 }
 
@@ -23,9 +22,9 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks() const {
 void TaskManager::Delete(TaskID id) {
     if (!tasks_[id].second.children().empty())
         throw std::runtime_error("TaskManager::Delete attempts to delete task with subtasks");
-    TaskID ancestor = tasks_[id].second.parent();
-    if (Validate(ancestor))
-        tasks_[ancestor].second.removeChild(id);
+    std::optional<TaskID> ancestor = tasks_[id].second.parent();
+    if (ancestor && Validate(ancestor.value()))
+        tasks_[ancestor.value()].second.removeChild(id);
     tasks_.erase(id);
 }
 

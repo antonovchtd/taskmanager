@@ -6,6 +6,7 @@
 #define TASKMANAGER_SRC_MODEL_TASKID_H_
 
 #include <iostream>
+#include <optional>
 
 class TaskID{
 public:
@@ -13,7 +14,7 @@ public:
 
     explicit TaskID(unsigned int val) : value_(val) { };
     unsigned int value() const;
-    static TaskID invalidID();
+    static std::optional<TaskID> invalidID();
     bool operator==(const TaskID&) const;
     bool operator!=(const TaskID&) const;
     bool operator<(const TaskID&) const;

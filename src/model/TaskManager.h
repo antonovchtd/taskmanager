@@ -6,6 +6,7 @@
 #define TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 
 
+#include <iostream>
 #include <cstdlib>
 #include <map>
 #include <utility>
@@ -19,7 +20,7 @@ class TaskManager {
 public:
     TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator)) {};
     explicit TaskManager(std::shared_ptr<IDGenerator> generator) : gen_(generator) { };
-    TaskID Add(Task, TaskID ancestor = TaskID::invalidID());
+    TaskID Add(Task, std::optional<TaskID> ancestor = TaskID::invalidID());
     void Edit(TaskID, Task);
     void Complete(TaskID);
     void Delete(TaskID);

@@ -18,7 +18,7 @@ void Node::removeChild(const TaskID& id){
         children_.erase(ch);
 }
 
-TaskID Node::parent() const{
+std::optional<TaskID> Node::parent() const{
     return ancestor_;
 }
 

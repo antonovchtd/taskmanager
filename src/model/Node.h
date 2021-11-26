@@ -10,17 +10,17 @@
 
 class Node{
 public:
-    Node() : ancestor_(TaskID(0)) { };
-    Node(TaskID ancestor) : ancestor_(ancestor) { };
+    Node() : ancestor_(TaskID::invalidID()) { };
+    Node(std::optional<TaskID> ancestor) : ancestor_(ancestor) { };
     void AddChild(const TaskID&);
     void removeChild(const TaskID&);
-    TaskID parent() const;
+    std::optional<TaskID> parent() const;
     std::string label() const;
     std::vector<TaskID> children() const;
     void SetLabel(const std::string &);
 
 private:
-    TaskID ancestor_;
+    std::optional<TaskID> ancestor_;
     std::vector<TaskID> children_;
     std::string label_;
 };
