@@ -2,8 +2,8 @@
 // Created by Anton O. on 11/22/21.
 //
 
-#ifndef TASKMANAGER_SRC_MODEL_STATE_H_
-#define TASKMANAGER_SRC_MODEL_STATE_H_
+#ifndef TASKMANAGER_SRC_UI_STATE_H_
+#define TASKMANAGER_SRC_UI_STATE_H_
 
 #include <string>
 #include <memory>
@@ -66,4 +66,4 @@ class ShowStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 };
 
-#endif //TASKMANAGER_SRC_MODEL_STATE_H_
+#endif //TASKMANAGER_SRC_UI_STATE_H_

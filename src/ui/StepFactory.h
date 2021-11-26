@@ -2,8 +2,8 @@
 // Created by Anton O. on 11/23/21.
 //
 
-#ifndef TASKMANAGER_SRC_MODEL_STATEFACTORY_H_
-#define TASKMANAGER_SRC_MODEL_STATEFACTORY_H_
+#ifndef TASKMANAGER_SRC_UI_STATEFACTORY_H_
+#define TASKMANAGER_SRC_UI_STATEFACTORY_H_
 
 #include <memory>
 #include <string>
@@ -54,4 +54,4 @@ private:
     std::map<State, std::shared_ptr<Step>> steps_;
 };
 
-#endif //TASKMANAGER_SRC_MODEL_STATEFACTORY_H_
+#endif //TASKMANAGER_SRC_UI_STATEFACTORY_H_

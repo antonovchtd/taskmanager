@@ -2,8 +2,8 @@
 // Created by Anton O. on 11/22/21.
 //
 
-#ifndef TASKMANAGER_SRC_MODEL_CONTEXT_H_
-#define TASKMANAGER_SRC_MODEL_CONTEXT_H_
+#ifndef TASKMANAGER_SRC_UI_CONTEXT_H_
+#define TASKMANAGER_SRC_UI_CONTEXT_H_
 
 #include <memory>
 #include <iostream>
@@ -35,4 +35,4 @@ private:
     std::shared_ptr<TaskManager> man_ = std::shared_ptr<TaskManager>{new TaskManager};
 };
 
-#endif //TASKMANAGER_SRC_MODEL_CONTEXT_H_
+#endif //TASKMANAGER_SRC_UI_CONTEXT_H_
