@@ -34,16 +34,16 @@ void HelpState::execute(Context &c, StateFactory &f) {
             State::print(line + "\n");
         file.close();
     }
-    c.changeState(f.create("HomeState"));
+    c.changeState(f.nextStep(*this));
 }
 
 void QuitState::execute(Context &c, StateFactory &f) {
-    c.changeState(nullptr);
+    c.changeState(f.nextStep(*this));
 }
 
 void AddState::execute(Context &c, StateFactory &f) {
     State::print("[Add Task]\n");
-    c.changeState(f.create("ReadTitleState"));
+    c.changeState(f.nextStep(*this));
 }
 
 void ReadTitleState::execute(Context &c, StateFactory &f) {
@@ -56,7 +56,7 @@ void ReadTitleState::execute(Context &c, StateFactory &f) {
             break;
     }
     c.setTitle(title);
-    c.changeState(f.create("ReadPriorityState"));
+    c.changeState(f.nextStep(*this));
 }
 
 void ReadPriorityState::execute(Context &c, StateFactory &f) {
@@ -71,7 +71,7 @@ void ReadPriorityState::execute(Context &c, StateFactory &f) {
             State::print("    Wrong priority option. Try again.\n");
     }
     c.setPriority(static_cast<Task::Priority>(pint));
-    c.changeState(f.create("ReadDueDateState"));
+    c.changeState(f.nextStep(*this));
 }
 
 void ReadDueDateState::execute(Context &c, StateFactory &f) {
@@ -85,17 +85,17 @@ void ReadDueDateState::execute(Context &c, StateFactory &f) {
             State::print("    Wrong date format. Try again.\n");
     }
     c.setDueDate(due_date.value());
-    c.changeState(f.create("AddTaskState"));
+    c.changeState(f.nextStep(*this));
 }
 
 void AddTaskState::execute(Context &c, StateFactory &f) {
     c.man_->Add(Task::Create(c.data_));
-    c.changeState(f.create("HomeState"));
+    c.changeState(f.nextStep(*this));
 }
 
 void ShowState::execute(Context &c, StateFactory &f) {
     c.man_->Show(std::cout);
-    c.changeState(f.create("HomeState"));
+    c.changeState(f.nextStep(*this));
 }
 
 std::optional<time_t> ReadDueDateState::stringToTime(std::string datestring) {

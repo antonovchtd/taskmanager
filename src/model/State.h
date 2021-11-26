@@ -10,8 +10,10 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include <optional>
 
-#include "StateFactory.h"
+//#include "StateFactory.h"
+class StateFactory;
 
 class Context;
 
