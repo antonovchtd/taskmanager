@@ -4,12 +4,12 @@
 
 #include "Context.h"
 
-void Context::execute(StateFactory &f) {
-    state_->execute(*this, f);
+void Context::execute(StepFactory &f) {
+    step_->execute(*this, f);
 }
 
-void Context::changeState(const std::shared_ptr<State> &s) {
-    state_ = s;
+void Context::changeStep(const std::shared_ptr<Step> &s) {
+    step_ = s;
 }
 
 //void Context::setTask(const Task &t){
@@ -21,11 +21,11 @@ void Context::changeState(const std::shared_ptr<State> &s) {
 //}
 
 void Context::setTitle(const std::string &title){
-    data_.title = title;
+    data_.title_ = title;
 }
 void Context::setDueDate(const time_t & dd){
-    data_.due_date = dd;
+    data_.due_date_ = dd;
 }
 void Context::setPriority(const Task::Priority &p){
-    data_.priority = p;
+    data_.priority_ = p;
 }

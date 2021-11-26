@@ -9,7 +9,7 @@ TaskID TaskManager::Add(Task t, std::optional<TaskID> ancestor) {
     if (Validate(id))
         throw std::runtime_error("TaskManager::Add attempts to overwrite task");
 
-    tasks_[id] = std::make_pair(std::move(t), Node(ancestor.value()));
+    tasks_[id] = std::make_pair(std::move(t), Node(ancestor));
     if (ancestor)
         tasks_[ancestor.value()].second.AddChild(id);
     return id;

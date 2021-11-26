@@ -20,8 +20,8 @@
 #include "model/TaskManager.h"
 //#include "model/Prompt.h"
 #include "model/Context.h"
-#include "model/State.h"
-#include "model/StateFactory.h"
+#include "model/Step.h"
+#include "model/StepFactory.h"
 
 int main() {
 //    TaskManager tm;
@@ -58,9 +58,9 @@ int main() {
 //    }
 
     Context c;
-    StateFactory f;
-    c.changeState(f.nextStep());
-    while (c.getState()){
+    StepFactory f;
+    c.changeStep(f.nextStep());
+    while (c.getStep()){
         c.execute(f);
     }
 

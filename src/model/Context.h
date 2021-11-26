@@ -8,16 +8,17 @@
 #include <memory>
 #include <iostream>
 
-#include "State.h"
-#include "StateFactory.h"
+#include "Step.h"
+#include "StepFactory.h"
 #include "TaskManager.h"
 
 class Context{
 public:
-    virtual void execute(StateFactory &f);
-    void changeState(const std::shared_ptr<State> &);
+    virtual void execute(StepFactory &f);
+    void changeStep(const std::shared_ptr<Step> &);
 
-    std::shared_ptr<State> getState () { return state_; };
+    std::shared_ptr<Step> getStep () { return step_; };
+    Task::Data data() { return data_; };
     void setTitle(const std::string &);
     void setDueDate(const time_t &);
     void setPriority(const Task::Priority &);
@@ -25,11 +26,11 @@ public:
 
 private:
     //TODO for testing/development
-    friend class AddTaskState;
-    friend class ShowState;
+    friend class AddTaskStep;
+    friend class ShowStep;
 
     Task::Data data_;
-    std::shared_ptr<State> state_;
+    std::shared_ptr<Step> step_;
     //TODO TaskManager has to be removed from context
     std::shared_ptr<TaskManager> man_ = std::shared_ptr<TaskManager>{new TaskManager};
 };
