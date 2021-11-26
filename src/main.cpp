@@ -18,10 +18,7 @@
 
 #include "model/Task.h"
 #include "model/TaskManager.h"
-//#include "model/Prompt.h"
-#include "ui/Context.h"
-#include "ui/Step.h"
-#include "ui/StepFactory.h"
+#include "ui/Machine.h"
 
 int main() {
 //    TaskManager tm;
@@ -57,12 +54,8 @@ int main() {
 //        prompt.act(std::cout, std::cin, tm2);
 //    }
 
-    Context c;
-    StepFactory f;
-    c.changeStep(f.nextStep());
-    while (c.getStep()){
-        c.execute(f);
-    }
+    Machine m;
+    m.run();
 
     return 0;
 }
