@@ -19,9 +19,9 @@
 #include "model/Task.h"
 #include "model/TaskManager.h"
 //#include "model/Prompt.h"
-#include "model/Context.h"
-#include "model/Step.h"
-#include "model/StepFactory.h"
+#include "ui/Context.h"
+#include "ui/Step.h"
+#include "ui/StepFactory.h"
 
 int main() {
 //    TaskManager tm;

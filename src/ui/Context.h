@@ -10,7 +10,7 @@
 
 #include "Step.h"
 #include "StepFactory.h"
-#include "TaskManager.h"
+#include "../model/TaskManager.h"
 
 class Context{
 public:
