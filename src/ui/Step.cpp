@@ -5,6 +5,7 @@
 #include "Context.h"
 #include "Step.h"
 #include "StepFactory.h"
+#include "Machine.h"
 
 void Step::changeStep(const std::shared_ptr<Context> &c, const std::shared_ptr<Step> &s) {
     c->changeStep(s);
@@ -43,6 +44,9 @@ void QuitStep::execute(Context &c, StepFactory &f) {
 
 void AddStep::execute(Context &c, StepFactory &f) {
     Step::print("[Add Task]\n");
+    Machine wizard;
+    Context cwizard = wizard.run(StepFactory::State::READTITLE);
+    c.setData(cwizard.data());
     c.changeStep(f.nextStep(*this));
 }
 
