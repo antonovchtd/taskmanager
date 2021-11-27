@@ -59,8 +59,8 @@ void EditStep::execute(Context &c, StepFactory &f) {
             ShowStep shs;
             shs.execute(c, f); // Note: changes step_ of c, but does not matter
         }
-        else if (c.man_->Validate(TaskID((unsigned int) std::stoi(input)))){
-            c.setID(TaskID((unsigned int) std::stoi(input)));
+        else if (auto id = TaskID((unsigned int) std::stoi(input)); c.man_->Validate(id)){
+            c.setID(id);
             break;
         }
         else
