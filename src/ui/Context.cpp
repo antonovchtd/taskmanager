@@ -12,14 +12,6 @@ void Context::changeStep(const std::shared_ptr<Step> &s) {
     step_ = s;
 }
 
-//void Context::setTask(const Task &t){
-//    task_ = t;
-//}
-//
-//Task Context::getTask() const{
-//    return task_;
-//}
-
 void Context::setTitle(const std::string &title){
     data_.title_ = title;
 }

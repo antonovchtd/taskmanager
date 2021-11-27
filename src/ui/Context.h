@@ -32,15 +32,13 @@ private:
     friend class AddTaskStep;
     friend class EditTaskStep;
     friend class AddSubtaskStep;
-//    friend class EditStep;
-//    friend class SubtaskStep;
     friend class ShowStep;
     friend class ReadIDStep;
 
     Task::Data data_;
     std::optional<TaskID> id_ = TaskID::invalidID();
     std::shared_ptr<Step> step_;
-    //TODO TaskManager has to be removed from context
+    //TODO TaskManager has to be removed from context ?
     std::shared_ptr<TaskManager> man_ = std::shared_ptr<TaskManager>{new TaskManager};
 };
 

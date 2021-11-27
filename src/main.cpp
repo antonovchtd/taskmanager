@@ -46,14 +46,6 @@ int main() {
 //    std::cout << "------ Fourth call ------\n";
 //    tm.Show(std::cout);
 
-//    Prompt prompt;
-//    TaskManager tm2;
-//    while (!prompt.quit_flag()){
-//        prompt.ask(std::cout);
-//        prompt.input(std::cout, std::cin);
-//        prompt.act(std::cout, std::cin, tm2);
-//    }
-
     Machine m;
     m.run();
 
