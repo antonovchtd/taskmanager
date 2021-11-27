@@ -17,6 +17,7 @@ StepFactory::StepFactory() : steps_{{
     {State::READTITLE, nullptr},
     {State::READPRIORITY, nullptr},
     {State::READDATE, nullptr},
+    {State::EDIT, nullptr},
     {State::QUIT, nullptr},
     {State::ADDTASK, nullptr},
     {State::SHOW, nullptr}
@@ -36,6 +37,9 @@ std::shared_ptr<Step> StepFactory::create(const std::string &command) {
     }
     else if (command == "show"){
         return getShowStep();
+    }
+    else if (command == "edit"){
+        return getEditStep();
     }
     else{
         std::cout << "Wrong command. Try again. Type `help` for help.\n";
@@ -67,11 +71,19 @@ std::shared_ptr<Step> StepFactory::nextStep(const ReadDueDateStep &) {
     return getQuitStep();
 }
 
+std::shared_ptr<Step> StepFactory::nextStep(const EditStep &) {
+    return getEditTaskStep();
+}
+
 std::shared_ptr<Step> StepFactory::nextStep(const QuitStep &) {
     return nullptr;
 }
 
 std::shared_ptr<Step> StepFactory::nextStep(const AddTaskStep &) {
+    return getHomeStep();
+}
+
+std::shared_ptr<Step> StepFactory::nextStep(const EditTaskStep &) {
     return getHomeStep();
 }
 
@@ -107,8 +119,16 @@ std::shared_ptr<Step> StepFactory::getQuitStep() {
     GEN_STEP_GETTER(State::QUIT, QuitStep)
 }
 
+std::shared_ptr<Step> StepFactory::getEditStep() {
+    GEN_STEP_GETTER(State::EDIT, EditStep)
+}
+
 std::shared_ptr<Step> StepFactory::getAddTaskStep() {
     GEN_STEP_GETTER(State::ADDTASK, AddTaskStep)
+}
+
+std::shared_ptr<Step> StepFactory::getEditTaskStep() {
+    GEN_STEP_GETTER(State::EDITTASK, EditTaskStep)
 }
 
 std::shared_ptr<Step> StepFactory::getShowStep() {
@@ -129,10 +149,14 @@ std::shared_ptr<Step> StepFactory::getStep(const State &s) {
             return getReadPriorityStep();
         case State::READDATE:
             return getReadDueDateStep();
+        case State::EDIT:
+            return getEditStep();
         case State::QUIT:
             return getQuitStep();
         case State::ADDTASK:
             return getAddTaskStep();
+        case State::EDITTASK:
+            return getEditTaskStep();
         case State::SHOW:
             return getShowStep();
     }

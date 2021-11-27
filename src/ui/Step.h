@@ -54,6 +54,10 @@ class ReadDueDateStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 };
 
+class EditStep : public Step{
+    void execute(Context &c, StepFactory &f) override;
+};
+
 class QuitStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 };
@@ -62,7 +66,12 @@ class AddTaskStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 };
 
+class EditTaskStep : public Step{
+    void execute(Context &c, StepFactory &f) override;
+};
+
 class ShowStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 

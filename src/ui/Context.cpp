@@ -33,3 +33,7 @@ void Context::setPriority(const Task::Priority &p){
 void Context::setData(const Task::Data &d) {
     data_ = d;
 }
+
+void Context::setID(const std::optional<TaskID> &id) {
+    id_ = id;
+}

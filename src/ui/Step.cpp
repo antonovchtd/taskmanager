@@ -50,6 +50,29 @@ void AddStep::execute(Context &c, StepFactory &f) {
     c.changeStep(f.nextStep(*this));
 }
 
+void EditStep::execute(Context &c, StepFactory &f) {
+    Step::print("[Edit Task]\n");
+    std::string input;
+    while (true){
+        input = Step::read("   Task ID to edit (`show` to show tasks) > ");
+        if (input == "show") {
+            ShowStep shs;
+            shs.execute(c, f); // Note: changes step_ of c, but does not matter
+        }
+        else if (c.man_->Validate(TaskID((unsigned int) std::stoi(input)))){
+            c.setID(TaskID((unsigned int) std::stoi(input)));
+            break;
+        }
+        else
+            Step::print("   Bad ID. Try again.\n");
+
+    }
+    Machine wizard;
+    Context cwizard = wizard.run(StepFactory::State::READTITLE);
+    c.setData(cwizard.data());
+    c.changeStep(f.nextStep(*this));
+}
+
 void ReadTitleStep::execute(Context &c, StepFactory &f) {
     std::string title;
     while (true){
@@ -94,6 +117,11 @@ void ReadDueDateStep::execute(Context &c, StepFactory &f) {
 
 void AddTaskStep::execute(Context &c, StepFactory &f) {
     c.man_->Add(Task::Create(c.data()));
+    c.changeStep(f.nextStep(*this));
+}
+
+void EditTaskStep::execute(Context &c, StepFactory &f) {
+    c.man_->Edit(c.id().value(), Task::Create(c.data()));
     c.changeStep(f.nextStep(*this));
 }
 
