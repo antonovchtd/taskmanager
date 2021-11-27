@@ -4,11 +4,15 @@
 
 #include "Machine.h"
 
-void Machine::run() {
+Context Machine::run(std::optional<StepFactory::State> state) {
     Context c;
     StepFactory f;
-    c.changeStep(f.nextStep());
+    if (state)
+        c.changeStep(f.getStep(state.value()));
+    else
+        c.changeStep(f.nextStep());
     while (c.getStep()){
         c.execute(f);
     }
+    return c;
 }

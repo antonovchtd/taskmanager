@@ -10,7 +10,7 @@
 
 class Machine {
 public:
-    void run();
+    Context run(std::optional<StepFactory::State> state = std::nullopt);
 };
 
 
