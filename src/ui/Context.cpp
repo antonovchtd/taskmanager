@@ -29,3 +29,7 @@ void Context::setDueDate(const time_t & dd){
 void Context::setPriority(const Task::Priority &p){
     data_.priority_ = p;
 }
+
+void Context::setData(const Task::Data &d) {
+    data_ = d;
+}

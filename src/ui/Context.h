@@ -22,6 +22,7 @@ public:
     void setTitle(const std::string &);
     void setDueDate(const time_t &);
     void setPriority(const Task::Priority &);
+    void setData(const Task::Data &);
     virtual ~Context() = default;
 
 private:
