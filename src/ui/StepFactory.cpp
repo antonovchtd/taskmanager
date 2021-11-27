@@ -20,6 +20,7 @@ StepFactory::StepFactory() : steps_{{
     {State::READDATE, nullptr},
     {State::EDIT, nullptr},
     {State::SUBTASK, nullptr},
+    {State::ACKNOWLEDGE, nullptr},
     {State::QUIT, nullptr},
     {State::ADDTASK, nullptr},
     {State::ADDSUBTASK, nullptr},
@@ -90,16 +91,20 @@ std::shared_ptr<Step> StepFactory::nextStep(const SubtaskStep &) {
     return getAddSubtaskStep();
 }
 
+std::shared_ptr<Step> StepFactory::nextStep(const AcknowledgeStep &) {
+    return getHomeStep();
+}
+
 std::shared_ptr<Step> StepFactory::nextStep(const QuitStep &) {
     return nullptr;
 }
 
 std::shared_ptr<Step> StepFactory::nextStep(const AddTaskStep &) {
-    return getHomeStep();
+    return getAcknowledgeStep();
 }
 
 std::shared_ptr<Step> StepFactory::nextStep(const AddSubtaskStep &) {
-    return getHomeStep();
+    return getAcknowledgeStep();
 }
 
 std::shared_ptr<Step> StepFactory::nextStep(const EditTaskStep &) {
@@ -136,6 +141,10 @@ std::shared_ptr<Step> StepFactory::getReadPriorityStep() {
 
 std::shared_ptr<Step> StepFactory::getReadDueDateStep() {
     GEN_STEP_GETTER(State::READDATE, ReadDueDateStep)
+}
+
+std::shared_ptr<Step> StepFactory::getAcknowledgeStep() {
+    GEN_STEP_GETTER(State::ACKNOWLEDGE, AcknowledgeStep)
 }
 
 std::shared_ptr<Step> StepFactory::getQuitStep() {
@@ -186,6 +195,8 @@ std::shared_ptr<Step> StepFactory::getStep(const State &s) {
             return getReadDueDateStep();
         case State::EDIT:
             return getEditStep();
+        case State::ACKNOWLEDGE:
+            return getAcknowledgeStep();
         case State::QUIT:
             return getQuitStep();
         case State::ADDTASK:

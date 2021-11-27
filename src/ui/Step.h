@@ -64,6 +64,10 @@ class SubtaskStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 };
 
+class AcknowledgeStep : public Step{
+    void execute(Context &c, StepFactory &f) override;
+};
+
 class QuitStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 };

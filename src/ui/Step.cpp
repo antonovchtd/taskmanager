@@ -34,6 +34,11 @@ void HelpStep::execute(Context &c, StepFactory &f) {
     c.changeStep(f.nextStep(*this));
 }
 
+void AcknowledgeStep::execute(Context &c, StepFactory &f) {
+    Step::print("Added Task with ID " + c.id().value().str() + "\n");
+    c.changeStep(f.nextStep(*this));
+}
+
 void QuitStep::execute(Context &c, StepFactory &f) {
     c.changeStep(f.nextStep(*this));
 }
@@ -122,7 +127,7 @@ void ReadDueDateStep::execute(Context &c, StepFactory &f) {
 }
 
 void AddTaskStep::execute(Context &c, StepFactory &f) {
-    c.man_->Add(Task::Create(c.data()));
+    c.id_ = c.man_->Add(Task::Create(c.data()));
     c.changeStep(f.nextStep(*this));
 }
 
@@ -132,7 +137,7 @@ void EditTaskStep::execute(Context &c, StepFactory &f) {
 }
 
 void AddSubtaskStep::execute(Context &c, StepFactory &f) {
-    c.man_->Add(Task::Create(c.data()), c.id().value());
+    c.id_ = c.man_->Add(Task::Create(c.data()), c.id().value());
     c.changeStep(f.nextStep(*this));
 }
 

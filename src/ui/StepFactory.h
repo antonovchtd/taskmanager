@@ -23,6 +23,7 @@ public:
         READDATE,
         EDIT,
         SUBTASK,
+        ACKNOWLEDGE,
         QUIT,
         ADDTASK,
         EDITTASK,
@@ -44,6 +45,7 @@ public:
     std::shared_ptr<Step> nextStep(const ReadDueDateStep &);
     std::shared_ptr<Step> nextStep(const EditStep &);
     std::shared_ptr<Step> nextStep(const SubtaskStep &);
+    std::shared_ptr<Step> nextStep(const AcknowledgeStep &);
     std::shared_ptr<Step> nextStep(const QuitStep &);
     std::shared_ptr<Step> nextStep(const AddTaskStep &);
     std::shared_ptr<Step> nextStep(const EditTaskStep &);
@@ -59,6 +61,7 @@ public:
     std::shared_ptr<Step> getReadDueDateStep();
     std::shared_ptr<Step> getEditStep();
     std::shared_ptr<Step> getSubtaskStep();
+    std::shared_ptr<Step> getAcknowledgeStep();
     std::shared_ptr<Step> getQuitStep();
     std::shared_ptr<Step> getAddTaskStep();
     std::shared_ptr<Step> getEditTaskStep();
