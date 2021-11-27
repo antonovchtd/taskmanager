@@ -91,7 +91,7 @@ void ReadPriorityStep::execute(Context &c, StepFactory &f) {
     int pint;
     while (true){
         p = Step::read("    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > ");
-        pint = std::stoi(p);
+        pint = p.empty() ? 0 : std::stoi(p);
         if (pint >= 0 && pint <= 3)
             break;
         else
