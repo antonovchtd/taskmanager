@@ -10,7 +10,13 @@
 
 class Machine {
 public:
+    Machine() = default;
+    explicit Machine(const Context &c) : context_(c) {};
     Context run(std::optional<StepFactory::State> state = std::nullopt);
+
+private:
+    Context context_;
+    StepFactory factory_;
 };
 
 

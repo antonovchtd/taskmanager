@@ -24,8 +24,6 @@ public:
     static void print(const std::string &line);
     virtual ~Step() = default;
 
-public:
-    void changeStep(const std::shared_ptr<Context> &, const std::shared_ptr<Step> &);
 };
 
 class HomeStep : public Step{
@@ -39,6 +37,10 @@ class HelpStep : public Step{
 class AddStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 
+};
+
+class ReadIDStep : public Step{
+    void execute(Context &c, StepFactory &f) override;
 };
 
 class ReadTitleStep : public Step{
@@ -58,6 +60,10 @@ class EditStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 };
 
+class SubtaskStep : public Step{
+    void execute(Context &c, StepFactory &f) override;
+};
+
 class QuitStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 };
@@ -67,6 +73,10 @@ class AddTaskStep : public Step{
 };
 
 class EditTaskStep : public Step{
+    void execute(Context &c, StepFactory &f) override;
+};
+
+class AddSubtaskStep : public Step{
     void execute(Context &c, StepFactory &f) override;
 };
 

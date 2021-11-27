@@ -5,14 +5,12 @@
 #include "Machine.h"
 
 Context Machine::run(std::optional<StepFactory::State> state) {
-    Context c;
-    StepFactory f;
     if (state)
-        c.changeStep(f.getStep(state.value()));
+        context_.changeStep(factory_.getStep(state.value()));
     else
-        c.changeStep(f.nextStep());
-    while (c.getStep()){
-        c.execute(f);
+        context_.changeStep(factory_.nextStep());
+    while (context_.getStep()){
+        context_.execute(factory_);
     }
-    return c;
+    return context_;
 }

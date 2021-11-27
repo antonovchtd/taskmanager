@@ -31,8 +31,11 @@ private:
     //TODO for testing/development
     friend class AddTaskStep;
     friend class EditTaskStep;
-    friend class EditStep;
+    friend class AddSubtaskStep;
+//    friend class EditStep;
+//    friend class SubtaskStep;
     friend class ShowStep;
+    friend class ReadIDStep;
 
     Task::Data data_;
     std::optional<TaskID> id_ = TaskID::invalidID();

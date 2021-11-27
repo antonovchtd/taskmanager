@@ -14,12 +14,16 @@ StepFactory::StepFactory() : steps_{{
     {State::HOME, nullptr},
     {State::HELP, nullptr},
     {State::ADD, nullptr},
+    {State::READID, nullptr},
     {State::READTITLE, nullptr},
     {State::READPRIORITY, nullptr},
     {State::READDATE, nullptr},
     {State::EDIT, nullptr},
+    {State::SUBTASK, nullptr},
     {State::QUIT, nullptr},
     {State::ADDTASK, nullptr},
+    {State::ADDSUBTASK, nullptr},
+    {State::EDITTASK, nullptr},
     {State::SHOW, nullptr}
 }}
 {
@@ -41,6 +45,9 @@ std::shared_ptr<Step> StepFactory::create(const std::string &command) {
     else if (command == "edit"){
         return getEditStep();
     }
+    else if (command == "subtask"){
+        return getSubtaskStep();
+    }
     else{
         std::cout << "Wrong command. Try again. Type `help` for help.\n";
         return getHomeStep();
@@ -59,6 +66,10 @@ std::shared_ptr<Step> StepFactory::nextStep(const AddStep &) {
     return getAddTaskStep();
 }
 
+std::shared_ptr<Step> StepFactory::nextStep(const ReadIDStep &) {
+    return getReadTitleStep();
+}
+
 std::shared_ptr<Step> StepFactory::nextStep(const ReadTitleStep &) {
     return getReadPriorityStep();
 }
@@ -75,11 +86,19 @@ std::shared_ptr<Step> StepFactory::nextStep(const EditStep &) {
     return getEditTaskStep();
 }
 
+std::shared_ptr<Step> StepFactory::nextStep(const SubtaskStep &) {
+    return getAddSubtaskStep();
+}
+
 std::shared_ptr<Step> StepFactory::nextStep(const QuitStep &) {
     return nullptr;
 }
 
 std::shared_ptr<Step> StepFactory::nextStep(const AddTaskStep &) {
+    return getHomeStep();
+}
+
+std::shared_ptr<Step> StepFactory::nextStep(const AddSubtaskStep &) {
     return getHomeStep();
 }
 
@@ -103,6 +122,10 @@ std::shared_ptr<Step> StepFactory::getAddStep() {
     GEN_STEP_GETTER(State::ADD, AddStep)
 }
 
+std::shared_ptr<Step> StepFactory::getReadIDStep() {
+    GEN_STEP_GETTER(State::READID, ReadIDStep)
+}
+
 std::shared_ptr<Step> StepFactory::getReadTitleStep() {
     GEN_STEP_GETTER(State::READTITLE, ReadTitleStep)
 }
@@ -123,8 +146,16 @@ std::shared_ptr<Step> StepFactory::getEditStep() {
     GEN_STEP_GETTER(State::EDIT, EditStep)
 }
 
+std::shared_ptr<Step> StepFactory::getSubtaskStep() {
+    GEN_STEP_GETTER(State::SUBTASK, SubtaskStep)
+}
+
 std::shared_ptr<Step> StepFactory::getAddTaskStep() {
     GEN_STEP_GETTER(State::ADDTASK, AddTaskStep)
+}
+
+std::shared_ptr<Step> StepFactory::getAddSubtaskStep() {
+    GEN_STEP_GETTER(State::ADDSUBTASK, AddSubtaskStep)
 }
 
 std::shared_ptr<Step> StepFactory::getEditTaskStep() {
@@ -143,6 +174,10 @@ std::shared_ptr<Step> StepFactory::getStep(const State &s) {
             return getHelpStep();
         case State::ADD:
             return getAddStep();
+        case State::SUBTASK:
+            return getSubtaskStep();
+        case State::READID:
+            return getReadIDStep();
         case State::READTITLE:
             return getReadTitleStep();
         case State::READPRIORITY:
@@ -155,6 +190,8 @@ std::shared_ptr<Step> StepFactory::getStep(const State &s) {
             return getQuitStep();
         case State::ADDTASK:
             return getAddTaskStep();
+        case State::ADDSUBTASK:
+            return getAddSubtaskStep();
         case State::EDITTASK:
             return getEditTaskStep();
         case State::SHOW:

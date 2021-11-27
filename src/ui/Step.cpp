@@ -7,10 +7,6 @@
 #include "StepFactory.h"
 #include "Machine.h"
 
-void Step::changeStep(const std::shared_ptr<Context> &c, const std::shared_ptr<Step> &s) {
-    c->changeStep(s);
-}
-
 void Step::print(const std::string &line){
     std::cout << line;
 }
@@ -44,17 +40,16 @@ void QuitStep::execute(Context &c, StepFactory &f) {
 
 void AddStep::execute(Context &c, StepFactory &f) {
     Step::print("[Add Task]\n");
-    Machine wizard;
-    Context cwizard = wizard.run(StepFactory::State::READTITLE);
-    c.setData(cwizard.data());
+    Machine wizard(c);
+    c = wizard.run(StepFactory::State::READTITLE);
     c.changeStep(f.nextStep(*this));
 }
 
-void EditStep::execute(Context &c, StepFactory &f) {
-    Step::print("[Edit Task]\n");
+
+void ReadIDStep::execute(Context &c, StepFactory &f) {
     std::string input;
     while (true){
-        input = Step::read("   Task ID to edit (`show` to show tasks) > ");
+        input = Step::read("   Task ID (`show` to show tasks) > ");
         if (input == "show") {
             ShowStep shs;
             shs.execute(c, f); // Note: changes step_ of c, but does not matter
@@ -67,9 +62,20 @@ void EditStep::execute(Context &c, StepFactory &f) {
             Step::print("   Bad ID. Try again.\n");
 
     }
-    Machine wizard;
-    Context cwizard = wizard.run(StepFactory::State::READTITLE);
-    c.setData(cwizard.data());
+    c.changeStep(f.nextStep(*this));
+}
+
+void EditStep::execute(Context &c, StepFactory &f) {
+    Step::print("[Edit Task]\n");
+    Machine wizard(c);
+    c = wizard.run(StepFactory::State::READID);
+    c.changeStep(f.nextStep(*this));
+}
+
+void SubtaskStep::execute(Context &c, StepFactory &f) {
+    Step::print("[Add Subtask]\n");
+    Machine wizard(c);
+    c = wizard.run(StepFactory::State::READID);
     c.changeStep(f.nextStep(*this));
 }
 
@@ -122,6 +128,11 @@ void AddTaskStep::execute(Context &c, StepFactory &f) {
 
 void EditTaskStep::execute(Context &c, StepFactory &f) {
     c.man_->Edit(c.id().value(), Task::Create(c.data()));
+    c.changeStep(f.nextStep(*this));
+}
+
+void AddSubtaskStep::execute(Context &c, StepFactory &f) {
+    c.man_->Add(Task::Create(c.data()), c.id().value());
     c.changeStep(f.nextStep(*this));
 }
 

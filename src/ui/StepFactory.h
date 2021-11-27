@@ -17,13 +17,16 @@ public:
         HOME,
         HELP,
         ADD,
+        READID,
         READTITLE,
         READPRIORITY,
         READDATE,
         EDIT,
+        SUBTASK,
         QUIT,
         ADDTASK,
         EDITTASK,
+        ADDSUBTASK,
         SHOW
     };
 
@@ -35,25 +38,31 @@ public:
     std::shared_ptr<Step> nextStep();
     std::shared_ptr<Step> nextStep(const HelpStep &);
     std::shared_ptr<Step> nextStep(const AddStep &);
+    std::shared_ptr<Step> nextStep(const ReadIDStep &);
     std::shared_ptr<Step> nextStep(const ReadTitleStep &);
     std::shared_ptr<Step> nextStep(const ReadPriorityStep &);
     std::shared_ptr<Step> nextStep(const ReadDueDateStep &);
     std::shared_ptr<Step> nextStep(const EditStep &);
+    std::shared_ptr<Step> nextStep(const SubtaskStep &);
     std::shared_ptr<Step> nextStep(const QuitStep &);
     std::shared_ptr<Step> nextStep(const AddTaskStep &);
     std::shared_ptr<Step> nextStep(const EditTaskStep &);
+    std::shared_ptr<Step> nextStep(const AddSubtaskStep &);
     std::shared_ptr<Step> nextStep(const ShowStep &);
 
     std::shared_ptr<Step> getHomeStep();
     std::shared_ptr<Step> getHelpStep();
     std::shared_ptr<Step> getAddStep();
+    std::shared_ptr<Step> getReadIDStep();
     std::shared_ptr<Step> getReadTitleStep();
     std::shared_ptr<Step> getReadPriorityStep();
     std::shared_ptr<Step> getReadDueDateStep();
     std::shared_ptr<Step> getEditStep();
+    std::shared_ptr<Step> getSubtaskStep();
     std::shared_ptr<Step> getQuitStep();
     std::shared_ptr<Step> getAddTaskStep();
     std::shared_ptr<Step> getEditTaskStep();
+    std::shared_ptr<Step> getAddSubtaskStep();
     std::shared_ptr<Step> getShowStep();
     std::shared_ptr<Step> getStep(const State &);
 
