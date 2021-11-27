@@ -16,6 +16,10 @@ bool TaskID::operator==(const TaskID& rhs) const{
     return value_ == rhs.value();
 }
 
+std::string TaskID::str() const {
+    return std::to_string(value_);
+}
+
 bool TaskID::operator!=(const TaskID& rhs) const{
     return !(*this == rhs);
 }

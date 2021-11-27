@@ -14,6 +14,7 @@ public:
 
     explicit TaskID(unsigned int val) : value_(val) { };
     unsigned int value() const;
+    std::string str() const;
     static std::optional<TaskID> invalidID();
     bool operator==(const TaskID&) const;
     bool operator!=(const TaskID&) const;
