@@ -5,6 +5,11 @@
 #include "Step.h"
 #include "StepFactory.h"
 
+#define GEN_STEP_GETTER(state, step)                   \
+  if (!steps_[state])                                  \
+      steps_[state] = std::shared_ptr<Step>{new step}; \
+  return steps_[state];
+
 StepFactory::StepFactory() : steps_{{
     {State::HOME, nullptr},
     {State::HELP, nullptr},
@@ -47,7 +52,7 @@ std::shared_ptr<Step> StepFactory::nextStep(const HelpStep &) {
 }
 
 std::shared_ptr<Step> StepFactory::nextStep(const AddStep &) {
-    return getReadTitleStep();
+    return getAddTaskStep();
 }
 
 std::shared_ptr<Step> StepFactory::nextStep(const ReadTitleStep &) {
@@ -59,7 +64,7 @@ std::shared_ptr<Step> StepFactory::nextStep(const ReadPriorityStep &) {
 }
 
 std::shared_ptr<Step> StepFactory::nextStep(const ReadDueDateStep &) {
-    return getAddTaskStep();
+    return getQuitStep();
 }
 
 std::shared_ptr<Step> StepFactory::nextStep(const QuitStep &) {
@@ -75,55 +80,60 @@ std::shared_ptr<Step> StepFactory::nextStep(const ShowStep &) {
 }
 
 std::shared_ptr<Step> StepFactory::getHomeStep() {
-    if (!steps_[State::HOME])
-        steps_[State::HOME] = std::shared_ptr<Step>{new HomeStep};
-    return steps_[State::HOME];
+    GEN_STEP_GETTER(State::HOME, HomeStep)
 }
 
 std::shared_ptr<Step> StepFactory::getHelpStep() {
-    if (!steps_[State::HELP])
-        steps_[State::HELP] = std::shared_ptr<Step>{new HelpStep};
-    return steps_[State::HELP];
+    GEN_STEP_GETTER(State::HELP, HelpStep)
 }
 
 std::shared_ptr<Step> StepFactory::getAddStep() {
-    if (!steps_[State::ADD])
-        steps_[State::ADD] = std::shared_ptr<Step>{new AddStep};
-    return steps_[State::ADD];
+    GEN_STEP_GETTER(State::ADD, AddStep)
 }
 
 std::shared_ptr<Step> StepFactory::getReadTitleStep() {
-    if (!steps_[State::READTITLE])
-        steps_[State::READTITLE] = std::shared_ptr<Step>{new ReadTitleStep};
-    return steps_[State::READTITLE];
+    GEN_STEP_GETTER(State::READTITLE, ReadTitleStep)
 }
 
 std::shared_ptr<Step> StepFactory::getReadPriorityStep() {
-    if (!steps_[State::READPRIORITY])
-        steps_[State::READPRIORITY] = std::shared_ptr<Step>{new ReadPriorityStep};
-    return steps_[State::READPRIORITY];
+    GEN_STEP_GETTER(State::READPRIORITY, ReadPriorityStep)
 }
 
 std::shared_ptr<Step> StepFactory::getReadDueDateStep() {
-    if (!steps_[State::READDATE])
-        steps_[State::READDATE] = std::shared_ptr<Step>{new ReadDueDateStep};
-    return steps_[State::READDATE];
+    GEN_STEP_GETTER(State::READDATE, ReadDueDateStep)
 }
 
 std::shared_ptr<Step> StepFactory::getQuitStep() {
-    if (!steps_[State::QUIT])
-        steps_[State::QUIT] = std::shared_ptr<Step>{new QuitStep};
-    return steps_[State::QUIT];
+    GEN_STEP_GETTER(State::QUIT, QuitStep)
 }
 
 std::shared_ptr<Step> StepFactory::getAddTaskStep() {
-    if (!steps_[State::ADDTASK])
-        steps_[State::ADDTASK] = std::shared_ptr<Step>{new AddTaskStep};
-    return steps_[State::ADDTASK];
+    GEN_STEP_GETTER(State::ADDTASK, AddTaskStep)
 }
 
 std::shared_ptr<Step> StepFactory::getShowStep() {
-    if (!steps_[State::SHOW])
-        steps_[State::SHOW] = std::shared_ptr<Step>{new ShowStep};
-    return steps_[State::SHOW];
+    GEN_STEP_GETTER(State::SHOW, ShowStep)
+}
+
+std::shared_ptr<Step> StepFactory::getStep(const State &s) {
+    switch (s){
+        case State::HOME:
+            return getHomeStep();
+        case State::HELP:
+            return getHelpStep();
+        case State::ADD:
+            return getAddStep();
+        case State::READTITLE:
+            return getReadTitleStep();
+        case State::READPRIORITY:
+            return getReadPriorityStep();
+        case State::READDATE:
+            return getReadDueDateStep();
+        case State::QUIT:
+            return getQuitStep();
+        case State::ADDTASK:
+            return getAddTaskStep();
+        case State::SHOW:
+            return getShowStep();
+    }
 }

@@ -49,6 +49,7 @@ public:
     std::shared_ptr<Step> getQuitStep();
     std::shared_ptr<Step> getAddTaskStep();
     std::shared_ptr<Step> getShowStep();
+    std::shared_ptr<Step> getStep(const State &);
 
 private:
     std::map<State, std::shared_ptr<Step>> steps_;
