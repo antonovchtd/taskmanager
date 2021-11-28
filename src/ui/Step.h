@@ -27,60 +27,73 @@ public:
 };
 
 class HomeStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class HelpStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class AddStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
-
 };
 
 class ReadIDStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class ReadTitleStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class ReadPriorityStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class ReadDueDateStep : public Step{
+public:
     static std::optional<time_t> stringToTime(const std::string &);
     void execute(Context &c, StepFactory &f) override;
 };
 
 class EditStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class SubtaskStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class AcknowledgeStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class QuitStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class AddTaskStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class EditTaskStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 
 class AddSubtaskStep : public Step{
+public:
     void execute(Context &c, StepFactory &f) override;
 };
 

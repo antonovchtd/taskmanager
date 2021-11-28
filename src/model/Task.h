@@ -8,6 +8,7 @@
 #include <string>
 #include <ctime>
 #include <map>
+#include <iostream>
 
 //Value Type
 class Task {
@@ -42,7 +43,7 @@ private:
 private:
     std::string title_;
     Priority priority_;
-    time_t due_date_; // Example of strong typing
+    time_t due_date_;
     bool isComplete_ = false;
 };
 

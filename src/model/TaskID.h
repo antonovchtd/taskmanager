@@ -10,12 +10,13 @@
 
 class TaskID{
 public:
-    friend std::istream& operator>>(std::istream& is, TaskID& id);
-
     explicit TaskID(unsigned int val) : value_(val) { };
+    static std::optional<TaskID> invalidID();
+
     unsigned int value() const;
     std::string str() const;
-    static std::optional<TaskID> invalidID();
+
+    friend std::istream& operator>>(std::istream& is, TaskID& id);
     bool operator==(const TaskID&) const;
     bool operator!=(const TaskID&) const;
     bool operator<(const TaskID&) const;

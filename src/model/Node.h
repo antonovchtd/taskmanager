@@ -12,11 +12,13 @@ class Node{
 public:
     Node() : ancestor_(TaskID::invalidID()) { };
     Node(std::optional<TaskID> ancestor) : ancestor_(ancestor) { };
-    void AddChild(const TaskID&);
-    void removeChild(const TaskID&);
+
     std::optional<TaskID> parent() const;
     std::string label() const;
     std::vector<TaskID> children() const;
+
+    void removeChild(const TaskID&);
+    void AddChild(const TaskID&);
     void SetLabel(const std::string &);
 
 private:

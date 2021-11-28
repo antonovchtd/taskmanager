@@ -1,7 +1,6 @@
 //
 // Created by Anton Ovcharenko on 08.11.2021.
 //
-#include <iostream>
 
 #include "Task.h"
 
@@ -11,7 +10,7 @@ Task::Task(std::string title, Task::Priority p, time_t due_date, bool complete_f
     due_date_{due_date},
     isComplete_(complete_flag)
 {
-};
+}
 
 Task Task::Create(const Task::Data &d) {
     return Task::Create(d.title_, d.priority_, d.due_date_, d.isComplete_);

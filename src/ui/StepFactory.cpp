@@ -5,7 +5,7 @@
 #include "Step.h"
 #include "StepFactory.h"
 
-#define GEN_STEP_GETTER(state, step)                   \
+#define STEPFACTORY_GEN_STEP_GETTER(state, step)                   \
   if (!steps_[state])                                  \
       steps_[state] = std::shared_ptr<Step>{new step}; \
   return steps_[state];
@@ -116,63 +116,63 @@ std::shared_ptr<Step> StepFactory::nextStep(const ShowStep &) {
 }
 
 std::shared_ptr<Step> StepFactory::getHomeStep() {
-    GEN_STEP_GETTER(State::HOME, HomeStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::HOME, HomeStep)
 }
 
 std::shared_ptr<Step> StepFactory::getHelpStep() {
-    GEN_STEP_GETTER(State::HELP, HelpStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::HELP, HelpStep)
 }
 
 std::shared_ptr<Step> StepFactory::getAddStep() {
-    GEN_STEP_GETTER(State::ADD, AddStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::ADD, AddStep)
 }
 
 std::shared_ptr<Step> StepFactory::getReadIDStep() {
-    GEN_STEP_GETTER(State::READID, ReadIDStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::READID, ReadIDStep)
 }
 
 std::shared_ptr<Step> StepFactory::getReadTitleStep() {
-    GEN_STEP_GETTER(State::READTITLE, ReadTitleStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::READTITLE, ReadTitleStep)
 }
 
 std::shared_ptr<Step> StepFactory::getReadPriorityStep() {
-    GEN_STEP_GETTER(State::READPRIORITY, ReadPriorityStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::READPRIORITY, ReadPriorityStep)
 }
 
 std::shared_ptr<Step> StepFactory::getReadDueDateStep() {
-    GEN_STEP_GETTER(State::READDATE, ReadDueDateStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::READDATE, ReadDueDateStep)
 }
 
 std::shared_ptr<Step> StepFactory::getAcknowledgeStep() {
-    GEN_STEP_GETTER(State::ACKNOWLEDGE, AcknowledgeStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::ACKNOWLEDGE, AcknowledgeStep)
 }
 
 std::shared_ptr<Step> StepFactory::getQuitStep() {
-    GEN_STEP_GETTER(State::QUIT, QuitStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::QUIT, QuitStep)
 }
 
 std::shared_ptr<Step> StepFactory::getEditStep() {
-    GEN_STEP_GETTER(State::EDIT, EditStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::EDIT, EditStep)
 }
 
 std::shared_ptr<Step> StepFactory::getSubtaskStep() {
-    GEN_STEP_GETTER(State::SUBTASK, SubtaskStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::SUBTASK, SubtaskStep)
 }
 
 std::shared_ptr<Step> StepFactory::getAddTaskStep() {
-    GEN_STEP_GETTER(State::ADDTASK, AddTaskStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::ADDTASK, AddTaskStep)
 }
 
 std::shared_ptr<Step> StepFactory::getAddSubtaskStep() {
-    GEN_STEP_GETTER(State::ADDSUBTASK, AddSubtaskStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::ADDSUBTASK, AddSubtaskStep)
 }
 
 std::shared_ptr<Step> StepFactory::getEditTaskStep() {
-    GEN_STEP_GETTER(State::EDITTASK, EditTaskStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::EDITTASK, EditTaskStep)
 }
 
 std::shared_ptr<Step> StepFactory::getShowStep() {
-    GEN_STEP_GETTER(State::SHOW, ShowStep)
+    STEPFACTORY_GEN_STEP_GETTER(State::SHOW, ShowStep)
 }
 
 std::shared_ptr<Step> StepFactory::getStep(const State &s) {

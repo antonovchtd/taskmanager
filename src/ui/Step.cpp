@@ -34,22 +34,12 @@ void HelpStep::execute(Context &c, StepFactory &f) {
     c.changeStep(f.nextStep(*this));
 }
 
-void AcknowledgeStep::execute(Context &c, StepFactory &f) {
-    Step::print("Added Task with ID " + c.id().value().str() + "\n");
-    c.changeStep(f.nextStep(*this));
-}
-
-void QuitStep::execute(Context &c, StepFactory &f) {
-    c.changeStep(f.nextStep(*this));
-}
-
 void AddStep::execute(Context &c, StepFactory &f) {
     Step::print("[Add Task]\n");
     Machine wizard(c);
     c = wizard.run(StepFactory::State::READTITLE);
     c.changeStep(f.nextStep(*this));
 }
-
 
 void ReadIDStep::execute(Context &c, StepFactory &f) {
     std::string input;
@@ -67,20 +57,6 @@ void ReadIDStep::execute(Context &c, StepFactory &f) {
             Step::print("   Bad ID. Try again.\n");
 
     }
-    c.changeStep(f.nextStep(*this));
-}
-
-void EditStep::execute(Context &c, StepFactory &f) {
-    Step::print("[Edit Task]\n");
-    Machine wizard(c);
-    c = wizard.run(StepFactory::State::READID);
-    c.changeStep(f.nextStep(*this));
-}
-
-void SubtaskStep::execute(Context &c, StepFactory &f) {
-    Step::print("[Add Subtask]\n");
-    Machine wizard(c);
-    c = wizard.run(StepFactory::State::READID);
     c.changeStep(f.nextStep(*this));
 }
 
@@ -123,6 +99,29 @@ void ReadDueDateStep::execute(Context &c, StepFactory &f) {
             Step::print("    Wrong date format. Try again.\n");
     }
     c.setDueDate(due_date.value());
+    c.changeStep(f.nextStep(*this));
+}
+
+void EditStep::execute(Context &c, StepFactory &f) {
+    Step::print("[Edit Task]\n");
+    Machine wizard(c);
+    c = wizard.run(StepFactory::State::READID);
+    c.changeStep(f.nextStep(*this));
+}
+
+void SubtaskStep::execute(Context &c, StepFactory &f) {
+    Step::print("[Add Subtask]\n");
+    Machine wizard(c);
+    c = wizard.run(StepFactory::State::READID);
+    c.changeStep(f.nextStep(*this));
+}
+
+void AcknowledgeStep::execute(Context &c, StepFactory &f) {
+    Step::print("Added Task with ID " + c.id().value().str() + "\n");
+    c.changeStep(f.nextStep(*this));
+}
+
+void QuitStep::execute(Context &c, StepFactory &f) {
     c.changeStep(f.nextStep(*this));
 }
 
