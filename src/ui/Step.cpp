@@ -145,6 +145,20 @@ void ShowStep::execute(Context &c, StepFactory &f) {
     c.changeStep(f.nextStep(*this));
 }
 
+void CompleteStep::execute(Context &c, StepFactory &f) {
+    ReadIDStep rids;
+    rids.execute(c,f);
+    c.man_->Complete(c.id().value());
+    c.changeStep(f.nextStep(*this));
+}
+
+void DeleteStep::execute(Context &c, StepFactory &f) {
+    ReadIDStep rids;
+    rids.execute(c,f);
+    c.man_->Delete(c.id().value());
+    c.changeStep(f.nextStep(*this));
+}
+
 std::optional<time_t> ReadDueDateStep::stringToTime(const std::string &datestring) {
     std::smatch matches;
     if (std::regex_search(datestring, matches, std::regex(R"(in (\d+:)?(\d+):(\d+))"))){

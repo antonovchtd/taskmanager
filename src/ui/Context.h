@@ -28,12 +28,14 @@ public:
     virtual ~Context() = default;
 
 private:
-    //TODO for testing/development
+    //TODO not using friends ?
     friend class AddTaskStep;
     friend class EditTaskStep;
     friend class AddSubtaskStep;
     friend class ShowStep;
     friend class ReadIDStep;
+    friend class CompleteStep;
+    friend class DeleteStep;
 
     Task::Data data_;
     std::optional<TaskID> id_ = TaskID::invalidID();

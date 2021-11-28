@@ -28,7 +28,9 @@ public:
         ADDTASK,
         EDITTASK,
         ADDSUBTASK,
-        SHOW
+        SHOW,
+        COMPLETE,
+        DELETE
     };
 
 public:
@@ -51,6 +53,8 @@ public:
     std::shared_ptr<Step> nextStep(const EditTaskStep &);
     std::shared_ptr<Step> nextStep(const AddSubtaskStep &);
     std::shared_ptr<Step> nextStep(const ShowStep &);
+    std::shared_ptr<Step> nextStep(const CompleteStep &);
+    std::shared_ptr<Step> nextStep(const DeleteStep &);
 
     std::shared_ptr<Step> getHomeStep();
     std::shared_ptr<Step> getHelpStep();
@@ -67,6 +71,8 @@ public:
     std::shared_ptr<Step> getEditTaskStep();
     std::shared_ptr<Step> getAddSubtaskStep();
     std::shared_ptr<Step> getShowStep();
+    std::shared_ptr<Step> getCompleteStep();
+    std::shared_ptr<Step> getDeleteStep();
     std::shared_ptr<Step> getStep(const State &);
 
 private:

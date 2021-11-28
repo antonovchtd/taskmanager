@@ -25,7 +25,9 @@ StepFactory::StepFactory() : steps_{{
     {State::ADDTASK, nullptr},
     {State::ADDSUBTASK, nullptr},
     {State::EDITTASK, nullptr},
-    {State::SHOW, nullptr}
+    {State::SHOW, nullptr},
+    {State::COMPLETE, nullptr},
+    {State::DELETE, nullptr}
 }}
 {
 }
@@ -48,6 +50,12 @@ std::shared_ptr<Step> StepFactory::create(const std::string &command) {
     }
     else if (command == "subtask"){
         return getSubtaskStep();
+    }
+    else if (command == "complete"){
+        return getCompleteStep();
+    }
+    else if (command == "delete"){
+        return getDeleteStep();
     }
     else{
         std::cout << "Wrong command. Try again. Type `help` for help.\n";
@@ -115,6 +123,14 @@ std::shared_ptr<Step> StepFactory::nextStep(const ShowStep &) {
     return getHomeStep();
 }
 
+std::shared_ptr<Step> StepFactory::nextStep(const CompleteStep &) {
+    return getHomeStep();
+}
+
+std::shared_ptr<Step> StepFactory::nextStep(const DeleteStep &) {
+    return getHomeStep();
+}
+
 std::shared_ptr<Step> StepFactory::getHomeStep() {
     STEPFACTORY_GEN_STEP_GETTER(State::HOME, HomeStep)
 }
@@ -175,6 +191,14 @@ std::shared_ptr<Step> StepFactory::getShowStep() {
     STEPFACTORY_GEN_STEP_GETTER(State::SHOW, ShowStep)
 }
 
+std::shared_ptr<Step> StepFactory::getCompleteStep() {
+    STEPFACTORY_GEN_STEP_GETTER(State::COMPLETE, CompleteStep)
+}
+
+std::shared_ptr<Step> StepFactory::getDeleteStep() {
+    STEPFACTORY_GEN_STEP_GETTER(State::DELETE, DeleteStep)
+}
+
 std::shared_ptr<Step> StepFactory::getStep(const State &s) {
     switch (s){
         case State::HOME:
@@ -207,5 +231,9 @@ std::shared_ptr<Step> StepFactory::getStep(const State &s) {
             return getEditTaskStep();
         case State::SHOW:
             return getShowStep();
+        case State::COMPLETE:
+            return getCompleteStep();
+        case State::DELETE:
+            return getDeleteStep();
     }
 }

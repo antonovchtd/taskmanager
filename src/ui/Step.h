@@ -102,4 +102,14 @@ public:
     void execute(Context &c, StepFactory &f) override;
 };
 
+class CompleteStep : public Step{
+public:
+    void execute(Context &c, StepFactory &f) override;
+};
+
+class DeleteStep : public Step{
+public:
+    void execute(Context &c, StepFactory &f) override;
+};
+
 #endif //TASKMANAGER_SRC_UI_STATE_H_
