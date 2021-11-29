@@ -43,7 +43,7 @@ void AddStep::execute(Context &c, StepFactory &f) {
 
 void ReadIDStep::execute(Context &c, StepFactory &f) {
     std::string input;
-    while (true){
+    while (true) {
         input = Step::read("   Task ID (`show` to show tasks) > ");
         if (input == "show") {
             ShowStep shs;
@@ -62,7 +62,7 @@ void ReadIDStep::execute(Context &c, StepFactory &f) {
 
 void ReadTitleStep::execute(Context &c, StepFactory &f) {
     std::string title;
-    while (true){
+    while (true) {
         title = Step::read("    Title > ");
         if (title.empty())
             Step::print("Title cannot be empty!\n");
@@ -76,7 +76,7 @@ void ReadTitleStep::execute(Context &c, StepFactory &f) {
 void ReadPriorityStep::execute(Context &c, StepFactory &f) {
     std::string p;
     int pint;
-    while (true){
+    while (true) {
         p = Step::read("    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > ");
         pint = p.empty() ? 0 : std::stoi(p);
         if (pint >= 0 && pint <= 3)
@@ -161,18 +161,19 @@ void DeleteStep::execute(Context &c, StepFactory &f) {
 
 std::optional<time_t> ReadDueDateStep::stringToTime(const std::string &datestring) {
     std::smatch matches;
-    if (std::regex_search(datestring, matches, std::regex(R"(in (\d+:)?(\d+):(\d+))"))){
+    if (std::regex_search(datestring, matches,
+                          std::regex(R"(in (\d+:)?(\d+):(\d+))"))) {
         return time(nullptr) + std::stoi(matches.str(1))*24*3600
                + std::stoi(matches.str(2))*3600
                + std::stoi(matches.str(3))*60;
-    }
-    else if (std::regex_search(datestring, matches, std::regex(R"((\d+)/(\d+)(/(\d+))?( (\d+):(\d+))?)"))){
+    } else if (std::regex_search(datestring, matches,
+                               std::regex(R"((\d+)[./](\d+)([./](\d+))?( (\d+):(\d+))?)"))){
         time_t rawtime;
         time(&rawtime);
         struct tm * timeinfo = localtime(&rawtime);
         timeinfo->tm_mday = std::stoi(matches.str(1));
         timeinfo->tm_mon = std::stoi(matches.str(2))-1;
-        if (!matches.str(3).empty()){
+        if (!matches.str(3).empty()) {
             int year = std::stoi(matches.str(4));
             if (year > 1900)
                 year -= 1900;
@@ -183,15 +184,12 @@ std::optional<time_t> ReadDueDateStep::stringToTime(const std::string &datestrin
         if (!matches.str(5).empty()) {
             timeinfo->tm_hour = std::stoi(matches.str(6));
             timeinfo->tm_min = std::stoi(matches.str(7));
-        }
-        else
-        {
+        } else {
             timeinfo->tm_hour = 0;
             timeinfo->tm_min = 0;
         }
         timeinfo->tm_sec = 0;
         return mktime(timeinfo);
-    }
-    else
+    } else
         return std::nullopt;
 }
