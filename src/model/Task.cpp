@@ -13,7 +13,7 @@ Task::Task(std::string title, Task::Priority p, time_t due_date, bool complete_f
 }
 
 Task Task::Create(const Task::Data &d) {
-    return Task::Create(d.title_, d.priority_, d.due_date_, d.isComplete_);
+    return Task::Create(d.title, d.priority, d.due_date, d.isComplete);
 }
 
 Task Task::Create(const std::string &title, Task::Priority p, time_t due_date, bool complete_flag) {
@@ -48,5 +48,5 @@ std::ostream & operator<<(std::ostream &os, const Task& t) {
 }
 
 Task::Data Task::data() const {
-    return Task::Data{title(), priority(), due_date(), isComplete()};
+    return Task::Data{title_, priority_, due_date_, isComplete_};
 }

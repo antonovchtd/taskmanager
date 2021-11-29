@@ -13,13 +13,13 @@ void Context::changeStep(const std::shared_ptr<Step> &s) {
 }
 
 void Context::setTitle(const std::string &title){
-    data_.title_ = title;
+    data_.title = title;
 }
 void Context::setDueDate(const time_t & dd){
-    data_.due_date_ = dd;
+    data_.due_date = dd;
 }
 void Context::setPriority(const Task::Priority &p){
-    data_.priority_ = p;
+    data_.priority = p;
 }
 
 void Context::setData(const Task::Data &d) {

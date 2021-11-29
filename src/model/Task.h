@@ -20,10 +20,10 @@ public:
         HIGH
     };
     struct Data{
-        std::string title_;
-        Priority priority_;
-        time_t due_date_;
-        bool isComplete_ = false;
+        std::string title;
+        Priority priority;
+        time_t due_date;
+        bool isComplete = false;
     };
     static Task Create(const std::string& title, Task::Priority p, time_t due_date, bool complete_flag);
     static Task Create(const Task::Data&);
