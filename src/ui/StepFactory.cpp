@@ -35,29 +35,21 @@ StepFactory::StepFactory() : steps_{{
 std::shared_ptr<Step> StepFactory::create(const std::string &command) {
     if (command == "add") {
         return getAddStep();
-    }
-    else if (command == "help"){
+    } else if (command == "help") {
         return getHelpStep();
-    }
-    else if (command == "quit"){
+    } else if (command == "quit") {
         return getQuitStep();
-    }
-    else if (command == "show"){
+    } else if (command == "show") {
         return getShowStep();
-    }
-    else if (command == "edit"){
+    } else if (command == "edit") {
         return getEditStep();
-    }
-    else if (command == "subtask"){
+    } else if (command == "subtask") {
         return getSubtaskStep();
-    }
-    else if (command == "complete"){
+    } else if (command == "complete") {
         return getCompleteStep();
-    }
-    else if (command == "delete"){
+    } else if (command == "delete") {
         return getDeleteStep();
-    }
-    else{
+    } else {
         std::cout << "Wrong command. Try again. Type `help` for help.\n";
         return getHomeStep();
     }

@@ -10,8 +10,8 @@
 
 class Node{
 public:
-    Node() : ancestor_(TaskID::invalidID()) { };
-    Node(std::optional<TaskID> ancestor) : ancestor_(ancestor) { };
+    Node() : ancestor_(TaskID::invalidID()) {};
+    Node(std::optional<TaskID> ancestor) : ancestor_(ancestor) {};
 
     std::optional<TaskID> parent() const;
     std::string label() const;

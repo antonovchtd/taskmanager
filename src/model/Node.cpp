@@ -4,13 +4,13 @@
 
 #include "Node.h"
 
-void Node::AddChild(const TaskID& id){
+void Node::AddChild(const TaskID& id) {
     children_.push_back(id);
 }
 
-void Node::removeChild(const TaskID& id){
+void Node::removeChild(const TaskID& id) {
     std::vector<TaskID>::iterator ch;
-    for (ch = children_.begin(); ch != children_.end(); ++ch){
+    for (ch = children_.begin(); ch != children_.end(); ++ch) {
         if (*ch == id)
             break;
     }
@@ -18,15 +18,15 @@ void Node::removeChild(const TaskID& id){
         children_.erase(ch);
 }
 
-std::optional<TaskID> Node::parent() const{
+std::optional<TaskID> Node::parent() const {
     return ancestor_;
 }
 
-std::string Node::label() const{
+std::string Node::label() const {
     return label_;
 }
 
-std::vector<TaskID> Node::children() const{
+std::vector<TaskID> Node::children() const {
     return children_;
 }
 

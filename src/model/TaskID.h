@@ -10,7 +10,7 @@
 
 class TaskID{
 public:
-    explicit TaskID(unsigned int val) : value_(val) { };
+    explicit TaskID(unsigned int val) : value_(val) {};
     static std::optional<TaskID> invalidID();
 
     unsigned int value() const;

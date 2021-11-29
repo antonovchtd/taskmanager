@@ -3,9 +3,10 @@
 
     add     enters a wizard that prompts you to enter in succession: the new task's title,
             priority and due date in the format dd/mm/yy (or yyyy) + optionally time in the
-            format hh:mm. Alternatively, the due date can be set relatively to the current
-            time by typing "in dd:hh:mm" (days are optional). If nothing is entered,
-            priority defaults to NONE.
+            format hh:mm. Separators can be dots (`.`) and year is optional altogether if
+            it's equal to the current one. Alternatively, the due date can be set relatively
+            to the current time by typing "in dd:hh:mm" (days are optional). If nothing is
+            entered, priority defaults to NONE.
 
     edit    enters the same wizard as "add", preceded by an ask for in ID. After the wizard
             is done, overwrites the existing entry with the given ID.

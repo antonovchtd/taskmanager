@@ -34,7 +34,7 @@ void TaskManager::Edit(TaskID id, Task t) {
 
 void TaskManager::Complete(TaskID id) {
     Task t = tasks_[id].first;
-    this->Edit(id, Task::Create(t.title(), t.priority(), t.due_date(), true));
+    this->Edit(id, Task::Create(t.title(), t.priority(), t.dueDate(), true));
 }
 
 std::pair<Task, Node>& TaskManager::operator[](TaskID id) {
@@ -58,14 +58,14 @@ void TaskManager::recursivePrint(std::ostream &os, const std::pair<TaskID, std::
 }
 
 void TaskManager::Show(std::ostream &os) const{
-    for (const auto &kv : tasks_){
+    for (const auto &kv : tasks_) {
         if (kv.second.second.parent() == TaskID::invalidID())
             recursivePrint(os, kv, "");
     }
 }
 
 void TaskManager::Show(std::ostream &os, std::string &label) const{
-    for (const auto &kv : tasks_){
+    for (const auto &kv : tasks_) {
         if (kv.second.second.label() == label)
             os << kv;
     }

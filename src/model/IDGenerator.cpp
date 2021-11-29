@@ -4,6 +4,6 @@
 
 #include "IDGenerator.h"
 
-TaskID IDGenerator::genID(){
+TaskID IDGenerator::genID() {
     return TaskID(last_++);
 }

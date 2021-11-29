@@ -23,17 +23,17 @@ public:
         std::string title;
         Priority priority;
         time_t due_date;
-        bool isComplete = false;
+        bool is_complete = false;
     };
     static Task Create(const std::string& title, Task::Priority p, time_t due_date, bool complete_flag);
     static Task Create(const Task::Data&);
 
 public:
-    Task() : Task("Default", Priority::NONE, 0, false) { };
-    time_t due_date() const { return due_date_; };
+    Task() : Task("Default", Priority::NONE, 0, false) {};
+    time_t dueDate() const { return due_date_; };
     std::string title() const { return title_; };
     Priority priority() const { return priority_; };
-    bool isComplete() const { return isComplete_; };
+    bool isComplete() const { return is_complete_; };
     Data data() const;
     bool operator==(const Task&) const;
 
@@ -44,7 +44,7 @@ private:
     std::string title_;
     Priority priority_;
     time_t due_date_;
-    bool isComplete_ = false;
+    bool is_complete_ = false;
 };
 
 
