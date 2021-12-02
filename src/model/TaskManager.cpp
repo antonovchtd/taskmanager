@@ -3,15 +3,16 @@
 //
 
 #include "TaskManager.h"
+#include "utils.h"
 
-TaskID TaskManager::Add(Task t, std::optional<TaskID> ancestor) {
+TaskID TaskManager::Add(Task t, TaskID ancestor) {
     TaskID id = gen_->genID();
     if (Validate(id))
         throw std::runtime_error("TaskManager::Add attempts to overwrite task");
 
     tasks_[id] = std::make_pair(std::move(t), Node(ancestor));
-    if (ancestor)
-        tasks_[ancestor.value()].second.AddChild(id);
+    if (ancestor.isValid())
+        tasks_[ancestor].second.AddChild(id);
     return id;
 }
 
@@ -41,30 +42,11 @@ std::pair<Task, Node>& TaskManager::operator[](TaskID id) {
     return tasks_[id];
 }
 
-std::ostream & operator<<(std::ostream &os, const TaskID& id);
-std::ostream & operator<<(std::ostream &os, const Task& t);
-
-std::ostream & operator<<(std::ostream &os, const std::pair<TaskID, std::pair<Task, Node>>& kv){
-    os << kv.first << " — " << kv.second.first;
-    return os;
+void TaskManager::Show(std::ostream &os) const {
+    os << tasks_;
 }
 
-void TaskManager::recursivePrint(std::ostream &os, const std::pair<TaskID, std::pair<Task, Node>>& kv, const std::string& prefix) const {
-    os << prefix << kv;
-    for (const auto &id : kv.second.second.children()) {
-        auto ch = std::make_pair(id, tasks_.at(id));
-        recursivePrint(os, ch, prefix + "    ");
-    }
-}
-
-void TaskManager::Show(std::ostream &os) const{
-    for (const auto &kv : tasks_) {
-        if (kv.second.second.parent() == TaskID::invalidID())
-            recursivePrint(os, kv, "");
-    }
-}
-
-void TaskManager::Show(std::ostream &os, std::string &label) const{
+void TaskManager::Show(std::ostream &os, std::string &label) const {
     for (const auto &kv : tasks_) {
         if (kv.second.second.label() == label)
             os << kv;

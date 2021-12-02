@@ -5,18 +5,24 @@
 #ifndef TASKMANAGER_SRC_UI_MACHINE_H_
 #define TASKMANAGER_SRC_UI_MACHINE_H_
 
+#include "../model/TaskManager.h"
+#include "../controller/Controller.h"
 #include "Context.h"
-#include "StepFactory.h"
+#include "Factory.h"
 
 class Machine {
 public:
-    Machine() = default;
-    explicit Machine(const Context &c) : context_(c) {};
-    Context run(std::optional<StepFactory::State> state = std::nullopt);
+    Machine();
+    explicit Machine(const Factory::State &s);
+
+public:
+    Context run();
 
 private:
     Context context_;
-    StepFactory factory_;
+    Factory factory_;
+    Controller controller_;
+    TaskManager model_;
 };
 
 

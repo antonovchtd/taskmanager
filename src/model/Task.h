@@ -10,7 +10,6 @@
 #include <map>
 #include <iostream>
 
-//Value Type
 class Task {
 public:
     enum class Priority {
@@ -25,16 +24,20 @@ public:
         time_t due_date;
         bool is_complete = false;
     };
+
+public:
+    Task();
     static Task Create(const std::string& title, Task::Priority p, time_t due_date, bool complete_flag);
     static Task Create(const Task::Data&);
 
 public:
-    Task() : Task("Default", Priority::NONE, 0, false) {};
-    time_t dueDate() const { return due_date_; };
-    std::string title() const { return title_; };
-    Priority priority() const { return priority_; };
-    bool isComplete() const { return is_complete_; };
+    time_t dueDate() const;
+    std::string title() const;
+    Priority priority() const;
+    bool isComplete() const;
     Data data() const;
+
+public:
     bool operator==(const Task&) const;
 
 private:
@@ -44,7 +47,7 @@ private:
     std::string title_;
     Priority priority_;
     time_t due_date_;
-    bool is_complete_ = false;
+    bool is_complete_;
 };
 
 

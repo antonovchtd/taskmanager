@@ -6,23 +6,26 @@
 #define TASKMANAGER_SRC_MODEL_TASKID_H_
 
 #include <iostream>
+#include <string>
 #include <optional>
 
 class TaskID{
 public:
-    explicit TaskID(unsigned int val) : value_(val) {};
-    static std::optional<TaskID> invalidID();
+    explicit TaskID(int val);
+    static TaskID Create(const std::string &);
+    static TaskID invalidID();
+    static TaskID nullid();
 
-    unsigned int value() const;
-    std::string str() const;
+    bool isValid() const;
+    int value() const;
+    std::string to_string() const;
 
-    friend std::istream& operator>>(std::istream& is, TaskID& id);
     bool operator==(const TaskID&) const;
     bool operator!=(const TaskID&) const;
     bool operator<(const TaskID&) const;
 
 private:
-    unsigned int value_;
+    int value_;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_TASKID_H_

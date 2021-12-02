@@ -4,6 +4,9 @@
 
 #include "Task.h"
 
+Task::Task() : Task("Default", Priority::NONE, 0, false) {
+}
+
 Task::Task(std::string title, Task::Priority p, time_t due_date, bool complete_flag) :
         title_{std::move(title)},
         priority_{p},
@@ -22,29 +25,26 @@ Task Task::Create(const std::string &title, Task::Priority p, time_t due_date, b
     return {title, p, due_date, complete_flag};
 }
 
+time_t Task::dueDate() const {
+    return due_date_;
+}
+
+std::string Task::title() const {
+    return title_;
+}
+
+Task::Priority Task::priority() const {
+    return priority_;
+}
+
+bool Task::isComplete() const {
+    return is_complete_;
+}
+
 bool Task::operator==(const Task& rhs) const {
     return title_ == rhs.title()
         && priority_ == rhs.priority()
         && due_date_ == rhs.dueDate();
-}
-
-std::ostream & operator<<(std::ostream &os, const Task& t) {
-    const std::string priorityName[] = { "None", "Low", "Medium", "High"};
-    os << t.title() << ", Priority: " <<
-       priorityName[static_cast<int>(t.priority())];
-    if (t.dueDate() < time(nullptr)) {
-        os << " [overdue] ";
-    } else {
-        time_t dd = t.dueDate();
-        std::string str_time = std::string(asctime(localtime(&dd)));
-        str_time.pop_back();
-        os << ", Due: " << str_time;
-    }
-    if (t.isComplete()) {
-        os << " [completed] ";
-    }
-    os << std::endl;
-    return os;
 }
 
 Task::Data Task::data() const {

@@ -4,12 +4,38 @@
 
 #include "Context.h"
 
-void Context::execute(StepFactory &f) {
-    step_->execute(*this, f);
+std::shared_ptr<Step> Context::getStep() {
+    return step_;
 }
 
-void Context::changeStep(const std::shared_ptr<Step> &s) {
+std::shared_ptr<Step> Context::getOldStep() {
+    return oldStep_;
+}
+
+Task::Data Context::data() {
+    return data_;
+}
+
+std::optional<TaskID> Context::id() {
+    return id_;
+}
+
+void Context::setStep(const std::shared_ptr<Step> &s) {
+    setOldStep(getStep());
     step_ = s;
+}
+
+void Context::setOldStep(const std::shared_ptr<Step> &s) {
+    oldStep_ = s;
+}
+
+void Context::revertStep() {
+    step_ = oldStep_;
+}
+
+void Context::resetTaskData() {
+    data_ = Task::Data{};
+    id_ = TaskID::invalidID();
 }
 
 void Context::setTitle(const std::string &title) {
@@ -28,4 +54,12 @@ void Context::setData(const Task::Data &d) {
 
 void Context::setID(const std::optional<TaskID> &id) {
     id_ = id;
+}
+
+std::map<TaskID, std::pair<Task, Node>> Context::getTasks() {
+    return tasks_;
+}
+
+void Context::setTasks(const std::map<TaskID, std::pair<Task, Node>> &tasks) {
+    tasks_ = tasks;
 }

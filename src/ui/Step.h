@@ -11,105 +11,98 @@
 #include <fstream>
 #include <regex>
 #include <optional>
+#include <sstream>
 
-//#include "StepFactory.h"
-class StepFactory;
+#include "../model/Task.h"
 
 class Context;
+class Action;
+class Factory;
 
 class Step{
 public:
-    virtual void execute(Context &c, StepFactory &f) = 0;
+    virtual std::shared_ptr<Action> execute(Context &c, Factory &f) = 0;
+    virtual void process(Context &c, Factory &f) = 0;
+    virtual std::shared_ptr<Action> getValidateIDAction(Factory &f) = 0;
     static std::string read(const std::string &prompt);
     static void print(const std::string &line);
+    static void printFromFile(const std::string &fname);
     virtual ~Step() = default;
-
 };
 
 class HomeStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
 class HelpStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
 class AddStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
-class ReadIDStep : public Step{
+class ReadTaskDataStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
-};
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 
-class ReadTitleStep : public Step{
-public:
-    void execute(Context &c, StepFactory &f) override;
-};
-
-class ReadPriorityStep : public Step{
-public:
-    void execute(Context &c, StepFactory &f) override;
-};
-
-class ReadDueDateStep : public Step{
 public:
     static std::optional<time_t> stringToTime(const std::string &);
-    void execute(Context &c, StepFactory &f) override;
+    static bool validateTitle(const std::string &);
+    static std::optional<Task::Priority> stringToPriority(const std::string &);
 };
 
 class EditStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
 class SubtaskStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
-};
-
-class AcknowledgeStep : public Step{
-public:
-    void execute(Context &c, StepFactory &f) override;
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
 class QuitStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
-};
-
-class AddTaskStep : public Step{
-public:
-    void execute(Context &c, StepFactory &f) override;
-};
-
-class EditTaskStep : public Step{
-public:
-    void execute(Context &c, StepFactory &f) override;
-};
-
-class AddSubtaskStep : public Step{
-public:
-    void execute(Context &c, StepFactory &f) override;
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
 class ShowStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
 class CompleteStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
 class DeleteStep : public Step{
 public:
-    void execute(Context &c, StepFactory &f) override;
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
 #endif //TASKMANAGER_SRC_UI_STATE_H_

@@ -4,11 +4,23 @@
 
 #include "Context.h"
 #include "Step.h"
-#include "StepFactory.h"
+#include "Factory.h"
 #include "Machine.h"
+
+#include "../model/utils.h"
 
 void Step::print(const std::string &line){
     std::cout << line;
+}
+
+void Step::printFromFile(const std::string &fname){
+    std::ifstream file(fname);
+    std::string line;
+    if (file.is_open()) {
+        while (getline(file, line))
+            Step::print(line + "\n");
+        file.close();
+    };
 }
 
 std::string Step::read(const std::string &prompt) {
@@ -18,148 +30,79 @@ std::string Step::read(const std::string &prompt) {
     return input;
 }
 
-void HomeStep::execute(Context &c, StepFactory &f) {
-    std::string command = Step::read(" > ");
-    c.changeStep(f.create(command));
+std::shared_ptr<Action> HomeStep::execute(Context &c, Factory &f) {
+    std::stringstream ss{Step::read(" > ")};
+    std::string command, id;
+    ss >> command >> id;
+    c.setStep(f.create(command));
+    c.setID(TaskID::Create(id));
+    return c.getStep()->getValidateIDAction(f);
 }
 
-void HelpStep::execute(Context &c, StepFactory &f) {
-    std::ifstream file("../src/model/help.txt");
-    std::string line;
-    if (file.is_open()) {
-        while (getline(file, line))
-            Step::print(line + "\n");
-        file.close();
+void HomeStep::process(Context &c, Factory &f) {
+    if (c.id().has_value()) {
+        if (!c.id()->isValid())
+            Step::print("Invalid ID. Try again.\n");
+    } else {
+        Step::print("This function takes no ID value.\n");
     }
-    c.changeStep(f.nextStep(*this));
 }
 
-void AddStep::execute(Context &c, StepFactory &f) {
+std::shared_ptr<Action> HomeStep::getValidateIDAction(Factory &f) {
+    return f.getValidateNoIDAction();
+}
+
+std::shared_ptr<Action> HelpStep::execute(Context &c, Factory &f) {
+    Step::printFromFile("../src/model/help.txt");
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void HelpStep::process(Context &c, Factory &f) {
+    // do nothing
+}
+
+std::shared_ptr<Action> HelpStep::getValidateIDAction(Factory &f) {
+    return f.getValidateNoIDAction();
+}
+
+std::shared_ptr<Action> AddStep::execute(Context &c, Factory &f) {
     Step::print("[Add Task]\n");
-    Machine wizard(c);
-    c = wizard.run(StepFactory::State::READTITLE);
-    c.changeStep(f.nextStep(*this));
+    Machine wizard(Factory::State::READTASK);
+    Context input_context = wizard.run();
+    c.setData(input_context.data());
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
 }
 
-void ReadIDStep::execute(Context &c, StepFactory &f) {
-    std::string input;
-    while (true) {
-        input = Step::read("   Task ID (`show` to show tasks) > ");
-        if (input == "show") {
-            ShowStep shs;
-            shs.execute(c, f); // Note: changes step_ of c, but does not matter
-        }
-        else if (auto id = TaskID((unsigned int) std::stoi(input)); c.man_->Validate(id)){
-            c.setID(id);
-            break;
-        }
-        else
-            Step::print("   Bad ID. Try again.\n");
+void AddStep::process(Context &c, Factory &f) {
+    Step::print("Added Task with ID " + c.id().value().to_string() + ".\n");
+    c.resetTaskData();
+}
 
+std::shared_ptr<Action> AddStep::getValidateIDAction(Factory &f) {
+    return f.getValidateNoIDAction();
+}
+
+bool ReadTaskDataStep::validateTitle(const std::string &title) {
+    if (title.empty()) {
+        Step::print("Title cannot be empty!\n");
+        return false;
     }
-    c.changeStep(f.nextStep(*this));
+    return true;
 }
 
-void ReadTitleStep::execute(Context &c, StepFactory &f) {
-    std::string title;
-    while (true) {
-        title = Step::read("    Title > ");
-        if (title.empty())
-            Step::print("Title cannot be empty!\n");
-        else
-            break;
+std::optional<Task::Priority> ReadTaskDataStep::stringToPriority(const std::string &priority) {
+    int pint = priority.empty() ? 0 : std::stoi(priority);
+    if (pint >= 0 && pint <= 3)
+        return static_cast<Task::Priority>(pint);
+    else {
+        Step::print("    Wrong priority option. Try again.\n");
+        return std::nullopt;
     }
-    c.setTitle(title);
-    c.changeStep(f.nextStep(*this));
 }
 
-void ReadPriorityStep::execute(Context &c, StepFactory &f) {
-    std::string p;
-    int pint;
-    while (true) {
-        p = Step::read("    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > ");
-        pint = p.empty() ? 0 : std::stoi(p);
-        if (pint >= 0 && pint <= 3)
-            break;
-        else
-            Step::print("    Wrong priority option. Try again.\n");
-    }
-    c.setPriority(static_cast<Task::Priority>(pint));
-    c.changeStep(f.nextStep(*this));
-}
-
-void ReadDueDateStep::execute(Context &c, StepFactory &f) {
-    std::optional<time_t> due_date;
-    while (true) {
-        std::string datestring = Step::read("    Due > ");
-        due_date = ReadDueDateStep::stringToTime(datestring);
-        if (due_date)
-            break;
-        else
-            Step::print("    Wrong date format. Try again.\n");
-    }
-    c.setDueDate(due_date.value());
-    c.changeStep(f.nextStep(*this));
-}
-
-void EditStep::execute(Context &c, StepFactory &f) {
-    Step::print("[Edit Task]\n");
-    Machine wizard(c);
-    c = wizard.run(StepFactory::State::READID);
-    c.changeStep(f.nextStep(*this));
-}
-
-void SubtaskStep::execute(Context &c, StepFactory &f) {
-    Step::print("[Add Subtask]\n");
-    Machine wizard(c);
-    c = wizard.run(StepFactory::State::READID);
-    c.changeStep(f.nextStep(*this));
-}
-
-void AcknowledgeStep::execute(Context &c, StepFactory &f) {
-    Step::print("Added Task with ID " + c.id().value().str() + "\n");
-    c.changeStep(f.nextStep(*this));
-}
-
-void QuitStep::execute(Context &c, StepFactory &f) {
-    c.changeStep(f.nextStep(*this));
-}
-
-void AddTaskStep::execute(Context &c, StepFactory &f) {
-    c.id_ = c.man_->Add(Task::Create(c.data()));
-    c.changeStep(f.nextStep(*this));
-}
-
-void EditTaskStep::execute(Context &c, StepFactory &f) {
-    c.man_->Edit(c.id().value(), Task::Create(c.data()));
-    c.changeStep(f.nextStep(*this));
-}
-
-void AddSubtaskStep::execute(Context &c, StepFactory &f) {
-    c.id_ = c.man_->Add(Task::Create(c.data()), c.id().value());
-    c.changeStep(f.nextStep(*this));
-}
-
-void ShowStep::execute(Context &c, StepFactory &f) {
-    c.man_->Show(std::cout);
-    c.changeStep(f.nextStep(*this));
-}
-
-void CompleteStep::execute(Context &c, StepFactory &f) {
-    ReadIDStep rids;
-    rids.execute(c,f);
-    c.man_->Complete(c.id().value());
-    c.changeStep(f.nextStep(*this));
-}
-
-void DeleteStep::execute(Context &c, StepFactory &f) {
-    ReadIDStep rids;
-    rids.execute(c,f);
-    c.man_->Delete(c.id().value());
-    c.changeStep(f.nextStep(*this));
-}
-
-std::optional<time_t> ReadDueDateStep::stringToTime(const std::string &datestring) {
+std::optional<time_t> ReadTaskDataStep::stringToTime(const std::string &datestring) {
     std::smatch matches;
     if (std::regex_search(datestring, matches,
                           std::regex(R"(in (\d+:)?(\d+):(\d+))"))) {
@@ -167,7 +110,7 @@ std::optional<time_t> ReadDueDateStep::stringToTime(const std::string &datestrin
                + std::stoi(matches.str(2))*3600
                + std::stoi(matches.str(3))*60;
     } else if (std::regex_search(datestring, matches,
-                               std::regex(R"((\d+)[./](\d+)([./](\d+))?( (\d+):(\d+))?)"))){
+                                 std::regex(R"((\d+)[./](\d+)([./](\d+))?( (\d+):(\d+))?)"))){
         time_t rawtime;
         time(&rawtime);
         struct tm * timeinfo = localtime(&rawtime);
@@ -190,6 +133,125 @@ std::optional<time_t> ReadDueDateStep::stringToTime(const std::string &datestrin
         }
         timeinfo->tm_sec = 0;
         return mktime(timeinfo);
-    } else
+    } else {
+        Step::print("    Wrong date format. Try again.\n");
         return std::nullopt;
+    }
+}
+
+std::shared_ptr<Action> ReadTaskDataStep::execute(Context &c, Factory &f) {
+    std::string title;
+    do {
+        title = Step::read("    Title > ");
+    } while (!validateTitle(title));
+    c.setTitle(title);
+
+    std::optional<Task::Priority> priority{std::nullopt};
+    while (!priority) {
+        priority = stringToPriority(Step::read("    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > "));
+    };
+    c.setPriority(priority.value());
+
+    std::optional<time_t> due_date;
+    while (!due_date) {
+        due_date = ReadTaskDataStep::stringToTime(Step::read("    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} > "));
+    }
+    c.setDueDate(due_date.value());
+
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void ReadTaskDataStep::process(Context &c, Factory &f) {
+    // do nothing
+}
+
+std::shared_ptr<Action> ReadTaskDataStep::getValidateIDAction(Factory &f) {
+    return f.getValidateNoIDAction();
+}
+
+std::shared_ptr<Action> EditStep::execute(Context &c, Factory &f) {
+    Step::print("[Edit Task]\n");
+    Machine wizard(Factory::State::READTASK);
+    Context input_context = wizard.run();
+    c.setData(input_context.data());
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void EditStep::process(Context &c, Factory &f) {
+    Step::print("Edited Task with ID " + c.id().value().to_string() + ".\n");
+}
+
+std::shared_ptr<Action> EditStep::getValidateIDAction(Factory &f) {
+    return f.getValidateIDAction();
+}
+
+std::shared_ptr<Action> SubtaskStep::execute(Context &c, Factory &f) {
+    Step::print("[Add Subtask]\n");
+    Machine wizard(Factory::State::READTASK);
+    Context input_context = wizard.run();
+    c.setData(input_context.data());
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void SubtaskStep::process(Context &c, Factory &f) {
+    Step::print("Added Subtask with ID " + c.id().value().to_string() + ".\n");
+}
+
+std::shared_ptr<Action> SubtaskStep::getValidateIDAction(Factory &f) {
+    return f.getValidateIDAction();
+}
+
+std::shared_ptr<Action> QuitStep::execute(Context &c, Factory &f) {
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void QuitStep::process(Context &c, Factory &f) {
+    // do nothing
+}
+
+std::shared_ptr<Action> QuitStep::getValidateIDAction(Factory &f) {
+    return f.getValidateNoIDAction();
+}
+
+std::shared_ptr<Action> ShowStep::execute(Context &c, Factory &f) {
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void ShowStep::process(Context &c, Factory &f) {
+    std::cout << c.getTasks();
+}
+
+std::shared_ptr<Action> ShowStep::getValidateIDAction(Factory &f) {
+    return f.getValidateNoIDAction();
+}
+
+std::shared_ptr<Action> CompleteStep::execute(Context &c, Factory &f) {
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void CompleteStep::process(Context &c, Factory &f) {
+    Step::print("Marked Task with ID " + c.id().value().to_string() + " as completed.\n");
+}
+
+std::shared_ptr<Action> CompleteStep::getValidateIDAction(Factory &f) {
+    return f.getValidateIDAction();
+}
+
+std::shared_ptr<Action> DeleteStep::execute(Context &c, Factory &f) {
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void DeleteStep::process(Context &c, Factory &f) {
+    Step::print("Deleted Task with ID " + c.id().value().to_string() + ".\n");
+}
+
+std::shared_ptr<Action> DeleteStep::getValidateIDAction(Factory &f) {
+    return f.getValidateIDAction();
 }

@@ -4,13 +4,22 @@
 
 #include "Machine.h"
 
-Context Machine::run(std::optional<StepFactory::State> state) {
-    if (state)
-        context_.changeStep(factory_.getStep(state.value()));
-    else
-        context_.changeStep(factory_.nextStep());
+Machine::Machine() {
+    context_.setStep(factory_.getStep(Factory::State::HOME));
+}
+
+Machine::Machine(const Factory::State &s) {
+    context_.setStep(factory_.getStep(s));
+}
+
+Context Machine::run() {
+
     while (context_.getStep()){
-        context_.execute(factory_);
+        auto act = context_.getStep()->execute(context_, factory_);
+        if (act) {
+            controller_.Accept(model_, context_, act);
+            context_.getOldStep()->process(context_, factory_);
+        }
     }
     return context_;
 }

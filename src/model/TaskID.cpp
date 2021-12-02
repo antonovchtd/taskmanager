@@ -4,19 +4,41 @@
 
 #include "TaskID.h"
 
-unsigned int TaskID::value() const {
+TaskID::TaskID(int val) : value_(val) {
+}
+
+TaskID TaskID::Create(const std::string &str) {
+    try {
+        if (str.empty())
+            throw std::invalid_argument{""};
+        return TaskID(std::stoi(str));
+    }
+    catch (const std::invalid_argument &) {
+        return TaskID::invalidID();
+    }
+}
+
+int TaskID::value() const {
     return value_;
 }
 
-std::optional<TaskID> TaskID::invalidID() {
-    return std::nullopt;
+TaskID TaskID::invalidID() {
+    return TaskID(-1);
+}
+
+TaskID TaskID::nullid() {
+    return TaskID(0);
+}
+
+bool TaskID::isValid() const {
+    return value_ >= 0;
 }
 
 bool TaskID::operator==(const TaskID& rhs) const {
     return value_ == rhs.value();
 }
 
-std::string TaskID::str() const {
+std::string TaskID::to_string() const {
     return std::to_string(value_);
 }
 
@@ -26,14 +48,4 @@ bool TaskID::operator!=(const TaskID& rhs) const {
 
 bool TaskID::operator<(const TaskID& rhs) const {
     return value_ < rhs.value();
-}
-
-std::ostream & operator<<(std::ostream &os, const TaskID& id) {
-    os << id.value();
-    return os;
-}
-
-std::istream& operator>>(std::istream& is, TaskID& id) {
-    is >> id.value_;
-    return is;
 }
