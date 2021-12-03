@@ -14,11 +14,12 @@
 
 class Context{
 public:
-    std::shared_ptr<Step> getStep();
-    std::shared_ptr<Step> getOldStep();
-    Task::Data data();
-    std::optional<TaskID> id();
-    std::map<TaskID, std::pair<Task, Node>> getTasks();
+    std::shared_ptr<Step> getStep() const;
+    std::shared_ptr<Step> getOldStep() const;
+    Task::Data data() const;
+    std::optional<TaskID> id() const;
+    std::map<TaskID, std::pair<Task, Node>> getTasks() const;
+    std::string label() const;
 
 public:
     void setStep(const std::shared_ptr<Step> &);
@@ -29,6 +30,7 @@ public:
     void setData(const Task::Data &);
     void setID(const std::optional<TaskID> &);
     void setTasks(const std::map<TaskID, std::pair<Task, Node>> &);
+    void setLabel(const std::string &);
 
 public:
     void revertStep();
@@ -38,6 +40,7 @@ private:
     Task::Data data_;
     std::optional<TaskID> id_;
     std::map<TaskID, std::pair<Task, Node>> tasks_;
+    std::string label_;
     std::shared_ptr<Step> step_;
     std::shared_ptr<Step> oldStep_;
 };

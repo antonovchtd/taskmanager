@@ -18,7 +18,6 @@ std::ostream & operator<<(std::ostream &os, const Task& t) {
     if (t.isComplete()) {
         os << " [completed] ";
     }
-    os << std::endl;
     return os;
 }
 
@@ -27,8 +26,14 @@ std::ostream & operator<<(std::ostream &os, const TaskID& id) {
     return os;
 }
 
+std::ostream & operator<<(std::ostream &os, const Node& node) {
+    if (!node.label().empty())
+        os << "L:" << node.label();
+    return os;
+}
+
 std::ostream & operator<<(std::ostream &os, const std::pair<TaskID, std::pair<Task, Node>>& kv) {
-    os << kv.first << " — " << kv.second.first;
+    os << kv.first << " — " << kv.second.first << " " << kv.second.second << std::endl;
     return os;
 }
 

@@ -4,20 +4,28 @@
 
 #include "Context.h"
 
-std::shared_ptr<Step> Context::getStep() {
+std::shared_ptr<Step> Context::getStep() const {
     return step_;
 }
 
-std::shared_ptr<Step> Context::getOldStep() {
+std::shared_ptr<Step> Context::getOldStep() const {
     return oldStep_;
 }
 
-Task::Data Context::data() {
+Task::Data Context::data() const {
     return data_;
 }
 
-std::optional<TaskID> Context::id() {
+std::optional<TaskID> Context::id() const {
     return id_;
+}
+
+std::map<TaskID, std::pair<Task, Node>> Context::getTasks() const {
+    return tasks_;
+}
+
+std::string Context::label() const {
+    return label_;
 }
 
 void Context::setStep(const std::shared_ptr<Step> &s) {
@@ -56,10 +64,10 @@ void Context::setID(const std::optional<TaskID> &id) {
     id_ = id;
 }
 
-std::map<TaskID, std::pair<Task, Node>> Context::getTasks() {
-    return tasks_;
-}
-
 void Context::setTasks(const std::map<TaskID, std::pair<Task, Node>> &tasks) {
     tasks_ = tasks;
+}
+
+void Context::setLabel(const std::string &s) {
+    label_ = s;
 }

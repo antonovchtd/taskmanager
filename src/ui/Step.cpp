@@ -254,3 +254,17 @@ void DeleteStep::process(Context &c, Factory &f) {
 std::shared_ptr<Action> DeleteStep::getValidateIDAction(Factory &f) {
     return f.getValidateIDAction();
 }
+
+std::shared_ptr<Action> LabelStep::execute(Context &c, Factory &f) {
+    c.setLabel(Step::read("[Add Label]\n    >> "));
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void LabelStep::process(Context &c, Factory &f) {
+    Step::print("Added label to Task with ID " + c.id().value().to_string() + ".\n");
+}
+
+std::shared_ptr<Action> LabelStep::getValidateIDAction(Factory &f) {
+    return f.getValidateIDAction();
+}

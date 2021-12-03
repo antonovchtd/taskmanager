@@ -24,7 +24,8 @@ public:
         QUIT,
         SHOW,
         COMPLETE,
-        DELETE
+        DELETE,
+        LABEL
     };
 
     enum class ActionLabel{
@@ -35,7 +36,8 @@ public:
         EDIT,
         SHOW,
         COMPLETE,
-        DELETE
+        DELETE,
+        LABEL
     };
 
 public:
@@ -53,6 +55,7 @@ public:
     std::shared_ptr<Step> nextStep(const ShowStep &);
     std::shared_ptr<Step> nextStep(const CompleteStep &);
     std::shared_ptr<Step> nextStep(const DeleteStep &);
+    std::shared_ptr<Step> nextStep(const LabelStep &);
 
     std::shared_ptr<Step> getStep(const State &);
     std::shared_ptr<Step> getHomeStep();
@@ -65,6 +68,7 @@ public:
     std::shared_ptr<Step> getShowStep();
     std::shared_ptr<Step> getCompleteStep();
     std::shared_ptr<Step> getDeleteStep();
+    std::shared_ptr<Step> getLabelStep();
 
     std::shared_ptr<Action> getAction(const HelpStep &);
     std::shared_ptr<Action> getAction(const AddStep &);
@@ -75,6 +79,7 @@ public:
     std::shared_ptr<Action> getAction(const ShowStep &);
     std::shared_ptr<Action> getAction(const CompleteStep &);
     std::shared_ptr<Action> getAction(const DeleteStep &);
+    std::shared_ptr<Action> getAction(const LabelStep &);
 
     std::shared_ptr<Action> getAddTaskAction();
     std::shared_ptr<Action> getAddSubtaskAction();
@@ -84,6 +89,7 @@ public:
     std::shared_ptr<Action> getShowAction();
     std::shared_ptr<Action> getCompleteAction();
     std::shared_ptr<Action> getDeleteAction();
+    std::shared_ptr<Action> getLabelAction();
 
 private:
     std::map<State, std::shared_ptr<Step>> steps_;

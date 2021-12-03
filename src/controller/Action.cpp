@@ -42,3 +42,7 @@ void CompleteTaskAction::make(TaskManager &model, Context &context) {
 void DeleteTaskAction::make(TaskManager &model, Context &context) {
     model.Delete(context.id().value());
 }
+
+void LabelAction::make(TaskManager &model, Context &context) {
+    model[context.id().value()].second.SetLabel(context.label());
+}

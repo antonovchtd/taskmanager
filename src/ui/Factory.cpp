@@ -19,7 +19,8 @@ Factory::Factory() : steps_{{
     {State::QUIT, nullptr},
     {State::SHOW, nullptr},
     {State::COMPLETE, nullptr},
-    {State::DELETE, nullptr}
+    {State::DELETE, nullptr},
+    {State::LABEL, nullptr}
 }}
 {
 }
@@ -41,6 +42,8 @@ std::shared_ptr<Step> Factory::create(const std::string &command) {
         return getCompleteStep();
     } else if (command == "delete") {
         return getDeleteStep();
+    } else if (command == "label") {
+        return getLabelStep();
     } else {
         if (!command.empty())
             std::cout << "Wrong command. Try again. Type `help` for help.\n";
@@ -88,6 +91,10 @@ std::shared_ptr<Step> Factory::nextStep(const DeleteStep &) {
     return getHomeStep();
 }
 
+std::shared_ptr<Step> Factory::nextStep(const LabelStep &) {
+    return getHomeStep();
+}
+
 std::shared_ptr<Step> Factory::getHomeStep() {
     FACTORY_GEN_MAP_GETTER(steps_, Step, State::HOME, HomeStep)
 }
@@ -128,6 +135,10 @@ std::shared_ptr<Step> Factory::getDeleteStep() {
     FACTORY_GEN_MAP_GETTER(steps_, Step, State::DELETE, DeleteStep)
 }
 
+std::shared_ptr<Step> Factory::getLabelStep() {
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::LABEL, LabelStep)
+}
+
 std::shared_ptr<Step> Factory::getStep(const State &s) {
     switch (s){
         case State::HOME:
@@ -150,6 +161,8 @@ std::shared_ptr<Step> Factory::getStep(const State &s) {
             return getCompleteStep();
         case State::DELETE:
             return getDeleteStep();
+        case State::LABEL:
+            return getLabelStep();
     }
 }
 
@@ -187,6 +200,10 @@ std::shared_ptr<Action> Factory::getAction(const CompleteStep &) {
 
 std::shared_ptr<Action> Factory::getAction(const DeleteStep &) {
     return getDeleteAction();
+}
+
+std::shared_ptr<Action> Factory::getAction(const LabelStep &) {
+    return getLabelAction();
 }
 
 std::shared_ptr<Action> Factory::getAddTaskAction(){
@@ -233,4 +250,10 @@ std::shared_ptr<Action> Factory::getDeleteAction(){
     FACTORY_GEN_MAP_GETTER(actions_, Action,
                            ActionLabel::DELETE,
                            DeleteTaskAction)
+}
+
+std::shared_ptr<Action> Factory::getLabelAction(){
+    FACTORY_GEN_MAP_GETTER(actions_, Action,
+                           ActionLabel::LABEL,
+                           LabelAction)
 }

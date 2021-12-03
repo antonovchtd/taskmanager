@@ -11,6 +11,7 @@
 
 std::ostream & operator<<(std::ostream &os, const Task& t);
 std::ostream & operator<<(std::ostream &os, const TaskID& id);
+std::ostream & operator<<(std::ostream &os, const Node& node);
 std::ostream & operator<<(std::ostream &os, const std::pair<TaskID, std::pair<Task, Node>>& kv);
 std::ostream & operator<<(std::ostream &os, const std::map<TaskID, std::pair<Task, Node>>& tasks);
 

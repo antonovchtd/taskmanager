@@ -54,5 +54,10 @@ public:
     void make(TaskManager &, Context &) override;
 };
 
+class LabelAction : public Action {
+public:
+    void make(TaskManager &, Context &) override;
+};
+
 
 #endif //TASKMANAGER_SRC_ACTION_H_

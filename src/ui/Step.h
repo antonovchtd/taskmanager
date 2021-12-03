@@ -107,4 +107,11 @@ public:
     std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
 };
 
+class LabelStep : public Step{
+public:
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateIDAction(Factory &f) override;
+};
+
 #endif //TASKMANAGER_SRC_UI_STATE_H_
