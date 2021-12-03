@@ -29,12 +29,13 @@ public:
 
 public:
     TaskID Add(Task, TaskID ancestor = TaskID::invalidID());
-    void Edit(TaskID, Task);
-    void Complete(TaskID);
-    void Delete(TaskID);
-    bool Validate(TaskID id) const;
-    void Show(std::ostream &os) const;
-    void Show(std::ostream &os, std::string &s) const;
+    void Edit(const TaskID &, Task);
+    void Complete(const TaskID &);
+    void Delete(const TaskID &);
+    bool Validate(const TaskID &id) const;
+    void SetLabel(const TaskID &, const std::string &);
+//    void Show(std::ostream &os) const;
+//    void Show(std::ostream &os, std::string &s) const;
 
 private:
     std::map<TaskID, std::pair<Task, Node>> tasks_;

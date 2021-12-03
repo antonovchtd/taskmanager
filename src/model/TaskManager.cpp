@@ -38,7 +38,7 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks(const std::string 
     return tasks;
 }
 
-void TaskManager::Delete(TaskID id) {
+void TaskManager::Delete(const TaskID &id) {
     if (!tasks_[id].second.children().empty())
         throw std::runtime_error("TaskManager::Delete attempts to delete task with subtasks");
     std::optional<TaskID> ancestor = tasks_[id].second.parent();
@@ -47,11 +47,11 @@ void TaskManager::Delete(TaskID id) {
     tasks_.erase(id);
 }
 
-void TaskManager::Edit(TaskID id, Task t) {
+void TaskManager::Edit(const TaskID &id, Task t) {
     tasks_[id].first = std::move(t);
 }
 
-void TaskManager::Complete(TaskID id) {
+void TaskManager::Complete(const TaskID &id) {
     Task t = tasks_[id].first;
     this->Edit(id, Task::Create(t.title(), t.priority(), t.dueDate(), true));
 }
@@ -60,21 +60,25 @@ std::pair<Task, Node>& TaskManager::operator[](TaskID id) {
     return tasks_[id];
 }
 
-void TaskManager::Show(std::ostream &os) const {
-    os << tasks_;
-}
+//void TaskManager::Show(std::ostream &os) const {
+//    os << tasks_;
+//}
+//
+//void TaskManager::Show(std::ostream &os, std::string &label) const {
+//    for (const auto &kv : tasks_) {
+//        if (kv.second.second.label() == label)
+//            os << kv;
+//    }
+//}
 
-void TaskManager::Show(std::ostream &os, std::string &label) const {
-    for (const auto &kv : tasks_) {
-        if (kv.second.second.label() == label)
-            os << kv;
-    }
-}
-
-bool TaskManager::Validate(TaskID id) const{
+bool TaskManager::Validate(const TaskID &id) const{
     return tasks_.find(id) != tasks_.end();
 }
 
 size_t TaskManager::size() const {
     return tasks_.size();
+}
+
+void TaskManager::SetLabel(const TaskID &id, const std::string &label) {
+    tasks_[id].second.SetLabel(label);
 }
