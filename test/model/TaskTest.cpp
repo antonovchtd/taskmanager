@@ -3,6 +3,7 @@
 //
 
 #include "../../src/model/Task.h"
+#include <ctime>
 
 #include <gtest/gtest.h>
 
@@ -15,11 +16,30 @@ TEST_F(TaskTest, shouldCreate)
 {
     const auto title = "MyTask";
     auto p = Task::Priority::HIGH;
-    Task t = Task::Create(title, p, 0, false);
+    bool completeFlag = true;
+    time_t currtime = time(nullptr);
+    Task t = Task::Create(title, p, currtime, completeFlag);
     EXPECT_EQ(title, t.title());
     EXPECT_EQ(title, t.title());
     EXPECT_EQ(p, t.priority());
+    EXPECT_EQ(currtime, t.dueDate());
+    EXPECT_EQ(completeFlag, t.isComplete());
+}
 
+TEST_F(TaskTest, shouldCreateFromData)
+{
+    const auto title = "MyTask";
+    auto p = Task::Priority::HIGH;
+    bool completeFlag = true;
+    time_t currtime = time(nullptr);
+    Task::Data data = {title, p, currtime, true};
+    Task t = Task::Create(data);
+    EXPECT_EQ(title, t.title());
+    EXPECT_EQ(title, t.title());
+    EXPECT_EQ(p, t.priority());
+    EXPECT_EQ(currtime, t.dueDate());
+    EXPECT_EQ(completeFlag, t.isComplete());
+    EXPECT_EQ(t, Task::Create(t.data()));
 }
 
 TEST_F(TaskTest, shouldCreateAtSpecificDate)
@@ -29,30 +49,10 @@ TEST_F(TaskTest, shouldCreateAtSpecificDate)
     timeinfo.tm_mon = 10;
     timeinfo.tm_mday = 16;
     timeinfo.tm_hour = 19;
+    time_t test_time = mktime(&timeinfo);
 
-    Task t = Task::Create("TestTask",Task::Priority::NONE, "16/11/21 19:00", false);
-    EXPECT_EQ(mktime(&timeinfo), t.due_date());
-
-    t = Task::Create("TestTask", Task::Priority::NONE, "16/11/2021 19:00", false);
-    EXPECT_EQ(mktime(&timeinfo), t.due_date());
-
-    timeinfo.tm_hour = 0;
-    t = Task::Create("TestTask", Task::Priority::NONE, "16/11/2021", false);
-    EXPECT_EQ(mktime(&timeinfo), t.due_date());
-}
-
-TEST_F(TaskTest, shouldCreateAtFutureDate)
-{
-    time_t rawtime;
-    time(&rawtime);
-    rawtime += 2*24*3600 + 10*3600 + 5*60;
-    Task t = Task::Create("TestTask", Task::Priority::NONE, "in 02:10:05", false);
-    EXPECT_EQ(rawtime, t.due_date());
-
-    time(&rawtime);
-    rawtime += 10*3600 + 5*60;
-    t = Task::Create("TestTask", Task::Priority::NONE, "in 10:05", false);
-    EXPECT_EQ(rawtime, t.due_date());
+    Task t = Task::Create("TestTask",Task::Priority::NONE, test_time, false);
+    EXPECT_EQ(test_time, t.dueDate());
 }
 
 TEST_F(TaskTest, shouldThrowRuntimeErrorAtEmptyTitle)

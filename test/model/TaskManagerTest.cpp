@@ -15,10 +15,9 @@ class TaskManagerTest : public ::testing::Test
 
 };
 
-class MockIDGenerator : public IDGenerator
-{
+class MockIDGenerator : public IDGenerator {
 public:
-    MockIDGenerator(unsigned int last) {last_ = last;};
+    MockIDGenerator(int last) {last_ = last;};
     MockIDGenerator() {last_ = 1;};
     MOCK_METHOD(TaskID, genID, (), (override));
 };
@@ -26,16 +25,95 @@ public:
 TEST_F(TaskManagerTest, shouldAddTask)
 {
     TaskManager tm;
-    TaskID id = tm.Add(Task::Create("TestTitle", Task::Priority::NONE, "in 00:01", false));
+    TaskID id = tm.Add(Task::Create("TestTitle",
+                                    Task::Priority::NONE,
+                                    time(nullptr) + 10,
+                                    false));
     ASSERT_EQ(1, tm.size());
     EXPECT_TRUE(tm.Validate(id));
+}
+
+TEST_F(TaskManagerTest, shouldAddSubtask)
+{
+    TaskManager tm;
+    TaskID id = tm.Add(Task::Create("TestTitle",
+                                    Task::Priority::NONE,
+                                    time(nullptr) + 10,
+                                    false));
+    TaskID id_ch = tm.Add(Task::Create("SubTask",
+                                        Task::Priority::NONE,
+                                        time(nullptr) + 5,
+                                        false),
+                          id);
+    ASSERT_EQ(2, tm.size());
+    EXPECT_TRUE(tm.Validate(id));
+    EXPECT_TRUE(tm.Validate(id_ch));
+    EXPECT_EQ(id, tm[id_ch].second.parent());
+    auto children = tm[id].second.children();
+    auto it = std::find(children.begin(), children.end(), id_ch);
+    EXPECT_NE(it, children.end());
+}
+
+TEST_F(TaskManagerTest, shouldChangeParent)
+{
+    TaskManager tm;
+    TaskID id = tm.Add(Task::Create("TestTitle",
+                                    Task::Priority::NONE,
+                                    time(nullptr) + 10,
+                                    false));
+    TaskID id2 = tm.Add(Task::Create("TestTitle 2",
+                                    Task::Priority::NONE,
+                                    time(nullptr) + 100,
+                                    false));
+    TaskID id_ch = tm.Add(Task::Create("SubTask",
+                                        Task::Priority::NONE,
+                                        time(nullptr) + 5,
+                                        false),
+                          id);
+    ASSERT_EQ(3, tm.size());
+    tm[id_ch].second.SetParent(id2);
+    tm[id].second.removeChild(id_ch);
+    tm[id2].second.AddChild(id_ch);
+    EXPECT_EQ(id2, tm[id_ch].second.parent());
+    auto children = tm[id].second.children();
+    EXPECT_TRUE(children.empty());
+    auto children2 = tm[id2].second.children();
+    EXPECT_EQ(1, children2.size());
+    auto it = std::find(children2.begin(), children2.end(), id_ch);
+    EXPECT_NE(it, children2.end());
+}
+
+TEST_F(TaskManagerTest, shouldRemoveAllChildren)
+{
+    TaskManager tm;
+    TaskID id = tm.Add(Task::Create("TestTitle",
+                                    Task::Priority::NONE,
+                                    time(nullptr) + 10,
+                                    false));
+    tm.Add(Task::Create("Subtask",
+                        Task::Priority::NONE,
+                        time(nullptr) + 100,
+                        false),
+            id);
+    tm.Add(Task::Create("SubTask 2",
+                        Task::Priority::NONE,
+                        time(nullptr) + 5,
+                        false),
+          id);
+    ASSERT_EQ(3, tm.size());
+    tm[id].second.removeChildren();
+    auto children = tm[id].second.children();
+    EXPECT_TRUE(children.empty());
 }
 
 TEST_F(TaskManagerTest, shouldEdit)
 {
     TaskManager tm;
     TaskID id = tm.Add(Task{});
-    Task t = Task::Create("My Test Task", Task::Priority::MEDIUM, "16/11/2021 19:00", false);
+    Task t = Task::Create("My Test Task",
+                          Task::Priority::MEDIUM,
+                          time(nullptr),
+                          false);
     tm.Edit(id, t);
     EXPECT_EQ(t, tm[id].first);
 }
@@ -43,7 +121,10 @@ TEST_F(TaskManagerTest, shouldEdit)
 TEST_F(TaskManagerTest, shouldDeleteTask)
 {
     TaskManager tm;
-    TaskID id = tm.Add(Task::Create("TestTitle", Task::Priority::NONE, "in 00:00", false));
+    TaskID id = tm.Add(Task::Create("TestTitle",
+                                    Task::Priority::NONE,
+                                    time(nullptr),
+                                    false));
     tm.Delete(id);
     EXPECT_FALSE(tm.Validate(id));
 }
@@ -51,7 +132,10 @@ TEST_F(TaskManagerTest, shouldDeleteTask)
 TEST_F(TaskManagerTest, shouldCompleteTask)
 {
     TaskManager tm;
-    auto id = tm.Add(Task::Create("TestTitle", Task::Priority::NONE, "in 00:00", false));
+    TaskID id = tm.Add(Task::Create("TestTitle",
+                                  Task::Priority::NONE,
+                                    time(nullptr),
+                                    false));
     tm.Complete(id);
     EXPECT_TRUE(tm[id].first.isComplete());
 }
@@ -65,8 +149,11 @@ TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtAddingTasksSameID)
         .WillOnce(Return(TaskID(1)));
 
     TaskManager tm(generator);
-    Task t = Task::Create("My Test Task 1", Task::Priority::MEDIUM, "30/11/2021 19:00", false);
-    TaskID id = tm.Add(t);
+    Task t = Task::Create("My Test Task 1",
+                          Task::Priority::MEDIUM,
+                          time(nullptr),
+                          false);
+    tm.Add(t);
     EXPECT_THROW(tm.Add(t), std::runtime_error);
 }
 
@@ -74,8 +161,8 @@ TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtDeletingTaskWithChildren)
 {
     TaskManager tm;
     Task::Priority p = Task::Priority::NONE;
-    TaskID id = tm.Add(Task::Create("Task",p,"in 10:00",false));
-    tm.Add(Task::Create("Subtask", p,"in 5:00", false), id);
+    TaskID id = tm.Add(Task::Create("Task",p,time(nullptr),false));
+    tm.Add(Task::Create("Subtask", p,time(nullptr), false), id);
     ASSERT_EQ(2, tm.size());
     EXPECT_THROW(tm.Delete(id), std::runtime_error);
 
@@ -85,9 +172,67 @@ TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
 {
     TaskManager tm;
     Task::Priority p = Task::Priority::NONE;
-    TaskID id1 = tm.Add(Task::Create("Task",p,"in 10:00",false));
-    TaskID id2 = tm.Add(Task::Create("Subtask", p,"in 5:00", false), id1);
+    TaskID id1 = tm.Add(Task::Create("Task",p,time(nullptr),false));
+    TaskID id2 = tm.Add(Task::Create("Subtask", p,time(nullptr), false), id1);
     ASSERT_EQ(2, tm.size());
     tm.Delete(id2);
+    ASSERT_EQ(1, tm.size());
     EXPECT_TRUE(tm[id1].second.children().empty());
+}
+
+TEST_F(TaskManagerTest, shouldAddLabel){
+    TaskManager tm;
+    Task::Priority p = Task::Priority::NONE;
+    TaskID id = tm.Add(Task::Create("Task",p,time(nullptr),false));
+    std::string label = "testing";
+    tm.SetLabel(id, label);
+    EXPECT_EQ(label, tm[id].second.label());
+}
+
+TEST_F(TaskManagerTest, shouldReturnTasks){
+    TaskManager tm;
+    TaskID id = tm.Add(Task::Create("TestTitle",
+                                    Task::Priority::NONE,
+                                    time(nullptr) + 10,
+                                    false));
+    TaskID id2 = tm.Add(Task::Create("Subtask",
+                                    Task::Priority::NONE,
+                                    time(nullptr) + 100,
+                                    false),
+                       id);
+    TaskID id3 = tm.Add(Task::Create("SubTask 2",
+                                    Task::Priority::NONE,
+                                    time(nullptr) + 5,
+                                    false),
+                       id);
+
+    auto tasks = tm.getTasks();
+    ASSERT_EQ(3, tasks.size());
+    EXPECT_EQ(tm[id].first, tasks[id].first);
+    EXPECT_EQ(tm[id2].first, tasks[id2].first);
+    EXPECT_EQ(tm[id3].first, tasks[id3].first);
+}
+
+TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
+    TaskManager tm;
+    TaskID id = tm.Add(Task::Create("TestTitle",
+                                    Task::Priority::NONE,
+                                    time(nullptr) + 10,
+                                    false));
+    TaskID id2 = tm.Add(Task::Create("Subtask",
+                                     Task::Priority::NONE,
+                                     time(nullptr) + 100,
+                                     false),
+                        id);
+    TaskID id3 = tm.Add(Task::Create("SubTask 2",
+                                     Task::Priority::NONE,
+                                     time(nullptr) + 5,
+                                     false),
+                        id);
+
+    std::string label = "testing";
+    tm.SetLabel(id2, label);
+    auto tasks = tm.getTasks(label);
+    ASSERT_EQ(1, tasks.size());
+    EXPECT_EQ(tm[id2].first, tasks[id2].first);
 }
