@@ -9,14 +9,15 @@
 
 class IDGenerator{
 public:
-    IDGenerator() : last_(1) {};
-    explicit IDGenerator(unsigned int last) : last_(last) {};
+    IDGenerator();
+    explicit IDGenerator(int last);
     IDGenerator(const IDGenerator&) = default;
+
     virtual TaskID genID();
     virtual ~IDGenerator() = default;
 
 protected:
-    unsigned int last_;
+    int last_;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_IDGENERATOR_H_

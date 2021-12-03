@@ -6,8 +6,6 @@
 #define TASKMANAGER_SRC_ACTION_H_
 
 #include "../model/TaskManager.h"
-
-class Context;
 #include "../ui/Context.h"
 
 class Action {

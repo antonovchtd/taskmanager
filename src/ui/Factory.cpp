@@ -4,7 +4,7 @@
 
 #include "Factory.h"
 
-#define STEPFACTORY_GEN_MAP_GETTER(map, cls, state, step)                   \
+#define FACTORY_GEN_MAP_GETTER(map, cls, state, step)                   \
   if (!map[state])                                  \
       map[state] = std::shared_ptr<cls>{new step}; \
   return map[state];
@@ -89,43 +89,43 @@ std::shared_ptr<Step> Factory::nextStep(const DeleteStep &) {
 }
 
 std::shared_ptr<Step> Factory::getHomeStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::HOME, HomeStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::HOME, HomeStep)
 }
 
 std::shared_ptr<Step> Factory::getHelpStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::HELP, HelpStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::HELP, HelpStep)
 }
 
 std::shared_ptr<Step> Factory::getAddStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::ADD, AddStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::ADD, AddStep)
 }
 
 std::shared_ptr<Step> Factory::getReadTaskDataStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::READTASK, ReadTaskDataStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::READTASK, ReadTaskDataStep)
 }
 
 std::shared_ptr<Step> Factory::getQuitStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::QUIT, QuitStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::QUIT, QuitStep)
 }
 
 std::shared_ptr<Step> Factory::getEditStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::EDIT, EditStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::EDIT, EditStep)
 }
 
 std::shared_ptr<Step> Factory::getSubtaskStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::SUBTASK, SubtaskStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::SUBTASK, SubtaskStep)
 }
 
 std::shared_ptr<Step> Factory::getShowStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::SHOW, ShowStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::SHOW, ShowStep)
 }
 
 std::shared_ptr<Step> Factory::getCompleteStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::COMPLETE, CompleteStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::COMPLETE, CompleteStep)
 }
 
 std::shared_ptr<Step> Factory::getDeleteStep() {
-    STEPFACTORY_GEN_MAP_GETTER(steps_, Step, State::DELETE, DeleteStep)
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::DELETE, DeleteStep)
 }
 
 std::shared_ptr<Step> Factory::getStep(const State &s) {
@@ -190,47 +190,47 @@ std::shared_ptr<Action> Factory::getAction(const DeleteStep &) {
 }
 
 std::shared_ptr<Action> Factory::getAddTaskAction(){
-    STEPFACTORY_GEN_MAP_GETTER(actions_, Action, ActionLabel::ADDTASK, AddTaskAction)
+    FACTORY_GEN_MAP_GETTER(actions_, Action, ActionLabel::ADDTASK, AddTaskAction)
 }
 
 std::shared_ptr<Action> Factory::getAddSubtaskAction(){
-    STEPFACTORY_GEN_MAP_GETTER(actions_, Action,
-                               ActionLabel::ADDSUBTASK,
-                               AddSubtaskAction)
+    FACTORY_GEN_MAP_GETTER(actions_, Action,
+                           ActionLabel::ADDSUBTASK,
+                           AddSubtaskAction)
 }
 
 std::shared_ptr<Action> Factory::getValidateIDAction(){
-    STEPFACTORY_GEN_MAP_GETTER(actions_, Action,
-                               ActionLabel::VALIDATEID,
-                               ValidateIDAction)
+    FACTORY_GEN_MAP_GETTER(actions_, Action,
+                           ActionLabel::VALIDATEID,
+                           ValidateIDAction)
 }
 
 std::shared_ptr<Action> Factory::getValidateNoIDAction(){
-    STEPFACTORY_GEN_MAP_GETTER(actions_, Action,
-                               ActionLabel::VALIDATENOID,
-                               ValidateNoIDAction)
+    FACTORY_GEN_MAP_GETTER(actions_, Action,
+                           ActionLabel::VALIDATENOID,
+                           ValidateNoIDAction)
 }
 
 std::shared_ptr<Action> Factory::getEditAction(){
-    STEPFACTORY_GEN_MAP_GETTER(actions_, Action,
-                               ActionLabel::EDIT,
-                               EditTaskAction)
+    FACTORY_GEN_MAP_GETTER(actions_, Action,
+                           ActionLabel::EDIT,
+                           EditTaskAction)
 }
 
 std::shared_ptr<Action> Factory::getShowAction(){
-    STEPFACTORY_GEN_MAP_GETTER(actions_, Action,
-                               ActionLabel::SHOW,
-                               ShowAction)
+    FACTORY_GEN_MAP_GETTER(actions_, Action,
+                           ActionLabel::SHOW,
+                           ShowAction)
 }
 
 std::shared_ptr<Action> Factory::getCompleteAction(){
-    STEPFACTORY_GEN_MAP_GETTER(actions_, Action,
-                               ActionLabel::COMPLETE,
-                               CompleteTaskAction)
+    FACTORY_GEN_MAP_GETTER(actions_, Action,
+                           ActionLabel::COMPLETE,
+                           CompleteTaskAction)
 }
 
 std::shared_ptr<Action> Factory::getDeleteAction(){
-    STEPFACTORY_GEN_MAP_GETTER(actions_, Action,
-                               ActionLabel::DELETE,
-                               DeleteTaskAction)
+    FACTORY_GEN_MAP_GETTER(actions_, Action,
+                           ActionLabel::DELETE,
+                           DeleteTaskAction)
 }

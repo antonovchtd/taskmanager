@@ -24,10 +24,12 @@ public:
     virtual std::shared_ptr<Action> execute(Context &c, Factory &f) = 0;
     virtual void process(Context &c, Factory &f) = 0;
     virtual std::shared_ptr<Action> getValidateIDAction(Factory &f) = 0;
+    virtual ~Step() = default;
+
+public:
     static std::string read(const std::string &prompt);
     static void print(const std::string &line);
     static void printFromFile(const std::string &fname);
-    virtual ~Step() = default;
 };
 
 class HomeStep : public Step{

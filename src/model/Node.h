@@ -10,13 +10,15 @@
 
 class Node{
 public:
-    Node() : ancestor_(TaskID::invalidID()) {};
-    Node(TaskID ancestor) : ancestor_(ancestor) {};
+    Node();
+    Node(TaskID ancestor);
 
+public:
     TaskID parent() const;
     std::string label() const;
     std::vector<TaskID> children() const;
 
+public:
     void removeChild(const TaskID&);
     void AddChild(const TaskID&);
     void SetLabel(const std::string &);

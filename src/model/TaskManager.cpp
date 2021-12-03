@@ -5,6 +5,12 @@
 #include "TaskManager.h"
 #include "utils.h"
 
+TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator)) {
+}
+
+TaskManager::TaskManager(std::shared_ptr<IDGenerator> generator) : gen_(generator) {
+}
+
 TaskID TaskManager::Add(Task t, TaskID ancestor) {
     TaskID id = gen_->genID();
     if (Validate(id))

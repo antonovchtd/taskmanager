@@ -4,6 +4,12 @@
 
 #include "Node.h"
 
+Node::Node() : ancestor_(TaskID::invalidID()) {
+}
+
+Node::Node(TaskID ancestor) : ancestor_(ancestor) {
+}
+
 void Node::AddChild(const TaskID& id) {
     children_.push_back(id);
 }

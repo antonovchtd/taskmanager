@@ -6,7 +6,6 @@
 #include "Step.h"
 #include "Factory.h"
 #include "Machine.h"
-
 #include "../model/utils.h"
 
 void Step::print(const std::string &line){
