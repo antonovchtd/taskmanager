@@ -4,10 +4,10 @@
 
 #include "Node.h"
 
-Node::Node() : ancestor_(TaskID::invalidID()) {
+Node::Node() : parent_(TaskID::invalidID()) {
 }
 
-Node::Node(TaskID ancestor) : ancestor_(ancestor) {
+Node::Node(TaskID parent) : parent_(parent) {
 }
 
 void Node::AddChild(const TaskID& id) {
@@ -24,8 +24,12 @@ void Node::removeChild(const TaskID& id) {
         children_.erase(ch);
 }
 
+void Node::removeChildren() {
+    children_.clear();
+}
+
 TaskID Node::parent() const {
-    return ancestor_;
+    return parent_;
 }
 
 std::string Node::label() const {
@@ -36,6 +40,10 @@ std::vector<TaskID> Node::children() const {
     return children_;
 }
 
-void Node::SetLabel(const std::string & s) {
+void Node::SetLabel(const std::string &s) {
     label_ = s;
+}
+
+void Node::SetParent(const TaskID &id) {
+    parent_ = id;
 }

@@ -9,22 +9,6 @@
       map[state] = std::shared_ptr<cls>{new step}; \
   return map[state];
 
-Factory::Factory() : steps_{{
-    {State::HOME, nullptr},
-    {State::HELP, nullptr},
-    {State::ADD, nullptr},
-    {State::READTASK, nullptr},
-    {State::EDIT, nullptr},
-    {State::SUBTASK, nullptr},
-    {State::QUIT, nullptr},
-    {State::SHOW, nullptr},
-    {State::COMPLETE, nullptr},
-    {State::DELETE, nullptr},
-    {State::LABEL, nullptr}
-}}
-{
-}
-
 std::shared_ptr<Step> Factory::create(const std::string &command) {
     if (command == "add") {
         return getAddStep();
@@ -225,7 +209,13 @@ std::shared_ptr<Action> Factory::getValidateIDAction(){
 std::shared_ptr<Action> Factory::getValidateNoIDAction(){
     FACTORY_GEN_MAP_GETTER(actions_, Action,
                            ActionLabel::VALIDATENOID,
-                           ValidateNoIDAction)
+                           ValidateNoArgAction)
+}
+
+std::shared_ptr<Action> Factory::getValidateLabelAction(){
+    FACTORY_GEN_MAP_GETTER(actions_, Action,
+                           ActionLabel::VALIDATELABEL,
+                           ValidateLabelAction)
 }
 
 std::shared_ptr<Action> Factory::getEditAction(){

@@ -11,7 +11,7 @@
 class Node{
 public:
     Node();
-    Node(TaskID ancestor);
+    Node(TaskID parent);
 
 public:
     TaskID parent() const;
@@ -19,12 +19,14 @@ public:
     std::vector<TaskID> children() const;
 
 public:
+    void SetParent(const TaskID&);
     void removeChild(const TaskID&);
+    void removeChildren();
     void AddChild(const TaskID&);
     void SetLabel(const std::string &);
 
 private:
-    TaskID ancestor_;
+    TaskID parent_;
     std::vector<TaskID> children_;
     std::string label_;
 };

@@ -13,18 +13,35 @@ void AddSubtaskAction::make(TaskManager &model, Context &context) {
 }
 
 void ValidateIDAction::make(TaskManager &model, Context &context) {
+    context.setID(TaskID::Create(context.arg()));
+    context.setArg("");
     if (!context.id() || !model.Validate(context.id().value())) {
         context.revertStep();
         context.setID(TaskID::invalidID());
     }
 }
 
-void ValidateNoIDAction::make(TaskManager &model, Context &context) {
-    if (context.id() && context.id().value().isValid()) {
+void ValidateNoArgAction::make(TaskManager &model, Context &context) {
+//    context.setID(TaskID::Create(context.arg()));
+//    if (context.id() && context.id().value().isValid()) {
+//        context.revertStep();
+//        context.setID(std::nullopt);
+//    } else
+//        context.setID(TaskID::nullid());
+    if (!context.arg().empty()){
         context.revertStep();
         context.setID(std::nullopt);
-    } else
+    }
+    else
         context.setID(TaskID::nullid());
+}
+
+void ValidateLabelAction::make(TaskManager &model, Context &context) {
+    context.setID(TaskID::nullid());
+//    if (context.arg().empty()) {
+//        context.revertStep();
+//        Step::print("Command takes a label argument. Try again.\n");
+//    }
 }
 
 void EditTaskAction::make(TaskManager &model, Context &context) {
@@ -32,7 +49,10 @@ void EditTaskAction::make(TaskManager &model, Context &context) {
 }
 
 void ShowAction::make(TaskManager &model, Context &context) {
-    context.setTasks(model.getTasks());
+    if (context.arg().empty())
+        context.setTasks(model.getTasks());
+    else
+        context.setTasks(model.getTasks(context.arg()));
 }
 
 void CompleteTaskAction::make(TaskManager &model, Context &context) {

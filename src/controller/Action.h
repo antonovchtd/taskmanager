@@ -24,7 +24,12 @@ public:
     void make(TaskManager &, Context &) override;
 };
 
-class ValidateNoIDAction : public Action {
+class ValidateNoArgAction : public Action {
+public:
+    void make(TaskManager &, Context &) override;
+};
+
+class ValidateLabelAction : public Action {
 public:
     void make(TaskManager &, Context &) override;
 };

@@ -33,6 +33,7 @@ public:
         ADDSUBTASK,
         VALIDATEID,
         VALIDATENOID,
+        VALIDATELABEL,
         EDIT,
         SHOW,
         COMPLETE,
@@ -41,7 +42,6 @@ public:
     };
 
 public:
-    Factory();
 
     std::shared_ptr<Step> create(const std::string &);
 
@@ -85,6 +85,7 @@ public:
     std::shared_ptr<Action> getAddSubtaskAction();
     std::shared_ptr<Action> getValidateIDAction();
     std::shared_ptr<Action> getValidateNoIDAction();
+    std::shared_ptr<Action> getValidateLabelAction();
     std::shared_ptr<Action> getEditAction();
     std::shared_ptr<Action> getShowAction();
     std::shared_ptr<Action> getCompleteAction();

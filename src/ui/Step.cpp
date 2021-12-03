@@ -31,11 +31,11 @@ std::string Step::read(const std::string &prompt) {
 
 std::shared_ptr<Action> HomeStep::execute(Context &c, Factory &f) {
     std::stringstream ss{Step::read(" > ")};
-    std::string command, id;
-    ss >> command >> id;
+    std::string command, arg;
+    ss >> command >> arg;
     c.setStep(f.create(command));
-    c.setID(TaskID::Create(id));
-    return c.getStep()->getValidateIDAction(f);
+    c.setArg(arg);
+    return c.getStep()->getValidateArgAction(f);
 }
 
 void HomeStep::process(Context &c, Factory &f) {
@@ -43,11 +43,11 @@ void HomeStep::process(Context &c, Factory &f) {
         if (!c.id()->isValid())
             Step::print("Invalid ID. Try again.\n");
     } else {
-        Step::print("This function takes no ID value.\n");
+        Step::print("This function takes no argument.\n");
     }
 }
 
-std::shared_ptr<Action> HomeStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> HomeStep::getValidateArgAction(Factory &f) {
     return f.getValidateNoIDAction();
 }
 
@@ -61,7 +61,7 @@ void HelpStep::process(Context &c, Factory &f) {
     // do nothing
 }
 
-std::shared_ptr<Action> HelpStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> HelpStep::getValidateArgAction(Factory &f) {
     return f.getValidateNoIDAction();
 }
 
@@ -79,7 +79,7 @@ void AddStep::process(Context &c, Factory &f) {
     c.resetTaskData();
 }
 
-std::shared_ptr<Action> AddStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> AddStep::getValidateArgAction(Factory &f) {
     return f.getValidateNoIDAction();
 }
 
@@ -165,7 +165,7 @@ void ReadTaskDataStep::process(Context &c, Factory &f) {
     // do nothing
 }
 
-std::shared_ptr<Action> ReadTaskDataStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> ReadTaskDataStep::getValidateArgAction(Factory &f) {
     return f.getValidateNoIDAction();
 }
 
@@ -182,7 +182,7 @@ void EditStep::process(Context &c, Factory &f) {
     Step::print("Edited Task with ID " + c.id().value().to_string() + ".\n");
 }
 
-std::shared_ptr<Action> EditStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> EditStep::getValidateArgAction(Factory &f) {
     return f.getValidateIDAction();
 }
 
@@ -199,7 +199,7 @@ void SubtaskStep::process(Context &c, Factory &f) {
     Step::print("Added Subtask with ID " + c.id().value().to_string() + ".\n");
 }
 
-std::shared_ptr<Action> SubtaskStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> SubtaskStep::getValidateArgAction(Factory &f) {
     return f.getValidateIDAction();
 }
 
@@ -212,7 +212,7 @@ void QuitStep::process(Context &c, Factory &f) {
     // do nothing
 }
 
-std::shared_ptr<Action> QuitStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> QuitStep::getValidateArgAction(Factory &f) {
     return f.getValidateNoIDAction();
 }
 
@@ -225,8 +225,8 @@ void ShowStep::process(Context &c, Factory &f) {
     std::cout << c.getTasks();
 }
 
-std::shared_ptr<Action> ShowStep::getValidateIDAction(Factory &f) {
-    return f.getValidateNoIDAction();
+std::shared_ptr<Action> ShowStep::getValidateArgAction(Factory &f) {
+    return f.getValidateLabelAction();
 }
 
 std::shared_ptr<Action> CompleteStep::execute(Context &c, Factory &f) {
@@ -238,7 +238,7 @@ void CompleteStep::process(Context &c, Factory &f) {
     Step::print("Marked Task with ID " + c.id().value().to_string() + " as completed.\n");
 }
 
-std::shared_ptr<Action> CompleteStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> CompleteStep::getValidateArgAction(Factory &f) {
     return f.getValidateIDAction();
 }
 
@@ -251,7 +251,7 @@ void DeleteStep::process(Context &c, Factory &f) {
     Step::print("Deleted Task with ID " + c.id().value().to_string() + ".\n");
 }
 
-std::shared_ptr<Action> DeleteStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> DeleteStep::getValidateArgAction(Factory &f) {
     return f.getValidateIDAction();
 }
 
@@ -265,6 +265,6 @@ void LabelStep::process(Context &c, Factory &f) {
     Step::print("Added label to Task with ID " + c.id().value().to_string() + ".\n");
 }
 
-std::shared_ptr<Action> LabelStep::getValidateIDAction(Factory &f) {
+std::shared_ptr<Action> LabelStep::getValidateArgAction(Factory &f) {
     return f.getValidateIDAction();
 }

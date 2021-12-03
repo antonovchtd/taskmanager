@@ -71,3 +71,11 @@ void Context::setTasks(const std::map<TaskID, std::pair<Task, Node>> &tasks) {
 void Context::setLabel(const std::string &s) {
     label_ = s;
 }
+
+void Context::setArg(const std::string &arg) {
+    arg_ = arg;
+}
+
+const std::string &Context::arg() const {
+    return arg_;
+}
