@@ -8,7 +8,7 @@
 TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator)) {
 }
 
-TaskManager::TaskManager(std::shared_ptr<IDGenerator> generator) : gen_(generator) {
+TaskManager::TaskManager(std::shared_ptr<IDGenerator> generator) : gen_(std::move(generator)) {
 }
 
 TaskID TaskManager::Add(Task t, TaskID ancestor) {
