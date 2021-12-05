@@ -84,8 +84,8 @@ public:
     std::shared_ptr<Action> getAddTaskAction();
     std::shared_ptr<Action> getAddSubtaskAction();
     std::shared_ptr<Action> getValidateIDAction();
-    std::shared_ptr<Action> getValidateNoIDAction();
-    std::shared_ptr<Action> getValidateLabelAction();
+    std::shared_ptr<Action> getValidateNoArgAction();
+    std::shared_ptr<Action> getValidateLabelArgAction();
     std::shared_ptr<Action> getEditAction();
     std::shared_ptr<Action> getShowAction();
     std::shared_ptr<Action> getCompleteAction();

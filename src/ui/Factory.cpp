@@ -4,9 +4,9 @@
 
 #include "Factory.h"
 
-#define FACTORY_GEN_MAP_GETTER(map, cls, state, step)                   \
-  if (!map[state])                                  \
-      map[state] = std::shared_ptr<cls>{new step}; \
+#define FACTORY_GEN_MAP_GETTER(map, cls, state, step) \
+  if (!map[state])                                    \
+      map[state] = std::shared_ptr<cls>{new step};    \
   return map[state];
 
 std::shared_ptr<Step> Factory::create(const std::string &command) {
@@ -206,16 +206,16 @@ std::shared_ptr<Action> Factory::getValidateIDAction(){
                            ValidateIDAction)
 }
 
-std::shared_ptr<Action> Factory::getValidateNoIDAction(){
+std::shared_ptr<Action> Factory::getValidateNoArgAction(){
     FACTORY_GEN_MAP_GETTER(actions_, Action,
                            ActionLabel::VALIDATENOID,
                            ValidateNoArgAction)
 }
 
-std::shared_ptr<Action> Factory::getValidateLabelAction(){
+std::shared_ptr<Action> Factory::getValidateLabelArgAction(){
     FACTORY_GEN_MAP_GETTER(actions_, Action,
                            ActionLabel::VALIDATELABEL,
-                           ValidateLabelAction)
+                           ValidateLabelArgAction)
 }
 
 std::shared_ptr<Action> Factory::getEditAction(){

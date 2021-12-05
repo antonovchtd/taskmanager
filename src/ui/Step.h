@@ -27,9 +27,9 @@ public:
     virtual ~Step() = default;
 
 public:
-    static std::string read(const std::string &prompt);
-    static void print(const std::string &line);
-    static void printFromFile(const std::string &fname);
+    static std::string read(std::istream &is, std::ostream &os, const std::string &prompt);
+    static void print(std::ostream &os, const std::string &line);
+    static void printFromFile(std::ostream &os, const std::string &fname);
 };
 
 class HomeStep : public Step{
@@ -60,9 +60,9 @@ public:
     std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
 
 public:
-    static std::optional<time_t> stringToTime(const std::string &);
-    static bool validateTitle(const std::string &);
-    static std::optional<Task::Priority> stringToPriority(const std::string &);
+    static std::optional<time_t> stringToTime(const Context &c, const std::string &datestring);
+    static bool validateTitle(const Context &c, const std::string &title);
+    static std::optional<Task::Priority> stringToPriority(const Context &c, const std::string &priority);
 };
 
 class EditStep : public Step{

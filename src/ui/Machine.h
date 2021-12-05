@@ -14,6 +14,7 @@ class Machine {
 public:
     Machine();
     explicit Machine(const Factory::State &s);
+    Machine(const Context &c, const Factory::State &s);
 
 public:
     Context run();

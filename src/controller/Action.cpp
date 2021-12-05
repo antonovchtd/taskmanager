@@ -22,12 +22,6 @@ void ValidateIDAction::make(TaskManager &model, Context &context) {
 }
 
 void ValidateNoArgAction::make(TaskManager &model, Context &context) {
-//    context.setID(TaskID::Create(context.arg()));
-//    if (context.id() && context.id().value().isValid()) {
-//        context.revertStep();
-//        context.setID(std::nullopt);
-//    } else
-//        context.setID(TaskID::nullid());
     if (!context.arg().empty()){
         context.revertStep();
         context.setID(std::nullopt);
@@ -36,12 +30,9 @@ void ValidateNoArgAction::make(TaskManager &model, Context &context) {
         context.setID(TaskID::nullid());
 }
 
-void ValidateLabelAction::make(TaskManager &model, Context &context) {
+void ValidateLabelArgAction::make(TaskManager &model, Context &context) {
+    // context.arg() can be empty, can be something, no check for ID though
     context.setID(TaskID::nullid());
-//    if (context.arg().empty()) {
-//        context.revertStep();
-//        Step::print("Command takes a label argument. Try again.\n");
-//    }
 }
 
 void EditTaskAction::make(TaskManager &model, Context &context) {

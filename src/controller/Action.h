@@ -29,7 +29,7 @@ public:
     void make(TaskManager &, Context &) override;
 };
 
-class ValidateLabelAction : public Action {
+class ValidateLabelArgAction : public Action {
 public:
     void make(TaskManager &, Context &) override;
 };

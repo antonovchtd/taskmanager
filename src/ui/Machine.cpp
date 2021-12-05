@@ -12,6 +12,10 @@ Machine::Machine(const Factory::State &s) {
     context_.setStep(factory_.getStep(s));
 }
 
+Machine::Machine(const Context &c, const Factory::State &s) : context_(c) {
+    context_.setStep(factory_.getStep(s));
+}
+
 Context Machine::run() {
 
     while (context_.getStep()){
