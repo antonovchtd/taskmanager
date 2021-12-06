@@ -105,7 +105,7 @@ std::optional<time_t> ReadTaskDataStep::stringToTime(const Context &c, const std
     std::smatch matches;
     if (std::regex_search(datestring, matches,
                           std::regex(R"(in (\d+:)?(\d+):(\d+))"))) {
-        return time(nullptr) + std::stoi(matches.str(1))*24*3600
+        return time(nullptr) + std::stoi("0" + matches.str(1))*24*3600
                + std::stoi(matches.str(2))*3600
                + std::stoi(matches.str(3))*60;
     } else if (std::regex_search(datestring, matches,
