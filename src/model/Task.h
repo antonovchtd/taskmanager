@@ -9,6 +9,7 @@
 #include <ctime>
 #include <map>
 #include <iostream>
+#include <sstream>
 
 class Task {
 public:
@@ -36,6 +37,7 @@ public:
     Priority priority() const;
     bool isComplete() const;
     Data data() const;
+    std::string to_string() const;
 
 public:
     bool operator==(const Task&) const;

@@ -11,6 +11,12 @@
 
 #include "Step.h"
 #include "../controller/Action.h"
+#include "../io/AbstractReader.h"
+#include "../io/ConsoleReader.h"
+#include "../io/FileReader.h"
+#include "../io/AbstractPrinter.h"
+#include "../io/ConsolePrinter.h"
+#include "../io/FilePrinter.h"
 
 class Factory{
 public:
@@ -42,8 +48,12 @@ public:
     };
 
 public:
+    Factory();
+    Factory(std::shared_ptr<AbstractReader>, std::shared_ptr<AbstractPrinter>);
 
-    std::shared_ptr<Step> create(const Context &c, const std::string &command);
+public:
+
+    std::shared_ptr<Step> create(const std::string &command);
 
     std::shared_ptr<Step> nextStep();
     std::shared_ptr<Step> nextStep(const HelpStep &);
@@ -92,9 +102,15 @@ public:
     std::shared_ptr<Action> getDeleteAction();
     std::shared_ptr<Action> getLabelAction();
 
+public:
+    std::shared_ptr<AbstractReader> reader() const;
+    std::shared_ptr<AbstractPrinter> printer() const;
+
 private:
     std::map<State, std::shared_ptr<Step>> steps_;
     std::map<ActionLabel, std::shared_ptr<Action>> actions_;
+    std::shared_ptr<AbstractReader> reader_;
+    std::shared_ptr<AbstractPrinter> printer_;
 };
 
 #endif //TASKMANAGER_SRC_UI_FACTORY_H_

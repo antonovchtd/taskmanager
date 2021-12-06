@@ -14,7 +14,6 @@
 
 class Context{
 public:
-    Context();
     std::shared_ptr<Step> getStep() const;
     std::shared_ptr<Step> getOldStep() const;
     Task::Data data() const;
@@ -22,8 +21,6 @@ public:
     std::map<TaskID, std::pair<Task, Node>> getTasks() const;
     std::string label() const;
     const std::string &arg() const;
-    std::istream * in() const;
-    std::ostream * out() const;
 
 public:
     void setStep(const std::shared_ptr<Step> &);
@@ -36,8 +33,6 @@ public:
     void setTasks(const std::map<TaskID, std::pair<Task, Node>> &);
     void setLabel(const std::string &);
     void setArg(const std::string &arg);
-    void setOStream(std::ostream &);
-    void setIStream(std::istream &);
 
 public:
     void revertStep();
@@ -51,8 +46,6 @@ private:
     std::string arg_;
     std::shared_ptr<Step> step_;
     std::shared_ptr<Step> oldStep_;
-    std::istream *in_;
-    std::ostream *out_;
 };
 
 #endif //TASKMANAGER_SRC_UI_CONTEXT_H_

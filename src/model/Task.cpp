@@ -50,3 +50,21 @@ bool Task::operator==(const Task& rhs) const {
 Task::Data Task::data() const {
     return Task::Data{title_, priority_, due_date_, is_complete_};
 }
+
+std::string Task::to_string() const {
+    std::ostringstream os;
+    const std::string priorityName[] = { "None", "Low", "Medium", "High"};
+    os << title_ << ", Priority: " <<
+       priorityName[static_cast<int>(priority_)];
+    time_t dd = dueDate();
+    std::string str_time = std::string(asctime(localtime(&dd)));
+    str_time.pop_back();
+    os << ", Due: " << str_time;
+    if (due_date_ < time(nullptr))
+        os << " [overdue] ";
+
+    if (is_complete_) {
+        os << " [completed] ";
+    }
+    return os.str();
+}

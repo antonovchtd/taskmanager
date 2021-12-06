@@ -3,24 +3,58 @@
 //
 
 #include "../../src/ui/Machine.h"
+#include "../../src/ui/Step.h"
+#include "../../src/controller/Action.h"
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+using ::testing::AtLeast;
+using ::testing::Return;
+using ::testing::_;
+using testing::SaveArg;
 
 class MachineTest : public ::testing::Test
 {
 
 };
 
+class MockReader : public AbstractReader {
+public:
+    MOCK_METHOD(std::string, read, (const std::string &prompt), (override));
+};
+
+class MockPrinter : public AbstractPrinter {
+public:
+    MOCK_METHOD(void, print, (const std::string &message), (override));
+};
+
 TEST_F(MachineTest, shouldCreateThreeTasksCompleteDelete)
 {
-    std::istringstream is{
-    std::string("add\ntest 1\n1\n21/12\nadd\ntest 2\n2\n22/12\n") +
-    std::string("add\ntest 3\n3\n23/12\ncomplete 1\ndelete 3\nquit")};
-    std::ostringstream os{};
-    Context c;
-    c.setIStream(is);
-    c.setOStream(os);
-    Machine m(c, Factory::State::HOME);
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(AtLeast(1))
+            .WillOnce(Return("add"))
+            .WillOnce(Return("test 1"))
+            .WillOnce(Return("1"))
+            .WillOnce(Return("21/12"))
+            .WillOnce(Return("add"))
+            .WillOnce(Return("test 2"))
+            .WillOnce(Return("2"))
+            .WillOnce(Return("22/12"))
+            .WillOnce(Return("add"))
+            .WillOnce(Return("test 3"))
+            .WillOnce(Return("3"))
+            .WillOnce(Return("23/12"))
+            .WillOnce(Return("complete 1"))
+            .WillOnce(Return("delete 3"))
+            .WillOnce(Return("quit"));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+            .Times(AtLeast(1));
+
+    Machine m(f, Factory::State::HOME);
     m.run();
     TaskManager tm = m.model();
     ASSERT_EQ(2, tm.size());
@@ -36,14 +70,30 @@ TEST_F(MachineTest, shouldCreateThreeTasksCompleteDelete)
 
 TEST_F(MachineTest, shouldCreateTaskWithSubtasksCompleteTwo)
 {
-    std::istringstream is{
-    std::string("add\ntest\n1\n21/12\nsubtask 1\nsub\n2\n22/12\n") +
-    std::string("subtask 2\nsubsub\n3\n23/12\ncomplete 3\ncomplete 1\nquit")};
-    std::ostringstream os{};
-    Context c;
-    c.setIStream(is);
-    c.setOStream(os);
-    Machine m(c, Factory::State::HOME);
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(AtLeast(1))
+            .WillOnce(Return("add"))
+            .WillOnce(Return("test"))
+            .WillOnce(Return("1"))
+            .WillOnce(Return("21/12"))
+            .WillOnce(Return("subtask 1"))
+            .WillOnce(Return("sub"))
+            .WillOnce(Return("2"))
+            .WillOnce(Return("22/12"))
+            .WillOnce(Return("subtask 2"))
+            .WillOnce(Return("subsub"))
+            .WillOnce(Return("3"))
+            .WillOnce(Return("23/12"))
+            .WillOnce(Return("complete 3"))
+            .WillOnce(Return("complete 1"))
+            .WillOnce(Return("quit"));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+            .Times(AtLeast(1));
+
+    Machine m(f, Factory::State::HOME);
     m.run();
     TaskManager tm = m.model();
     ASSERT_EQ(3, tm.size());
@@ -82,11 +132,33 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksLabelTwo)
     std::istringstream is{
             std::string("add\ntask 1\n1\n21/12\nsubtask 1\nsub\n2\n22/12\n") +
             std::string("add\ntask 2\n3\n23/12\nlabel 3\nl3\nlabel 2\nl2\nquit")};
-    std::ostringstream os{};
-    Context c;
-    c.setIStream(is);
-    c.setOStream(os);
-    Machine m(c, Factory::State::HOME);
+
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(AtLeast(1))
+            .WillOnce(Return("add"))
+            .WillOnce(Return("task 1"))
+            .WillOnce(Return("1"))
+            .WillOnce(Return("21/12"))
+            .WillOnce(Return("subtask 1"))
+            .WillOnce(Return("sub"))
+            .WillOnce(Return("2"))
+            .WillOnce(Return("22/12"))
+            .WillOnce(Return("add"))
+            .WillOnce(Return("task 2"))
+            .WillOnce(Return("3"))
+            .WillOnce(Return("23/12"))
+            .WillOnce(Return("label 3"))
+            .WillOnce(Return("l3"))
+            .WillOnce(Return("label 2"))
+            .WillOnce(Return("l2"))
+            .WillOnce(Return("quit"));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+            .Times(AtLeast(1));
+
+    Machine m(f, Factory::State::HOME);
     m.run();
     TaskManager tm = m.model();
     ASSERT_EQ(3, tm.size());

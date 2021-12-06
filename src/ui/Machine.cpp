@@ -12,7 +12,7 @@ Machine::Machine(const Factory::State &s) {
     context_.setStep(factory_.getStep(s));
 }
 
-Machine::Machine(Context c, const Factory::State &s) : context_(std::move(c)) {
+Machine::Machine(Factory f, const Factory::State &s) : factory_(std::move(f)) {
     context_.setStep(factory_.getStep(s));
 }
 

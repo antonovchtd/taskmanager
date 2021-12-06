@@ -4,9 +4,6 @@
 
 #include "Context.h"
 
-Context::Context() : in_(&std::cin), out_(&std::cout){
-}
-
 std::shared_ptr<Step> Context::getStep() const {
     return step_;
 }
@@ -83,20 +80,4 @@ void Context::setArg(const std::string &arg) {
 
 const std::string &Context::arg() const {
     return arg_;
-}
-
-void Context::setOStream(std::ostream &os) {
-    out_ = &os;
-}
-
-void Context::setIStream(std::istream &is) {
-    in_ = &is;
-}
-
-std::istream *Context::in() const {
-    return in_;
-}
-
-std::ostream *Context::out() const {
-    return out_;
 }
