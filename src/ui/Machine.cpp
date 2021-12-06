@@ -12,7 +12,7 @@ Machine::Machine(const Factory::State &s) {
     context_.setStep(factory_.getStep(s));
 }
 
-Machine::Machine(const Context &c, const Factory::State &s) : context_(c) {
+Machine::Machine(Context c, const Factory::State &s) : context_(std::move(c)) {
     context_.setStep(factory_.getStep(s));
 }
 
@@ -26,4 +26,8 @@ Context Machine::run() {
         }
     }
     return context_;
+}
+
+TaskManager Machine::model() const {
+    return model_;
 }

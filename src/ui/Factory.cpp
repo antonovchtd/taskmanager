@@ -9,7 +9,7 @@
       map[state] = std::shared_ptr<cls>{new step};    \
   return map[state];
 
-std::shared_ptr<Step> Factory::create(const std::string &command) {
+std::shared_ptr<Step> Factory::create(const Context &c, const std::string &command) {
     if (command == "add") {
         return getAddStep();
     } else if (command == "help") {
@@ -30,7 +30,7 @@ std::shared_ptr<Step> Factory::create(const std::string &command) {
         return getLabelStep();
     } else {
         if (!command.empty())
-            std::cout << "Wrong command. Try again. Type `help` for help.\n";
+            *c.out() << "Wrong command. Try again. Type `help` for help.\n";
         return getHomeStep();
     }
 }

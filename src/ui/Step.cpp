@@ -33,7 +33,7 @@ std::shared_ptr<Action> HomeStep::execute(Context &c, Factory &f) {
     std::stringstream ss{Step::read(*c.in(), *c.out(), " > ")};
     std::string command, arg;
     ss >> command >> arg;
-    c.setStep(f.create(command));
+    c.setStep(f.create(c, command));
     c.setArg(arg);
     return c.getStep()->getValidateArgAction(f);
 }

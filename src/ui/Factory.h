@@ -43,7 +43,7 @@ public:
 
 public:
 
-    std::shared_ptr<Step> create(const std::string &);
+    std::shared_ptr<Step> create(const Context &c, const std::string &command);
 
     std::shared_ptr<Step> nextStep();
     std::shared_ptr<Step> nextStep(const HelpStep &);

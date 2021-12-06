@@ -14,10 +14,13 @@ class Machine {
 public:
     Machine();
     explicit Machine(const Factory::State &s);
-    Machine(const Context &c, const Factory::State &s);
+    Machine(Context c, const Factory::State &s);
 
 public:
     Context run();
+
+public:
+    TaskManager model() const;
 
 private:
     Context context_;
