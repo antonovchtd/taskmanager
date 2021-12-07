@@ -68,7 +68,7 @@ TEST_F(MachineTest, shouldCreateThreeTasksCompleteDelete)
     EXPECT_FALSE(tm.Validate(TaskID(3)));
 }
 
-TEST_F(MachineTest, shouldCreateTaskWithSubtasksCompleteTwo)
+TEST_F(MachineTest, shouldCreateTaskWithSubtasksCompleteAll)
 {
     Factory f(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
@@ -86,7 +86,6 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksCompleteTwo)
             .WillOnce(Return("subsub"))
             .WillOnce(Return("3"))
             .WillOnce(Return("23/12"))
-            .WillOnce(Return("complete 3"))
             .WillOnce(Return("complete 1"))
             .WillOnce(Return("quit"));
 
@@ -103,7 +102,7 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksCompleteTwo)
     EXPECT_TRUE(tm[TaskID(1)].first.isComplete());
 
     ASSERT_TRUE(tm.Validate(TaskID(2)));
-    EXPECT_FALSE(tm[TaskID(2)].first.isComplete());
+    EXPECT_TRUE(tm[TaskID(2)].first.isComplete());
 
     ASSERT_TRUE(tm.Validate(TaskID(3)));
     EXPECT_TRUE(tm[TaskID(3)].first.isComplete());
@@ -189,4 +188,64 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksLabelTwo)
     auto ch3 = tm[TaskID(3)].second.children();
     ASSERT_EQ(0, ch3.size());
 
+}
+
+TEST_F(MachineTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
+{
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(AtLeast(1))
+            .WillOnce(Return("add"))
+            .WillOnce(Return("test 1"))
+            .WillOnce(Return("1"))
+            .WillOnce(Return("21/12"))
+            .WillOnce(Return("add"))
+            .WillOnce(Return("test 2"))
+            .WillOnce(Return("2"))
+            .WillOnce(Return("22/12"))
+            .WillOnce(Return("subtask 1"))
+            .WillOnce(Return("test 3"))
+            .WillOnce(Return("3"))
+            .WillOnce(Return("23/12"))
+            .WillOnce(Return("delete 1"))
+            .WillOnce(Return("N"))
+            .WillOnce(Return("delete 1"))
+            .WillOnce(Return("Y"))
+            .WillOnce(Return("quit"));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+            .Times(AtLeast(1));
+
+    Machine m(f, Factory::State::HOME);
+    m.run();
+    TaskManager tm = m.model();
+    ASSERT_EQ(1, tm.size());
+
+    ASSERT_FALSE(tm.Validate(TaskID(1)));
+    ASSERT_TRUE(tm.Validate(TaskID(2)));
+    EXPECT_FALSE(tm.Validate(TaskID(3)));
+}
+
+TEST_F(MachineTest, shouldCreateNothingWithBadInput)
+{
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(AtLeast(1))
+            .WillOnce(Return("bad"))
+            .WillOnce(Return("so bad"))
+            .WillOnce(Return("so, so bad"))
+            .WillOnce(Return(""))
+            .WillOnce(Return("????"))
+            .WillOnce(Return("help"))
+            .WillOnce(Return("quit"));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+            .Times(7);
+
+    Machine m(f, Factory::State::HOME);
+    m.run();
+    TaskManager tm = m.model();
+    ASSERT_EQ(0, tm.size());
 }
