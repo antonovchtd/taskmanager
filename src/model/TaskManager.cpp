@@ -37,6 +37,20 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks(const std::string 
     return tasks;
 }
 
+std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks(const TaskID &id) {
+    decltype(tasks_) tasks;
+    tasks[id] = tasks_[id];
+    tasks[id].second.SetParent(TaskID::invalidID());
+    for (const auto &ch : tasks[id].second.children()) {
+        auto ch_tasks = getTasks(ch);
+        for (auto it = ch_tasks.begin(); it != ch_tasks.end(); it++) {
+            it->second.second.SetParent(tasks_[ch].second.parent());
+        }
+        tasks.insert(ch_tasks.begin(), ch_tasks.end());
+    }
+    return tasks;
+}
+
 void TaskManager::Delete(const TaskID &id, bool deleteChildren) {
     if (!tasks_[id].second.children().empty() && !deleteChildren)
         throw std::runtime_error("TaskManager::Delete attempts to delete task with subtasks");

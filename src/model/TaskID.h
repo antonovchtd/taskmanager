@@ -17,6 +17,7 @@ public:
     static TaskID nullid();
 
     bool isValid() const;
+    bool isValidOrNull() const;
     int value() const;
     std::string to_string() const;
 

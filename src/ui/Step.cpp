@@ -35,7 +35,7 @@ std::shared_ptr<Action> HomeStep::execute(Context &c, Factory &f) {
 
 void HomeStep::process(Context &c, Factory &f) {
     if (c.id().has_value()) {
-        if (!c.id()->isValid())
+        if (!c.id()->isValidOrNull())
             printer()->print("Invalid ID. Try again.\n");
     } else {
         printer()->print("This function takes no argument.\n");

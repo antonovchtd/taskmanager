@@ -25,6 +25,7 @@ public:
     std::pair<Task, Node>& operator[](TaskID);
     std::map<TaskID, std::pair<Task, Node>> getTasks() const;
     std::map<TaskID, std::pair<Task, Node>> getTasks(const std::string &label) const;
+    std::map<TaskID, std::pair<Task, Node>> getTasks(const TaskID &id);
     size_t size() const;
 
 public:

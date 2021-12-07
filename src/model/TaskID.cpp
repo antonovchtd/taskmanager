@@ -31,6 +31,10 @@ TaskID TaskID::nullid() {
 }
 
 bool TaskID::isValid() const {
+    return value_ > 0;
+}
+
+bool TaskID::isValidOrNull() const {
     return value_ >= 0;
 }
 

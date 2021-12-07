@@ -249,3 +249,66 @@ TEST_F(MachineTest, shouldCreateNothingWithBadInput)
     TaskManager tm = m.model();
     ASSERT_EQ(0, tm.size());
 }
+
+TEST_F(MachineTest, shouldCreateTaskWithSubtasksAndShowByID)
+{
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(AtLeast(1))
+            .WillOnce(Return("add"))
+            .WillOnce(Return("test"))
+            .WillOnce(Return("1"))
+            .WillOnce(Return("21/12"))
+            .WillOnce(Return("subtask 1"))
+            .WillOnce(Return("sub"))
+            .WillOnce(Return("2"))
+            .WillOnce(Return("22/12"))
+            .WillOnce(Return("subtask 2"))
+            .WillOnce(Return("subsub"))
+            .WillOnce(Return("3"))
+            .WillOnce(Return("23/12"))
+            .WillOnce(Return("show 1"))
+            .WillOnce(Return("show 2"))
+            .WillOnce(Return("show 3"))
+            .WillOnce(Return("show 4"))
+            .WillOnce(Return("quit"));
+
+    std::vector<std::string> out(19);
+    int i = 0;
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+            .Times(19)
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]))
+            .WillOnce(SaveArg<0>(&out[i++]));
+
+    Machine m(f, Factory::State::HOME);
+    m.run();
+    TaskManager tm = m.model();
+    ASSERT_EQ(3, tm.size());
+
+    EXPECT_EQ(out[6], "1 – test, Priority: Low, Due: Tue Dec 21 00:00:00 2021");
+    EXPECT_EQ(out[8], "    2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021");
+    EXPECT_EQ(out[10], "        3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
+    EXPECT_EQ(out[12], "2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021");
+    EXPECT_EQ(out[14], "    3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
+    EXPECT_EQ(out[16], "3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
+    EXPECT_EQ(out[18], "Invalid ID. Try again.\n");
+
+}

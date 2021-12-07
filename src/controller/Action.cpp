@@ -32,7 +32,19 @@ void ValidateNoArgAction::make(TaskManager &model, Context &context) {
 
 void ValidateLabelArgAction::make(TaskManager &model, Context &context) {
     // context.arg() can be empty, can be something, no check for ID though
-    context.setID(TaskID::nullid());
+    TaskID id = TaskID::Create(context.arg());
+    if (id.isValid()) {
+        if (model.Validate(id)) {
+            context.setID(id);
+        }
+        else {
+            context.setID(TaskID::invalidID());
+            context.revertStep();
+        }
+    }
+    else {
+        context.setID(TaskID::nullid());
+    }
 }
 
 void EditTaskAction::make(TaskManager &model, Context &context) {
@@ -42,6 +54,8 @@ void EditTaskAction::make(TaskManager &model, Context &context) {
 void ShowAction::make(TaskManager &model, Context &context) {
     if (context.arg().empty())
         context.setTasks(model.getTasks());
+    else if (context.id().has_value() && context.id()->isValid())
+        context.setTasks(model.getTasks(*context.id()));
     else
         context.setTasks(model.getTasks(context.arg()));
 }
