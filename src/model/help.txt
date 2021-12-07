@@ -22,8 +22,9 @@
                     <id>.
 
     show [<label>]  when used with no argument, displays all tasks and their subtasks in a
-                    hierarchy, along with their IDs. When a label is given, shows only
-                    (sub)tasks with this label.
+         [<id>]     hierarchy, along with their IDs. When a label is given, shows only
+                    (sub)tasks with this label. When an ID is given, shows that task and
+                    its subtasks.
 
     help            shows this help.
 
