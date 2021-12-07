@@ -55,6 +55,8 @@ void TaskManager::Edit(const TaskID &id, Task t) {
 void TaskManager::Complete(const TaskID &id) {
     Task t = tasks_[id].first;
     this->Edit(id, Task::Create(t.title(), t.priority(), t.dueDate(), true));
+    for (auto const &ch : tasks_[id].second.children())
+        Complete(ch);
 }
 
 std::pair<Task, Node>& TaskManager::operator[](TaskID id) {
