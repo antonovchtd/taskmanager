@@ -34,8 +34,6 @@ public:
     void Delete(const TaskID &);
     bool Validate(const TaskID &id) const;
     void SetLabel(const TaskID &, const std::string &);
-//    void Show(std::ostream &os) const;
-//    void Show(std::ostream &os, std::string &s) const;
 
 private:
     std::map<TaskID, std::pair<Task, Node>> tasks_;

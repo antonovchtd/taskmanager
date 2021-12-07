@@ -3,7 +3,6 @@
 //
 
 #include "TaskManager.h"
-#include "utils.h"
 
 TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator)) {
 }
@@ -59,17 +58,6 @@ void TaskManager::Complete(const TaskID &id) {
 std::pair<Task, Node>& TaskManager::operator[](TaskID id) {
     return tasks_[id];
 }
-
-//void TaskManager::Show(std::ostream &os) const {
-//    os << tasks_;
-//}
-//
-//void TaskManager::Show(std::ostream &os, std::string &label) const {
-//    for (const auto &kv : tasks_) {
-//        if (kv.second.second.label() == label)
-//            os << kv;
-//    }
-//}
 
 bool TaskManager::Validate(const TaskID &id) const{
     return tasks_.find(id) != tasks_.end();
