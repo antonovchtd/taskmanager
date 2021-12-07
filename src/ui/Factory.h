@@ -31,6 +31,7 @@ public:
         SHOW,
         COMPLETE,
         DELETE,
+        CONFIRMDELETE,
         LABEL
     };
 
@@ -44,6 +45,7 @@ public:
         SHOW,
         COMPLETE,
         DELETE,
+        CONFIRMDELETE,
         LABEL
     };
 
@@ -65,6 +67,7 @@ public:
     std::shared_ptr<Step> nextStep(const ShowStep &);
     std::shared_ptr<Step> nextStep(const CompleteStep &);
     std::shared_ptr<Step> nextStep(const DeleteStep &);
+    std::shared_ptr<Step> nextStep(const ConfirmDeleteStep &);
     std::shared_ptr<Step> nextStep(const LabelStep &);
 
     std::shared_ptr<Step> getStep(const State &);
@@ -78,6 +81,7 @@ public:
     std::shared_ptr<Step> getShowStep();
     std::shared_ptr<Step> getCompleteStep();
     std::shared_ptr<Step> getDeleteStep();
+    std::shared_ptr<Step> getConfirmDeleteStep();
     std::shared_ptr<Step> getLabelStep();
 
     std::shared_ptr<Action> getAction(const HelpStep &);
@@ -89,6 +93,7 @@ public:
     std::shared_ptr<Action> getAction(const ShowStep &);
     std::shared_ptr<Action> getAction(const CompleteStep &);
     std::shared_ptr<Action> getAction(const DeleteStep &);
+    std::shared_ptr<Action> getAction(const ConfirmDeleteStep &);
     std::shared_ptr<Action> getAction(const LabelStep &);
 
     std::shared_ptr<Action> getAddTaskAction();
@@ -100,6 +105,7 @@ public:
     std::shared_ptr<Action> getShowAction();
     std::shared_ptr<Action> getCompleteAction();
     std::shared_ptr<Action> getDeleteAction();
+    std::shared_ptr<Action> getConfirmDeleteAction();
     std::shared_ptr<Action> getLabelAction();
 
 public:

@@ -139,7 +139,7 @@ TEST_F(StepTest, executeHomeStepWithCompleteCommand)
 
 TEST_F(StepTest, executeHomeStepWithDeleteCommand)
 {
-    STEPTEST_GEN_HOMESTEP_CALL(delete, getValidateIDAction, getDeleteStep)
+    STEPTEST_GEN_HOMESTEP_CALL(delete, getValidateIDAction, getConfirmDeleteStep)
 }
 
 TEST_F(StepTest, executeHomeStepWithLabelCommand)
@@ -494,6 +494,112 @@ TEST_F(StepTest, processDeleteStep)
 {
     STEPTEST_GEN_PROCESS_CALL_ACK_ID(getDeleteStep)
     EXPECT_EQ(out, "Deleted Task with ID " + c.id().value().to_string() + ".\n");
+}
+
+TEST_F(StepTest, processConfirmDeleteStepWithConfrimFalse)
+{
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+        .Times(0);
+
+    auto hs = f.getConfirmDeleteStep();
+    Context c;
+    c.setAskConfirmation(false);
+    hs->process(c, f);
+}
+
+TEST_F(StepTest, processConfirmDeleteStepWithConfrimTrueEmptyStr)
+{
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(1)
+            .WillOnce(Return(""));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+        .Times(0);
+
+    auto hs = f.getConfirmDeleteStep();
+    Context c;
+    c.setAskConfirmation(true);
+    c.setID(TaskID(42));
+    hs->process(c, f);
+
+    EXPECT_EQ(c.getStep(), f.getDeleteStep());
+    EXPECT_EQ(c.getOldStep(), f.getHomeStep());
+}
+
+TEST_F(StepTest, processConfirmDeleteStepWithConfrimTrueYStr)
+{
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(1)
+            .WillOnce(Return("Y"));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+        .Times(0);
+
+    auto hs = f.getConfirmDeleteStep();
+    Context c;
+    c.setAskConfirmation(true);
+    c.setID(TaskID(42));
+    hs->process(c, f);
+
+    EXPECT_EQ(c.getStep(), f.getDeleteStep());
+    EXPECT_EQ(c.getOldStep(), f.getHomeStep());
+}
+
+TEST_F(StepTest, processConfirmDeleteStepWithConfrimTrueNStr)
+{
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(1)
+            .WillOnce(Return("N"));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+        .Times(0);
+
+    auto hs = f.getConfirmDeleteStep();
+    Context c;
+    c.setAskConfirmation(true);
+    c.setID(TaskID(42));
+    hs->process(c, f);
+
+    EXPECT_EQ(c.getStep(), f.getHomeStep());
+    EXPECT_EQ(c.getOldStep(), f.getHomeStep());
+}
+
+TEST_F(StepTest, processConfirmDeleteStepWithConfrimTrueBadStr)
+{
+    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
+
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+            .Times(2)
+            .WillOnce(Return("Bad"))
+            .WillOnce(Return("N"));
+
+    std::string out;
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+        .Times(1)
+        .WillOnce(SaveArg<0>(&out));
+
+    auto hs = f.getConfirmDeleteStep();
+    Context c;
+    c.setAskConfirmation(true);
+    c.setID(TaskID(42));
+    hs->process(c, f);
+
+    EXPECT_EQ(out, "Wrong option. Type Y or N.\n");
+    EXPECT_EQ(c.getStep(), f.getHomeStep());
+    EXPECT_EQ(c.getOldStep(), f.getHomeStep());
 }
 
 TEST_F(StepTest, executeLabelStep)

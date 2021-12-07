@@ -81,3 +81,11 @@ void Context::setArg(const std::string &arg) {
 const std::string &Context::arg() const {
     return arg_;
 }
+
+bool Context::askConfirmation() const {
+    return askConfirmation_;
+}
+
+void Context::setAskConfirmation(bool tf) {
+    askConfirmation_ = tf;
+}

@@ -307,6 +307,44 @@ std::shared_ptr<Action> DeleteStep::getValidateArgAction(Factory &f) {
     return f.getValidateIDAction();
 }
 
+ConfirmDeleteStep::ConfirmDeleteStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer) :
+        Step(std::move(reader), std::move(printer)) {
+}
+
+std::shared_ptr<Action> ConfirmDeleteStep::execute(Context &c, Factory &f) {
+    c.setStep(f.nextStep(*this));
+    return f.getAction(*this);
+}
+
+void ConfirmDeleteStep::process(Context &c, Factory &f) {
+    std::string reply;
+    if (c.askConfirmation())
+        while (true){
+            reply = reader()->read("Task " + c.id().value().to_string() +
+                                   " has subtasks. Confirm to delete all. [Y]/N > ");
+            if (reply.empty() || reply == "Y" || reply == "y") {
+                c.setStep(f.getDeleteStep());
+                c.setOldStep(f.getHomeStep());
+                break;
+            } else if (reply == "N" || reply == "n") {
+                c.setStep(f.getHomeStep());
+                c.setOldStep(f.getHomeStep());
+                break;
+            } else {
+                printer()->print("Wrong option. Type Y or N.\n");
+            }
+        }
+    else {
+        c.setStep(f.getDeleteStep());
+        c.setOldStep(f.getHomeStep());
+    }
+
+}
+
+std::shared_ptr<Action> ConfirmDeleteStep::getValidateArgAction(Factory &f) {
+    return f.getValidateIDAction();
+}
+
 LabelStep::LabelStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer) :
         Step(std::move(reader), std::move(printer)) {
 }

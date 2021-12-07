@@ -21,6 +21,7 @@ public:
     std::map<TaskID, std::pair<Task, Node>> getTasks() const;
     std::string label() const;
     const std::string &arg() const;
+    bool askConfirmation() const;
 
 public:
     void setStep(const std::shared_ptr<Step> &);
@@ -33,6 +34,7 @@ public:
     void setTasks(const std::map<TaskID, std::pair<Task, Node>> &);
     void setLabel(const std::string &);
     void setArg(const std::string &arg);
+    void setAskConfirmation(bool);
 
 public:
     void revertStep();
@@ -44,6 +46,7 @@ private:
     std::map<TaskID, std::pair<Task, Node>> tasks_;
     std::string label_;
     std::string arg_;
+    bool askConfirmation_;
     std::shared_ptr<Step> step_;
     std::shared_ptr<Step> oldStep_;
 };

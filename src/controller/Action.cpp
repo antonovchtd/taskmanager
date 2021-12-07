@@ -50,8 +50,15 @@ void CompleteTaskAction::make(TaskManager &model, Context &context) {
     model.Complete(context.id().value());
 }
 
-void DeleteTaskAction::make(TaskManager &model, Context &context) {
+void DeleteAction::make(TaskManager &model, Context &context) {
     model.Delete(context.id().value(), true);
+}
+
+void ConfirmDeleteAction::make(TaskManager &model, Context &context) {
+    if (model[context.id().value()].second.children().empty())
+        context.setAskConfirmation(false);
+    else
+        context.setAskConfirmation(true);
 }
 
 void LabelAction::make(TaskManager &model, Context &context) {

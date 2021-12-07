@@ -54,7 +54,12 @@ public:
     void make(TaskManager &, Context &) override;
 };
 
-class DeleteTaskAction : public Action {
+class DeleteAction : public Action {
+public:
+    void make(TaskManager &, Context &) override;
+};
+
+class ConfirmDeleteAction : public Action {
 public:
     void make(TaskManager &, Context &) override;
 };

@@ -131,6 +131,14 @@ public:
     std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
 };
 
+class ConfirmDeleteStep : public Step {
+public:
+    ConfirmDeleteStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
+    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
+    void process(Context &c, Factory &f) override;
+    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+};
+
 class LabelStep : public Step {
 public:
     LabelStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);

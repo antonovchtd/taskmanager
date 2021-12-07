@@ -162,7 +162,7 @@ TEST_F(ActionTest, makeDeleteTaskAction)
     TaskManager tm;
     Context c;
     TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    DeleteTaskAction da;
+    DeleteAction da;
     c.setID(id);
     da.make(tm, c);
     EXPECT_EQ(0, tm.size());
