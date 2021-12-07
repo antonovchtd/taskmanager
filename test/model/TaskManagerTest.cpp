@@ -125,7 +125,7 @@ TEST_F(TaskManagerTest, shouldDeleteTask)
                                     Task::Priority::NONE,
                                     time(nullptr),
                                     false));
-    tm.Delete(id);
+    tm.Delete(id, false);
     EXPECT_FALSE(tm.Validate(id));
 }
 
@@ -164,7 +164,7 @@ TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtDeletingTaskWithChildren)
     TaskID id = tm.Add(Task::Create("Task",p,time(nullptr),false));
     tm.Add(Task::Create("Subtask", p,time(nullptr), false), id);
     ASSERT_EQ(2, tm.size());
-    EXPECT_THROW(tm.Delete(id), std::runtime_error);
+    EXPECT_THROW(tm.Delete(id, false), std::runtime_error);
 
 }
 
@@ -175,7 +175,7 @@ TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
     TaskID id1 = tm.Add(Task::Create("Task",p,time(nullptr),false));
     TaskID id2 = tm.Add(Task::Create("Subtask", p,time(nullptr), false), id1);
     ASSERT_EQ(2, tm.size());
-    tm.Delete(id2);
+    tm.Delete(id2, false);
     ASSERT_EQ(1, tm.size());
     EXPECT_TRUE(tm[id1].second.children().empty());
 }

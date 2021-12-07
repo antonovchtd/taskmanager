@@ -37,12 +37,14 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks(const std::string 
     return tasks;
 }
 
-void TaskManager::Delete(const TaskID &id) {
-    if (!tasks_[id].second.children().empty())
+void TaskManager::Delete(const TaskID &id, bool deleteChildren) {
+    if (!tasks_[id].second.children().empty() && !deleteChildren)
         throw std::runtime_error("TaskManager::Delete attempts to delete task with subtasks");
     std::optional<TaskID> ancestor = tasks_[id].second.parent();
     if (ancestor && Validate(ancestor.value()))
         tasks_[ancestor.value()].second.removeChild(id);
+    for (auto const &ch : tasks_[id].second.children())
+        Delete(ch, true);
     tasks_.erase(id);
 }
 

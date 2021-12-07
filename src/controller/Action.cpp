@@ -51,7 +51,7 @@ void CompleteTaskAction::make(TaskManager &model, Context &context) {
 }
 
 void DeleteTaskAction::make(TaskManager &model, Context &context) {
-    model.Delete(context.id().value());
+    model.Delete(context.id().value(), true);
 }
 
 void LabelAction::make(TaskManager &model, Context &context) {

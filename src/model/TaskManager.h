@@ -31,7 +31,7 @@ public:
     TaskID Add(Task, TaskID ancestor = TaskID::invalidID());
     void Edit(const TaskID &, Task);
     void Complete(const TaskID &);
-    void Delete(const TaskID &);
+    void Delete(const TaskID &id, bool deleteChildren = false);
     bool Validate(const TaskID &id) const;
     void SetLabel(const TaskID &, const std::string &);
 
