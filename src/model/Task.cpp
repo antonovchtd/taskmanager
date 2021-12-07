@@ -61,10 +61,10 @@ std::string Task::to_string() const {
     str_time.pop_back();
     os << ", Due: " << str_time;
     if (due_date_ < time(nullptr))
-        os << " [overdue] ";
+        os << " [overdue]";
 
     if (is_complete_) {
-        os << " [completed] ";
+        os << " [completed]";
     }
     return os.str();
 }

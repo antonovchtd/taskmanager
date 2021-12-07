@@ -252,7 +252,7 @@ void ShowStep::recursivePrint(const std::pair<TaskID, std::pair<Task, Node>> &kv
                      " – " + kv.second.first.to_string());
 
     if (!kv.second.second.label().empty())
-        printer()->print(" :L" + kv.second.second.label());
+        printer()->print(" :L " + kv.second.second.label());
 
     printer()->print("\n");
     for (const auto &id : kv.second.second.children()) {
