@@ -5,10 +5,12 @@
 #include "Machine.h"
 
 Machine::Machine() {
+    factory_ = Factory::create();
     context_.setStep(factory_->getStep(Factory::State::HOME));
 }
 
 Machine::Machine(const Factory::State &s) {
+    factory_ = Factory::create();
     context_.setStep(factory_->getStep(s));
 }
 
@@ -21,7 +23,7 @@ Context Machine::run() {
     while (context_.getStep()){
         auto act = context_.getStep()->execute(context_);
         if (act) {
-            controller_.Accept(model_, context_, act);
+            act->make(model_, context_);
             context_.getOldStep()->process(context_);
         }
     }

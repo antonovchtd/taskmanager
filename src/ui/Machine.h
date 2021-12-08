@@ -6,7 +6,6 @@
 #define TASKMANAGER_SRC_UI_MACHINE_H_
 
 #include "../model/TaskManager.h"
-#include "../controller/Controller.h"
 #include "Context.h"
 #include "Factory.h"
 
@@ -25,7 +24,6 @@ public:
 private:
     Context context_;
     std::shared_ptr<Factory> factory_;
-    Controller controller_;
     TaskManager model_;
 };
 

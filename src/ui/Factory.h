@@ -10,7 +10,7 @@
 #include <map>
 
 #include "Step.h"
-#include "../controller/Action.h"
+#include "../ui/Action.h"
 #include "../io/AbstractReader.h"
 #include "../io/ConsoleReader.h"
 #include "../io/FileReader.h"
