@@ -128,10 +128,6 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksCompleteAll)
 
 TEST_F(MachineTest, shouldCreateTaskWithSubtasksLabelTwo)
 {
-    std::istringstream is{
-            std::string("add\ntask 1\n1\n21/12\nsubtask 1\nsub\n2\n22/12\n") +
-            std::string("add\ntask 2\n3\n23/12\nlabel 3\nl3\nlabel 2\nl2\nquit")};
-
     Factory f(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
     EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
