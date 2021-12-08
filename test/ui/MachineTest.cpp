@@ -31,9 +31,9 @@ public:
 
 TEST_F(MachineTest, shouldCreateThreeTasksCompleteDelete)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("test 1"))
@@ -51,7 +51,7 @@ TEST_F(MachineTest, shouldCreateThreeTasksCompleteDelete)
             .WillOnce(Return("delete 3"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(AtLeast(1));
 
     Machine m(f, Factory::State::HOME);
@@ -70,9 +70,9 @@ TEST_F(MachineTest, shouldCreateThreeTasksCompleteDelete)
 
 TEST_F(MachineTest, shouldCreateTaskWithSubtasksCompleteAll)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
-              std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("test"))
@@ -89,7 +89,7 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksCompleteAll)
             .WillOnce(Return("complete 1"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(AtLeast(1));
 
     Machine m(f, Factory::State::HOME);
@@ -128,9 +128,9 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksCompleteAll)
 
 TEST_F(MachineTest, shouldCreateTaskWithSubtasksLabelTwo)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
-              std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("task 1"))
@@ -150,7 +150,7 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksLabelTwo)
             .WillOnce(Return("l2"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(AtLeast(1));
 
     Machine m(f, Factory::State::HOME);
@@ -188,9 +188,9 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksLabelTwo)
 
 TEST_F(MachineTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
-              std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("test 1"))
@@ -210,7 +210,7 @@ TEST_F(MachineTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
             .WillOnce(Return("Y"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(AtLeast(1));
 
     Machine m(f, Factory::State::HOME);
@@ -225,9 +225,9 @@ TEST_F(MachineTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
 
 TEST_F(MachineTest, shouldCreateNothingWithBadInput)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
-              std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("bad"))
             .WillOnce(Return("so bad"))
@@ -237,7 +237,7 @@ TEST_F(MachineTest, shouldCreateNothingWithBadInput)
             .WillOnce(Return("help"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(7);
 
     Machine m(f, Factory::State::HOME);
@@ -248,9 +248,9 @@ TEST_F(MachineTest, shouldCreateNothingWithBadInput)
 
 TEST_F(MachineTest, shouldCreateTaskWithSubtasksAndShowByID)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
-              std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("test"))
@@ -272,7 +272,7 @@ TEST_F(MachineTest, shouldCreateTaskWithSubtasksAndShowByID)
 
     std::vector<std::string> out(19);
     int i = 0;
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(19)
             .WillOnce(SaveArg<0>(&out[i++]))
             .WillOnce(SaveArg<0>(&out[i++]))

@@ -73,9 +73,9 @@ TEST_F(ActionTest, makeValidateNoArgActionSomeID)
 {
     TaskManager tm;
     Context c;
-    Factory f;
-    c.setOldStep(f.getHomeStep());
-    c.setStep(f.getHelpStep());
+    auto f = Factory::create();
+    c.setOldStep(f->getHomeStep());
+    c.setStep(f->getHelpStep());
     c.setArg("1");
     ValidateNoArgAction via;
     via.make(tm, c);

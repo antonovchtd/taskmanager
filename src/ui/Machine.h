@@ -14,7 +14,7 @@ class Machine {
 public:
     Machine();
     explicit Machine(const Factory::State &s);
-    Machine(Factory f, const Factory::State &s);
+    Machine(const std::shared_ptr<Factory> &f, const Factory::State &s);
 
 public:
     Context run();
@@ -24,7 +24,7 @@ public:
 
 private:
     Context context_;
-    Factory factory_;
+    std::shared_ptr<Factory> factory_;
     Controller controller_;
     TaskManager model_;
 };

@@ -16,36 +16,36 @@ class ContextTest : public ::testing::Test
 TEST_F(ContextTest, shouldSetAndGetStep)
 {
     Context c;
-    Factory f;
-    c.setStep(f.getStep(Factory::State::HOME));
-    EXPECT_EQ(c.getStep(), f.getStep(Factory::State::HOME));
+    auto f = Factory::create();
+    c.setStep(f->getStep(Factory::State::HOME));
+    EXPECT_EQ(c.getStep(), f->getStep(Factory::State::HOME));
 }
 
 TEST_F(ContextTest, shouldSetAndGetOldStep)
 {
     Context c;
-    Factory f;
-    c.setOldStep(f.getStep(Factory::State::HOME));
-    EXPECT_EQ(c.getOldStep(), f.getStep(Factory::State::HOME));
-    EXPECT_NE(c.getOldStep(), f.getStep(Factory::State::HELP));
+    auto f = Factory::create();
+    c.setOldStep(f->getStep(Factory::State::HOME));
+    EXPECT_EQ(c.getOldStep(), f->getStep(Factory::State::HOME));
+    EXPECT_NE(c.getOldStep(), f->getStep(Factory::State::HELP));
 }
 
 TEST_F(ContextTest, shouldChangeStep)
 {
     Context c;
-    Factory f;
-    c.setStep(f.getStep(Factory::State::HOME));
-    c.setStep(f.getStep(Factory::State::HELP));
-    EXPECT_EQ(c.getOldStep(), f.getStep(Factory::State::HOME));
-    EXPECT_EQ(c.getStep(), f.getStep(Factory::State::HELP));
+    auto f = Factory::create();
+    c.setStep(f->getStep(Factory::State::HOME));
+    c.setStep(f->getStep(Factory::State::HELP));
+    EXPECT_EQ(c.getOldStep(), f->getStep(Factory::State::HOME));
+    EXPECT_EQ(c.getStep(), f->getStep(Factory::State::HELP));
 }
 
 TEST_F(ContextTest, shouldRevertStep)
 {
     Context c;
-    Factory f;
-    c.setStep(f.getStep(Factory::State::HOME));
-    c.setStep(f.getStep(Factory::State::HELP));
+    auto f = Factory::create();
+    c.setStep(f->getStep(Factory::State::HOME));
+    c.setStep(f->getStep(Factory::State::HELP));
     c.revertStep();
     EXPECT_EQ(c.getOldStep(), c.getStep());
 }

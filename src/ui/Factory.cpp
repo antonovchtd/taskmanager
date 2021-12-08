@@ -15,9 +15,19 @@ Factory::Factory() :
 
 }
 
-Factory::Factory(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer) :
-        reader_(std::move(reader)), printer_(std::move(printer)) {
+Factory::Factory(const std::shared_ptr<AbstractReader> &reader,
+                 const std::shared_ptr<AbstractPrinter> &printer) :
+         reader_(reader), printer_(printer) {
 
+}
+
+std::shared_ptr<Factory> Factory::create() {
+    return std::shared_ptr<Factory>(new Factory);
+}
+
+std::shared_ptr<Factory> Factory::create(const std::shared_ptr<AbstractReader> &reader,
+                                         const std::shared_ptr<AbstractPrinter> &printer) {
+    return std::shared_ptr<Factory>(new Factory(reader, printer));
 }
 
 std::shared_ptr<AbstractPrinter> Factory::printer() const {
@@ -28,7 +38,7 @@ std::shared_ptr<AbstractReader> Factory::reader() const {
     return reader_;
 }
 
-std::shared_ptr<Step> Factory::create(const std::string &command) {
+std::shared_ptr<Step> Factory::createStep(const std::string &command) {
     if (command == "add") {
         return getAddStep();
     } else if (command == "help") {
@@ -103,51 +113,51 @@ std::shared_ptr<Step> Factory::nextStep(const LabelStep &) {
 }
 
 std::shared_ptr<Step> Factory::getHomeStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::HOME, HomeStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::HOME, HomeStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getHelpStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::HELP, HelpStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::HELP, HelpStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getAddStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::ADD, AddStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::ADD, AddStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getReadTaskDataStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::READTASK, ReadTaskDataStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::READTASK, ReadTaskDataStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getQuitStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::QUIT, QuitStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::QUIT, QuitStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getEditStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::EDIT, EditStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::EDIT, EditStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getSubtaskStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::SUBTASK, SubtaskStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::SUBTASK, SubtaskStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getShowStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::SHOW, ShowStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::SHOW, ShowStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getCompleteStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::COMPLETE, CompleteStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::COMPLETE, CompleteStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getDeleteStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::DELETE, DeleteStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::DELETE, DeleteStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getConfirmDeleteStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::CONFIRMDELETE, ConfirmDeleteStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::CONFIRMDELETE, ConfirmDeleteStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getLabelStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::LABEL, LabelStep(reader_, printer_))
+    FACTORY_GEN_MAP_GETTER(steps_, Step, State::LABEL, LabelStep(reader_, printer_, shared_from_this()))
 }
 
 std::shared_ptr<Step> Factory::getStep(const State &s) {

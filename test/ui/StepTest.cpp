@@ -14,23 +14,23 @@ using ::testing::_;
 using testing::SaveArg;
 
 #define STEPTEST_GEN_HOMESTEP_CALL(command, act, step) \
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader), \
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader), \
               std::shared_ptr<AbstractPrinter>(new MockPrinter)); \
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_)) \
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_)) \
         .Times(AtLeast(1)) \
         .WillOnce(Return(#command))                     \
         .WillRepeatedly(Return("")); \
-    auto hs = f.getHomeStep(); \
+    auto hs = f->getHomeStep(); \
     Context c; \
-    auto action = hs->execute(c, f); \
-    EXPECT_EQ(action, f.act()); \
-    EXPECT_EQ(c.getStep(), f.step()); \
+    auto action = hs->execute(c); \
+    EXPECT_EQ(action, f->act()); \
+    EXPECT_EQ(c.getStep(), f->step()); \
     EXPECT_EQ(c.getOldStep(), nullptr);
 
 #define STEPTEST_GEN_WIZARD_STEP_CALL(getter, act) \
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),\
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),\
         std::shared_ptr<AbstractPrinter>(new MockPrinter));\
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))\
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))\
         .Times(6)\
         .WillOnce(Return(""))\
         .WillOnce(Return("test"))\
@@ -38,11 +38,11 @@ using testing::SaveArg;
         .WillOnce(Return("2"))\
         .WillOnce(Return("31-12-22"))\
         .WillOnce(Return("31/12/2022 15:00"));\
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))\
         .Times(4);\
-    auto hs = f.getter();\
+    auto hs = f->getter();\
     Context c;\
-    auto action = hs->execute(c, f);\
+    auto action = hs->execute(c);\
     EXPECT_EQ(c.data().title, "test");\
     EXPECT_EQ(c.data().priority, Task::Priority::MEDIUM);\
     time_t rawtime;\
@@ -55,31 +55,31 @@ using testing::SaveArg;
     timeinfo->tm_mday = 31;\
     timeinfo->tm_year = 122;\
     EXPECT_EQ(c.data().due_date, mktime(timeinfo));\
-    EXPECT_EQ(action, f.act());\
-    EXPECT_EQ(c.getStep(), f.getHomeStep());\
+    EXPECT_EQ(action, f->act());\
+    EXPECT_EQ(c.getStep(), f->getHomeStep());\
 
 #define STEPTEST_GEN_PROCESS_CALL_ACK_ID(getter)\
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),\
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),\
               std::shared_ptr<AbstractPrinter>(new MockPrinter));\
     std::string out;\
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))\
         .Times(AtLeast(1))\
         .WillRepeatedly(SaveArg<0>(&out));\
-    auto hs = f.getter();\
+    auto hs = f->getter();\
     Context c;\
     c.setID(TaskID(42));\
-    hs->process(c, f);\
+    hs->process(c);\
 
 #define STEPTEST_GEN_PROCESS_DO_NOTHING(getter) \
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),\
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),\
           std::shared_ptr<AbstractPrinter>(new MockPrinter));\
     std::string out;\
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))\
         .Times(0)\
         .WillOnce(SaveArg<0>(&out));\
-    auto hs = f.getter();\
+    auto hs = f->getter();\
     Context c;\
-    hs->process(c, f);
+    hs->process(c);
 
 class StepTest : public ::testing::Test
 {
@@ -156,83 +156,83 @@ TEST_F(StepTest, executeHomeStepWithEmptyCommand)
 TEST_F(StepTest, executeHomeStepWithBadCommand)
 {
 //    STEPTEST_GEN_HOMESTEP_CALL(bad, getValidateNoArgAction, getHomeStep)
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
         .Times(1)
         .WillOnce(Return("bad"));
 
     std::string out;
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(1)
             .WillOnce(SaveArg<0>(&out));
-    auto hs = f.getHomeStep();
+    auto hs = f->getHomeStep();
     Context c;
-    auto action = hs->execute(c, f);
-    EXPECT_EQ(action, f.getValidateNoArgAction());
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
+    auto action = hs->execute(c);
+    EXPECT_EQ(action, f->getValidateNoArgAction());
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
     EXPECT_EQ(c.getOldStep(), nullptr);
     EXPECT_EQ(out, "Wrong command. Try again. Type `help` for help.\n");
 }
 
 TEST_F(StepTest, processHomeStepWithMissingIDPrintsMessage)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
     std::string out;
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(1)
             .WillOnce(SaveArg<0>(&out));
-    auto hs = f.getHomeStep();
+    auto hs = f->getHomeStep();
     Context c;
     c.setID(std::nullopt);
-    hs->process(c, f);
+    hs->process(c);
     EXPECT_EQ(out, "This function takes no argument.\n");
 }
 
 TEST_F(StepTest, processHomeStepWithInvalidIDPrintsMessage)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
     std::string out;
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(1)
             .WillOnce(SaveArg<0>(&out));
-    auto hs = f.getHomeStep();
+    auto hs = f->getHomeStep();
     Context c;
     c.setID(TaskID::invalidID());
-    hs->process(c, f);
+    hs->process(c);
     EXPECT_EQ(out, "Invalid ID. Try again.\n");
 }
 
 TEST_F(StepTest, processHomeStepWithValidIDPrintsNoMessage)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
     std::string out;
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(0)
             .WillOnce(SaveArg<0>(&out));
 
-    auto hs = f.getHomeStep();
+    auto hs = f->getHomeStep();
     Context c;
     c.setID(TaskID(1));
-    hs->process(c, f);
+    hs->process(c);
 }
 
 TEST_F(StepTest, shouldExecuteHelpStep)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
     std::string out;
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(1)
             .WillOnce(SaveArg<0>(&out));
 
-    auto hs = f.getHelpStep();
+    auto hs = f->getHelpStep();
     Context c;
-    auto action = hs->execute(c, f);
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
+    auto action = hs->execute(c);
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
     EXPECT_EQ(action, nullptr);
 
     std::ifstream file("../src/model/help.txt");
@@ -247,9 +247,9 @@ TEST_F(StepTest, shouldExecuteHelpStep)
 TEST_F(StepTest, shouldRecordOldStep)
 {
     STEPTEST_GEN_HOMESTEP_CALL(help, getValidateNoArgAction, getHelpStep)
-    action = hs->execute(c, f);
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
-    EXPECT_EQ(c.getOldStep(), f.getHelpStep());
+    action = hs->execute(c);
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
+    EXPECT_EQ(c.getOldStep(), f->getHelpStep());
 }
 
 TEST_F(StepTest, processHelpStepPrintNothing)
@@ -259,20 +259,20 @@ TEST_F(StepTest, processHelpStepPrintNothing)
 
 TEST_F(StepTest, executeAddStepWithFutureDate)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(3)
             .WillOnce(Return("test"))
             .WillOnce(Return("1"))
             .WillOnce(Return("31/12"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(1);
 
-    auto hs = f.getAddStep();
+    auto hs = f->getAddStep();
     Context c;
-    auto action = hs->execute(c, f);
+    auto action = hs->execute(c);
     EXPECT_EQ(c.data().title, "test");
     EXPECT_EQ(c.data().priority, Task::Priority::LOW);
     time_t rawtime;
@@ -284,27 +284,27 @@ TEST_F(StepTest, executeAddStepWithFutureDate)
     timeinfo->tm_mon = 11;
     timeinfo->tm_mday = 31;
     EXPECT_EQ(c.data().due_date, mktime(timeinfo));
-    EXPECT_EQ(action, f.getAddTaskAction());
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
+    EXPECT_EQ(action, f->getAddTaskAction());
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
 }
 
 TEST_F(StepTest, executeAddStepWithFutureDateAndTime)
 {
 
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(3)
             .WillOnce(Return("test"))
             .WillOnce(Return("3"))
             .WillOnce(Return("31/12/21 23:45"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(1);
 
-    auto hs = f.getAddStep();
+    auto hs = f->getAddStep();
     Context c;
-    auto action = hs->execute(c, f);
+    auto action = hs->execute(c);
     EXPECT_EQ(c.data().title, "test");
     EXPECT_EQ(c.data().priority, Task::Priority::HIGH);
     time_t rawtime;
@@ -317,26 +317,26 @@ TEST_F(StepTest, executeAddStepWithFutureDateAndTime)
     timeinfo->tm_mday = 31;
     timeinfo->tm_year = 121;
     EXPECT_EQ(c.data().due_date, mktime(timeinfo));
-    EXPECT_EQ(action, f.getAddTaskAction());
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
+    EXPECT_EQ(action, f->getAddTaskAction());
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
 }
 
 TEST_F(StepTest, executeAddStepWithFutureTime)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(3)
             .WillOnce(Return("test"))
             .WillOnce(Return("2"))
             .WillOnce(Return("in 01:00"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(1);
 
-    auto hs = f.getAddStep();
+    auto hs = f->getAddStep();
     Context c;
-    auto action = hs->execute(c, f);
+    auto action = hs->execute(c);
 
     EXPECT_EQ(c.data().title, "test");
     EXPECT_EQ(c.data().priority, Task::Priority::MEDIUM);
@@ -346,8 +346,8 @@ TEST_F(StepTest, executeAddStepWithFutureTime)
     struct tm * timeinfo = localtime(&rawtime);
     timeinfo->tm_hour += 1;
     EXPECT_EQ(c.data().due_date, mktime(timeinfo));
-    EXPECT_EQ(action, f.getAddTaskAction());
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
+    EXPECT_EQ(action, f->getAddTaskAction());
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
 }
 
 TEST_F(StepTest, executeAddStepWithMissingEntries)
@@ -363,7 +363,7 @@ TEST_F(StepTest, processAddStep)
     // test that process() resets data in context
     c.setData(Task::Data{"title", Task::Priority::NONE, time(nullptr), false});
     c.setID(TaskID(1));
-    hs->process(c,f);
+    hs->process(c);
     EXPECT_TRUE(c.data().title.empty());
     EXPECT_EQ(c.id(), TaskID::invalidID());
 
@@ -371,11 +371,11 @@ TEST_F(StepTest, processAddStep)
 
 TEST_F(StepTest, getValidateArgActionReadTaskDataStep)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    auto rtds = f.getReadTaskDataStep();
-    auto action = rtds->getValidateArgAction(f);
-    EXPECT_EQ(action, f.getValidateNoArgAction());
+    auto rtds = f->getReadTaskDataStep();
+    auto action = rtds->getValidateArgAction();
+    EXPECT_EQ(action, f->getValidateNoArgAction());
 }
 
 TEST_F(StepTest, processReadTaskDataStepPrintNothing)
@@ -413,40 +413,40 @@ TEST_F(StepTest, processQuitStepPrintNothing)
 TEST_F(StepTest, executeShowStep)
 {
     Context c;
-    Factory f;
-    auto ss = f.getShowStep();
-    auto action = ss->execute(c, f);
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
-    EXPECT_EQ(action, f.getShowAction());
+    auto f = Factory::create();
+    auto ss = f->getShowStep();
+    auto action = ss->execute(c);
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
+    EXPECT_EQ(action, f->getShowAction());
 }
 
 TEST_F(StepTest, processShowStep)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
 
     std::string out;
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(AtLeast(1))
             .WillOnce(SaveArg<0>(&out));
 
     TaskManager tm;
     tm.Add(Task::Create("test", Task::Priority::MEDIUM, 1767218399, false));
 
-    auto ss = f.getShowStep();
+    auto ss = f->getShowStep();
     Context c;
     c.setTasks(tm.getTasks());
-    ss->process(c, f);
+    ss->process(c);
     EXPECT_EQ(out, "1 – test, Priority: Medium, Due: Wed Dec 31 23:59:59 2025");
 }
 
 TEST_F(StepTest, processShowStepWithChildren)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
 
     std::string out1, out2, out3;
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(AtLeast(1))
             .WillOnce(SaveArg<0>(&out1))
             .WillOnce(SaveArg<0>(&out2))
@@ -456,10 +456,10 @@ TEST_F(StepTest, processShowStepWithChildren)
     auto id = tm.Add(Task::Create("test", Task::Priority::MEDIUM, 1767218399, false));
     tm.AddSubtask(Task::Create("sub", Task::Priority::LOW, 1767218399, false), id);
 
-    auto ss = f.getShowStep();
+    auto ss = f->getShowStep();
     Context c;
     c.setTasks(tm.getTasks());
-    ss->process(c, f);
+    ss->process(c);
     EXPECT_EQ(out1, "1 – test, Priority: Medium, Due: Wed Dec 31 23:59:59 2025");
     EXPECT_EQ(out3, "    2 – sub, Priority: Low, Due: Wed Dec 31 23:59:59 2025");
 }
@@ -467,11 +467,11 @@ TEST_F(StepTest, processShowStepWithChildren)
 TEST_F(StepTest, executeCompleteStep)
 {
     Context c;
-    Factory f;
-    auto cs = f.getCompleteStep();
-    auto action = cs->execute(c, f);
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
-    EXPECT_EQ(action, f.getCompleteAction());
+    auto f = Factory::create();
+    auto cs = f->getCompleteStep();
+    auto action = cs->execute(c);
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
+    EXPECT_EQ(action, f->getCompleteAction());
 }
 
 TEST_F(StepTest, processCompleteStep)
@@ -483,11 +483,11 @@ TEST_F(StepTest, processCompleteStep)
 TEST_F(StepTest, executeDeleteStep)
 {
     Context c;
-    Factory f;
-    auto ds = f.getDeleteStep();
-    auto action = ds->execute(c, f);
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
-    EXPECT_EQ(action, f.getDeleteAction());
+    auto f = Factory::create();
+    auto ds = f->getDeleteStep();
+    auto action = ds->execute(c);
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
+    EXPECT_EQ(action, f->getDeleteAction());
 }
 
 TEST_F(StepTest, processDeleteStep)
@@ -498,127 +498,127 @@ TEST_F(StepTest, processDeleteStep)
 
 TEST_F(StepTest, processConfirmDeleteStepWithConfrimFalse)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))\
         .Times(0);
 
-    auto hs = f.getConfirmDeleteStep();
+    auto hs = f->getConfirmDeleteStep();
     Context c;
     c.setAskConfirmation(false);
-    hs->process(c, f);
+    hs->process(c);
 }
 
 TEST_F(StepTest, processConfirmDeleteStepWithConfrimTrueEmptyStr)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(1)
             .WillOnce(Return(""));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))\
         .Times(0);
 
-    auto hs = f.getConfirmDeleteStep();
+    auto hs = f->getConfirmDeleteStep();
     Context c;
     c.setAskConfirmation(true);
     c.setID(TaskID(42));
-    hs->process(c, f);
+    hs->process(c);
 
-    EXPECT_EQ(c.getStep(), f.getDeleteStep());
-    EXPECT_EQ(c.getOldStep(), f.getHomeStep());
+    EXPECT_EQ(c.getStep(), f->getDeleteStep());
+    EXPECT_EQ(c.getOldStep(), f->getHomeStep());
 }
 
 TEST_F(StepTest, processConfirmDeleteStepWithConfrimTrueYStr)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(1)
             .WillOnce(Return("Y"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))\
         .Times(0);
 
-    auto hs = f.getConfirmDeleteStep();
+    auto hs = f->getConfirmDeleteStep();
     Context c;
     c.setAskConfirmation(true);
     c.setID(TaskID(42));
-    hs->process(c, f);
+    hs->process(c);
 
-    EXPECT_EQ(c.getStep(), f.getDeleteStep());
-    EXPECT_EQ(c.getOldStep(), f.getHomeStep());
+    EXPECT_EQ(c.getStep(), f->getDeleteStep());
+    EXPECT_EQ(c.getOldStep(), f->getHomeStep());
 }
 
 TEST_F(StepTest, processConfirmDeleteStepWithConfrimTrueNStr)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(1)
             .WillOnce(Return("N"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))\
         .Times(0);
 
-    auto hs = f.getConfirmDeleteStep();
+    auto hs = f->getConfirmDeleteStep();
     Context c;
     c.setAskConfirmation(true);
     c.setID(TaskID(42));
-    hs->process(c, f);
+    hs->process(c);
 
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
-    EXPECT_EQ(c.getOldStep(), f.getHomeStep());
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
+    EXPECT_EQ(c.getOldStep(), f->getHomeStep());
 }
 
 TEST_F(StepTest, processConfirmDeleteStepWithConfrimTrueBadStr)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(2)
             .WillOnce(Return("Bad"))
             .WillOnce(Return("N"));
 
     std::string out;
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))\
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))\
         .Times(1)
         .WillOnce(SaveArg<0>(&out));
 
-    auto hs = f.getConfirmDeleteStep();
+    auto hs = f->getConfirmDeleteStep();
     Context c;
     c.setAskConfirmation(true);
     c.setID(TaskID(42));
-    hs->process(c, f);
+    hs->process(c);
 
     EXPECT_EQ(out, "Wrong option. Type Y or N.\n");
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
-    EXPECT_EQ(c.getOldStep(), f.getHomeStep());
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
+    EXPECT_EQ(c.getOldStep(), f->getHomeStep());
 }
 
 TEST_F(StepTest, executeLabelStep)
 {
-    Factory f(std::shared_ptr<AbstractReader>(new MockReader),
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f.reader()), read(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(1)
             .WillOnce(Return("myLabel"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f.printer()), print(_))
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(0);
 
-    auto hs = f.getLabelStep();
+    auto hs = f->getLabelStep();
     Context c;
-    auto action = hs->execute(c, f);
+    auto action = hs->execute(c);
 
-    EXPECT_EQ(c.getStep(), f.getHomeStep());
-    EXPECT_EQ(action, f.getLabelAction());
+    EXPECT_EQ(c.getStep(), f->getHomeStep());
+    EXPECT_EQ(action, f->getLabelAction());
     EXPECT_EQ("myLabel", c.label());
 }
 

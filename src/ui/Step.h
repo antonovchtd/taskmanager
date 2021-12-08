@@ -26,53 +26,65 @@ class Factory;
 
 class Step{
 public:
-    Step(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
+    Step(const std::shared_ptr<AbstractReader> &reader,
+         const std::shared_ptr<AbstractPrinter> &printer,
+         const std::shared_ptr<Factory> &factory);
 
 public:
-    virtual std::shared_ptr<Action> execute(Context &c, Factory &f) = 0;
-    virtual void process(Context &c, Factory &f) = 0;
-    virtual std::shared_ptr<Action> getValidateArgAction(Factory &f) = 0;
+    virtual std::shared_ptr<Action> execute(Context &c) = 0;
+    virtual void process(Context &c) = 0;
+    virtual std::shared_ptr<Action> getValidateArgAction() = 0;
     virtual ~Step() = default;
 
 public:
     std::shared_ptr<AbstractReader> reader() const;
     std::shared_ptr<AbstractPrinter> printer() const;
+    std::shared_ptr<Factory> factory() const;
 
 private:
     std::shared_ptr<AbstractReader> reader_;
     std::shared_ptr<AbstractPrinter> printer_;
+    std::shared_ptr<Factory> factory_;
 };
 
 class HomeStep : public Step {
 public:
-    HomeStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    HomeStep(const std::shared_ptr<AbstractReader> &reader,
+             const std::shared_ptr<AbstractPrinter> &printer,
+             const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class HelpStep : public Step {
 public:
-    HelpStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    HelpStep(const std::shared_ptr<AbstractReader> &reader,
+             const std::shared_ptr<AbstractPrinter> &printer,
+             const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class AddStep : public Step {
 public:
-    AddStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    AddStep(const std::shared_ptr<AbstractReader> &reader,
+            const std::shared_ptr<AbstractPrinter> &printer,
+            const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class ReadTaskDataStep : public Step {
 public:
-    ReadTaskDataStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    ReadTaskDataStep(const std::shared_ptr<AbstractReader> &reader,
+                     const std::shared_ptr<AbstractPrinter> &printer,
+                     const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 
 public:
     std::optional<time_t> stringToTime(const Context &c, const std::string &datestring);
@@ -82,34 +94,42 @@ public:
 
 class EditStep : public Step {
 public:
-    EditStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    EditStep(const std::shared_ptr<AbstractReader> &reader,
+             const std::shared_ptr<AbstractPrinter> &printer,
+             const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class SubtaskStep : public Step {
 public:
-    SubtaskStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    SubtaskStep(const std::shared_ptr<AbstractReader> &reader,
+                const std::shared_ptr<AbstractPrinter> &printer,
+                const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class QuitStep : public Step {
 public:
-    QuitStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    QuitStep(const std::shared_ptr<AbstractReader> &reader,
+             const std::shared_ptr<AbstractPrinter> &printer,
+             const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class ShowStep : public Step {
 public:
-    ShowStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    ShowStep(const std::shared_ptr<AbstractReader> &reader,
+             const std::shared_ptr<AbstractPrinter> &printer,
+             const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
     void recursivePrint(const std::pair<TaskID, std::pair<Task, Node>> &kv,
                         const Context &c,
                         const std::string &prefix);
@@ -117,34 +137,42 @@ public:
 
 class CompleteStep : public Step {
 public:
-    CompleteStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    CompleteStep(const std::shared_ptr<AbstractReader> &reader,
+                 const std::shared_ptr<AbstractPrinter> &printer,
+                 const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class DeleteStep : public Step {
 public:
-    DeleteStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    DeleteStep(const std::shared_ptr<AbstractReader> &reader,
+               const std::shared_ptr<AbstractPrinter> &printer,
+               const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class ConfirmDeleteStep : public Step {
 public:
-    ConfirmDeleteStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    ConfirmDeleteStep(const std::shared_ptr<AbstractReader> &reader,
+                      const std::shared_ptr<AbstractPrinter> &printer,
+                      const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class LabelStep : public Step {
 public:
-    LabelStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
-    std::shared_ptr<Action> execute(Context &c, Factory &f) override;
-    void process(Context &c, Factory &f) override;
-    std::shared_ptr<Action> getValidateArgAction(Factory &f) override;
+    LabelStep(const std::shared_ptr<AbstractReader> &reader,
+              const std::shared_ptr<AbstractPrinter> &printer,
+              const std::shared_ptr<Factory> &factory);
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 #endif //TASKMANAGER_SRC_UI_STATE_H_

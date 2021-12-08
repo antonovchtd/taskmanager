@@ -18,7 +18,7 @@
 #include "../io/ConsolePrinter.h"
 #include "../io/FilePrinter.h"
 
-class Factory{
+class Factory : public std::enable_shared_from_this<Factory> {
 public:
     enum class State{
         HOME,
@@ -50,12 +50,16 @@ public:
     };
 
 public:
+    static std::shared_ptr<Factory> create();
+    static std::shared_ptr<Factory> create(const std::shared_ptr<AbstractReader> &, const std::shared_ptr<AbstractPrinter> &);
+
+private:
     Factory();
-    Factory(std::shared_ptr<AbstractReader>, std::shared_ptr<AbstractPrinter>);
+    Factory(const std::shared_ptr<AbstractReader> &, const std::shared_ptr<AbstractPrinter> &);
 
 public:
 
-    std::shared_ptr<Step> create(const std::string &command);
+    std::shared_ptr<Step> createStep(const std::string &command);
 
     std::shared_ptr<Step> nextStep();
     std::shared_ptr<Step> nextStep(const HelpStep &);
