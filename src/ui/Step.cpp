@@ -100,7 +100,12 @@ bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title)
 }
 
 std::optional<Task::Priority> ReadTaskDataStep::stringToPriority(const Context &c, const std::string &priority) {
-    int pint = priority.empty() ? 0 : std::stoi(priority);
+    int pint;
+    try {
+        pint = priority.empty() ? 0 : std::stoi(priority);
+    } catch (const std::invalid_argument &) {
+        pint = -1;
+    }
     if (pint >= 0 && pint <= 3)
         return static_cast<Task::Priority>(pint);
     else {
