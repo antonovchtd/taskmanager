@@ -40,7 +40,7 @@ TEST_F(TaskManagerTest, shouldAddSubtask)
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
                                     false));
-    TaskID id_ch = tm.Add(Task::Create("SubTask",
+    TaskID id_ch = tm.AddSubtask(Task::Create("SubTask",
                                         Task::Priority::NONE,
                                         time(nullptr) + 5,
                                         false),
@@ -65,7 +65,7 @@ TEST_F(TaskManagerTest, shouldChangeParent)
                                     Task::Priority::NONE,
                                     time(nullptr) + 100,
                                     false));
-    TaskID id_ch = tm.Add(Task::Create("SubTask",
+    TaskID id_ch = tm.AddSubtask(Task::Create("SubTask",
                                         Task::Priority::NONE,
                                         time(nullptr) + 5,
                                         false),
@@ -90,12 +90,12 @@ TEST_F(TaskManagerTest, shouldRemoveAllChildren)
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
                                     false));
-    tm.Add(Task::Create("Subtask",
+    tm.AddSubtask(Task::Create("Subtask",
                         Task::Priority::NONE,
                         time(nullptr) + 100,
                         false),
             id);
-    tm.Add(Task::Create("SubTask 2",
+    tm.AddSubtask(Task::Create("SubTask 2",
                         Task::Priority::NONE,
                         time(nullptr) + 5,
                         false),
@@ -162,7 +162,7 @@ TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtDeletingTaskWithChildren)
     TaskManager tm;
     Task::Priority p = Task::Priority::NONE;
     TaskID id = tm.Add(Task::Create("Task",p,time(nullptr),false));
-    tm.Add(Task::Create("Subtask", p,time(nullptr), false), id);
+    tm.AddSubtask(Task::Create("Subtask", p,time(nullptr), false), id);
     ASSERT_EQ(2, tm.size());
     EXPECT_THROW(tm.Delete(id, false), std::runtime_error);
 
@@ -173,7 +173,7 @@ TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
     TaskManager tm;
     Task::Priority p = Task::Priority::NONE;
     TaskID id1 = tm.Add(Task::Create("Task",p,time(nullptr),false));
-    TaskID id2 = tm.Add(Task::Create("Subtask", p,time(nullptr), false), id1);
+    TaskID id2 = tm.AddSubtask(Task::Create("Subtask", p,time(nullptr), false), id1);
     ASSERT_EQ(2, tm.size());
     tm.Delete(id2, false);
     ASSERT_EQ(1, tm.size());
@@ -195,12 +195,12 @@ TEST_F(TaskManagerTest, shouldReturnTasks){
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
                                     false));
-    TaskID id2 = tm.Add(Task::Create("Subtask",
+    TaskID id2 = tm.AddSubtask(Task::Create("Subtask",
                                     Task::Priority::NONE,
                                     time(nullptr) + 100,
                                     false),
                        id);
-    TaskID id3 = tm.Add(Task::Create("SubTask 2",
+    TaskID id3 = tm.AddSubtask(Task::Create("SubTask 2",
                                     Task::Priority::NONE,
                                     time(nullptr) + 5,
                                     false),
@@ -219,12 +219,12 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
                                     false));
-    TaskID id2 = tm.Add(Task::Create("Subtask",
+    TaskID id2 = tm.AddSubtask(Task::Create("Subtask",
                                      Task::Priority::NONE,
                                      time(nullptr) + 100,
                                      false),
                         id);
-    TaskID id3 = tm.Add(Task::Create("SubTask 2",
+    TaskID id3 = tm.AddSubtask(Task::Create("SubTask 2",
                                      Task::Priority::NONE,
                                      time(nullptr) + 5,
                                      false),

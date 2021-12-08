@@ -29,7 +29,8 @@ public:
     size_t size() const;
 
 public:
-    TaskID Add(Task, TaskID ancestor = TaskID::invalidID());
+    TaskID Add(const Task &);
+    TaskID AddSubtask(const Task &, const TaskID &);
     void Edit(const TaskID &, Task);
     void Complete(const TaskID &);
     void Delete(const TaskID &id, bool deleteChildren = false);

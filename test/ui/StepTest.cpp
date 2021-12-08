@@ -454,7 +454,7 @@ TEST_F(StepTest, processShowStepWithChildren)
 
     TaskManager tm;
     auto id = tm.Add(Task::Create("test", Task::Priority::MEDIUM, 1767218399, false));
-    tm.Add(Task::Create("sub", Task::Priority::LOW, 1767218399, false), id);
+    tm.AddSubtask(Task::Create("sub", Task::Priority::LOW, 1767218399, false), id);
 
     auto ss = f.getShowStep();
     Context c;

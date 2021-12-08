@@ -10,14 +10,24 @@ TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator))
 TaskManager::TaskManager(std::shared_ptr<IDGenerator> generator) : gen_(std::move(generator)) {
 }
 
-TaskID TaskManager::Add(Task t, TaskID ancestor) {
+TaskID TaskManager::Add(const Task &t) {
     TaskID id = gen_->genID();
     if (Validate(id))
         throw std::runtime_error("TaskManager::Add attempts to overwrite task");
 
-    tasks_[id] = std::make_pair(std::move(t), Node(ancestor));
-    if (ancestor.isValid())
-        tasks_[ancestor].second.AddChild(id);
+    tasks_[id] = std::make_pair(t, TaskID::invalidID());
+    return id;
+}
+
+TaskID TaskManager::AddSubtask(const Task &t, const TaskID &parent) {
+    TaskID id = gen_->genID();
+    if (Validate(id))
+        throw std::runtime_error("TaskManager::AddSubtask attempts to overwrite task");
+    if (parent.isValid() && !Validate(parent))
+        throw std::runtime_error("TaskManager::AddSubtask invalid parent ID");
+
+    tasks_[id] = std::make_pair(t, Node(parent));
+    tasks_[parent].second.AddChild(id);
     return id;
 }
 

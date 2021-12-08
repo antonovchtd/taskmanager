@@ -9,7 +9,7 @@ void AddTaskAction::make(TaskManager &model, Context &context) {
 }
 
 void AddSubtaskAction::make(TaskManager &model, Context &context) {
-    context.setID(model.Add(Task::Create(context.data()), context.id().value()));
+    context.setID(model.AddSubtask(Task::Create(context.data()), *context.id()));
 }
 
 void ValidateIDAction::make(TaskManager &model, Context &context) {
