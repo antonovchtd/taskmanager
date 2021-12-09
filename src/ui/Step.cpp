@@ -28,12 +28,6 @@ std::shared_ptr<Factory> Step::factory() const {
     return factory_;
 }
 
-HomeStep::HomeStep(const std::shared_ptr<AbstractReader> &reader,
-                   const std::shared_ptr<AbstractPrinter> &printer,
-                   const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
-}
-
 std::shared_ptr<Action> HomeStep::execute(Context &c) {
     std::stringstream ss{reader()->read(" > ")};
     std::string command, arg;
@@ -56,12 +50,6 @@ std::shared_ptr<Action> HomeStep::getValidateArgAction() {
     return factory()->getValidateNoArgAction();
 }
 
-HelpStep::HelpStep(const std::shared_ptr<AbstractReader> &reader,
-                   const std::shared_ptr<AbstractPrinter> &printer,
-                   const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
-}
-
 std::shared_ptr<Action> HelpStep::execute(Context &c) {
     FileReader fr("../src/model/help.txt");
     printer()->print(fr.read(""));
@@ -75,12 +63,6 @@ void HelpStep::process(Context &c) {
 
 std::shared_ptr<Action> HelpStep::getValidateArgAction() {
     return factory()->getValidateNoArgAction();
-}
-
-AddStep::AddStep(const std::shared_ptr<AbstractReader> &reader,
-                 const std::shared_ptr<AbstractPrinter> &printer,
-                 const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
 }
 
 std::shared_ptr<Action> AddStep::execute(Context &c) {
@@ -99,12 +81,6 @@ void AddStep::process(Context &c) {
 
 std::shared_ptr<Action> AddStep::getValidateArgAction() {
     return factory()->getValidateNoArgAction();
-}
-
-ReadTaskDataStep::ReadTaskDataStep(const std::shared_ptr<AbstractReader> &reader,
-                                   const std::shared_ptr<AbstractPrinter> &printer,
-                                   const std::shared_ptr<Factory> &factory) :
-                    Step(reader, printer, factory) {
 }
 
 bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title) {
@@ -198,12 +174,6 @@ std::shared_ptr<Action> ReadTaskDataStep::getValidateArgAction() {
     return factory()->getValidateNoArgAction();
 }
 
-EditStep::EditStep(const std::shared_ptr<AbstractReader> &reader,
-                   const std::shared_ptr<AbstractPrinter> &printer,
-                   const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
-}
-
 std::shared_ptr<Action> EditStep::execute(Context &c) {
     printer()->print("[Edit Task]\n");
     Machine wizard(factory(), Factory::State::READTASK);
@@ -219,12 +189,6 @@ void EditStep::process(Context &c) {
 
 std::shared_ptr<Action> EditStep::getValidateArgAction() {
     return factory()->getValidateIDAction();
-}
-
-SubtaskStep::SubtaskStep(const std::shared_ptr<AbstractReader> &reader,
-                         const std::shared_ptr<AbstractPrinter> &printer,
-                         const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
 }
 
 std::shared_ptr<Action> SubtaskStep::execute(Context &c) {
@@ -244,12 +208,6 @@ std::shared_ptr<Action> SubtaskStep::getValidateArgAction() {
     return factory()->getValidateIDAction();
 }
 
-QuitStep::QuitStep(const std::shared_ptr<AbstractReader> &reader,
-                   const std::shared_ptr<AbstractPrinter> &printer,
-                   const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
-}
-
 std::shared_ptr<Action> QuitStep::execute(Context &c) {
     c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
@@ -261,12 +219,6 @@ void QuitStep::process(Context &c) {
 
 std::shared_ptr<Action> QuitStep::getValidateArgAction() {
     return factory()->getValidateNoArgAction();
-}
-
-ShowStep::ShowStep(const std::shared_ptr<AbstractReader> &reader,
-                   const std::shared_ptr<AbstractPrinter> &printer,
-                   const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
 }
 
 std::shared_ptr<Action> ShowStep::execute(Context &c) {
@@ -302,12 +254,6 @@ std::shared_ptr<Action> ShowStep::getValidateArgAction() {
     return factory()->getValidateLabelArgAction();
 }
 
-CompleteStep::CompleteStep(const std::shared_ptr<AbstractReader> &reader,
-                           const std::shared_ptr<AbstractPrinter> &printer,
-                           const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
-}
-
 std::shared_ptr<Action> CompleteStep::execute(Context &c) {
     c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
@@ -321,12 +267,6 @@ std::shared_ptr<Action> CompleteStep::getValidateArgAction() {
     return factory()->getValidateIDAction();
 }
 
-DeleteStep::DeleteStep(const std::shared_ptr<AbstractReader> &reader,
-                       const std::shared_ptr<AbstractPrinter> &printer,
-                       const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
-}
-
 std::shared_ptr<Action> DeleteStep::execute(Context &c) {
     c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
@@ -338,12 +278,6 @@ void DeleteStep::process(Context &c) {
 
 std::shared_ptr<Action> DeleteStep::getValidateArgAction() {
     return factory()->getValidateIDAction();
-}
-
-ConfirmDeleteStep::ConfirmDeleteStep(const std::shared_ptr<AbstractReader> &reader,
-                                     const std::shared_ptr<AbstractPrinter> &printer,
-                                     const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
 }
 
 std::shared_ptr<Action> ConfirmDeleteStep::execute(Context &c) {
@@ -378,12 +312,6 @@ void ConfirmDeleteStep::process(Context &c) {
 
 std::shared_ptr<Action> ConfirmDeleteStep::getValidateArgAction() {
     return factory()->getValidateIDAction();
-}
-
-LabelStep::LabelStep(const std::shared_ptr<AbstractReader> &reader,
-                     const std::shared_ptr<AbstractPrinter> &printer,
-                     const std::shared_ptr<Factory> &factory) :
-        Step(reader, printer, factory) {
 }
 
 std::shared_ptr<Action> LabelStep::execute(Context &c) {

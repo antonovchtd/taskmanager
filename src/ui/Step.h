@@ -49,9 +49,7 @@ private:
 
 class HomeStep : public Step {
 public:
-    HomeStep(const std::shared_ptr<AbstractReader> &reader,
-             const std::shared_ptr<AbstractPrinter> &printer,
-             const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -59,9 +57,7 @@ public:
 
 class HelpStep : public Step {
 public:
-    HelpStep(const std::shared_ptr<AbstractReader> &reader,
-             const std::shared_ptr<AbstractPrinter> &printer,
-             const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -69,9 +65,7 @@ public:
 
 class AddStep : public Step {
 public:
-    AddStep(const std::shared_ptr<AbstractReader> &reader,
-            const std::shared_ptr<AbstractPrinter> &printer,
-            const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -79,9 +73,7 @@ public:
 
 class ReadTaskDataStep : public Step {
 public:
-    ReadTaskDataStep(const std::shared_ptr<AbstractReader> &reader,
-                     const std::shared_ptr<AbstractPrinter> &printer,
-                     const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -94,9 +86,7 @@ public:
 
 class EditStep : public Step {
 public:
-    EditStep(const std::shared_ptr<AbstractReader> &reader,
-             const std::shared_ptr<AbstractPrinter> &printer,
-             const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -104,9 +94,7 @@ public:
 
 class SubtaskStep : public Step {
 public:
-    SubtaskStep(const std::shared_ptr<AbstractReader> &reader,
-                const std::shared_ptr<AbstractPrinter> &printer,
-                const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -114,9 +102,7 @@ public:
 
 class QuitStep : public Step {
 public:
-    QuitStep(const std::shared_ptr<AbstractReader> &reader,
-             const std::shared_ptr<AbstractPrinter> &printer,
-             const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -124,9 +110,7 @@ public:
 
 class ShowStep : public Step {
 public:
-    ShowStep(const std::shared_ptr<AbstractReader> &reader,
-             const std::shared_ptr<AbstractPrinter> &printer,
-             const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -137,9 +121,7 @@ public:
 
 class CompleteStep : public Step {
 public:
-    CompleteStep(const std::shared_ptr<AbstractReader> &reader,
-                 const std::shared_ptr<AbstractPrinter> &printer,
-                 const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -147,9 +129,7 @@ public:
 
 class DeleteStep : public Step {
 public:
-    DeleteStep(const std::shared_ptr<AbstractReader> &reader,
-               const std::shared_ptr<AbstractPrinter> &printer,
-               const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -157,9 +137,7 @@ public:
 
 class ConfirmDeleteStep : public Step {
 public:
-    ConfirmDeleteStep(const std::shared_ptr<AbstractReader> &reader,
-                      const std::shared_ptr<AbstractPrinter> &printer,
-                      const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
@@ -167,9 +145,7 @@ public:
 
 class LabelStep : public Step {
 public:
-    LabelStep(const std::shared_ptr<AbstractReader> &reader,
-              const std::shared_ptr<AbstractPrinter> &printer,
-              const std::shared_ptr<Factory> &factory);
+    using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
     std::shared_ptr<Action> getValidateArgAction() override;
