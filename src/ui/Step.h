@@ -33,7 +33,6 @@ public:
 public:
     virtual std::shared_ptr<Action> execute(Context &c) = 0;
     virtual void process(Context &c) = 0;
-    virtual std::shared_ptr<Action> getValidateArgAction() = 0;
     virtual ~Step() = default;
 
 public:
@@ -52,7 +51,15 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
+
+public:
+    std::shared_ptr<Action> getValidateArgAction();
+
+public:
+    std::string command() const;
+
+private:
+    std::string command_;
 };
 
 class HelpStep : public Step {
@@ -60,7 +67,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class AddStep : public Step {
@@ -68,7 +74,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class ReadTaskDataStep : public Step {
@@ -76,7 +81,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 
 public:
     std::optional<time_t> stringToTime(const Context &c, const std::string &datestring);
@@ -89,7 +93,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class SubtaskStep : public Step {
@@ -97,7 +100,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class QuitStep : public Step {
@@ -105,7 +107,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class ShowStep : public Step {
@@ -113,7 +114,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
     void recursivePrint(const std::pair<TaskID, std::pair<Task, Node>> &kv,
                         const Context &c,
                         const std::string &prefix);
@@ -124,7 +124,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class DeleteStep : public Step {
@@ -132,7 +131,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class ConfirmDeleteStep : public Step {
@@ -140,7 +138,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 class LabelStep : public Step {
@@ -148,7 +145,6 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    std::shared_ptr<Action> getValidateArgAction() override;
 };
 
 #endif //TASKMANAGER_SRC_UI_STATE_H_

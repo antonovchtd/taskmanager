@@ -8,10 +8,6 @@ std::shared_ptr<Step> Context::getStep() const {
     return step_;
 }
 
-std::shared_ptr<Step> Context::getOldStep() const {
-    return oldStep_;
-}
-
 Task::Data Context::data() const {
     return data_;
 }
@@ -29,16 +25,7 @@ std::string Context::label() const {
 }
 
 void Context::setStep(const std::shared_ptr<Step> &s) {
-    setOldStep(getStep());
     step_ = s;
-}
-
-void Context::setOldStep(const std::shared_ptr<Step> &s) {
-    oldStep_ = s;
-}
-
-void Context::revertStep() {
-    step_ = oldStep_;
 }
 
 void Context::resetTaskData() {

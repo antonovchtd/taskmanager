@@ -15,7 +15,6 @@
 class Context{
 public:
     std::shared_ptr<Step> getStep() const;
-    std::shared_ptr<Step> getOldStep() const;
     Task::Data data() const;
     std::optional<TaskID> id() const;
     std::map<TaskID, std::pair<Task, Node>> getTasks() const;
@@ -25,7 +24,6 @@ public:
 
 public:
     void setStep(const std::shared_ptr<Step> &);
-    void setOldStep(const std::shared_ptr<Step> &);
     void setTitle(const std::string &);
     void setDueDate(const time_t &);
     void setPriority(const Task::Priority &);
@@ -37,7 +35,6 @@ public:
     void setAskConfirmation(bool);
 
 public:
-    void revertStep();
     void resetTaskData();
 
 private:
@@ -48,7 +45,6 @@ private:
     std::string arg_;
     bool askConfirmation_;
     std::shared_ptr<Step> step_;
-    std::shared_ptr<Step> oldStep_;
 };
 
 #endif //TASKMANAGER_SRC_UI_CONTEXT_H_

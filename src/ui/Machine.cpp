@@ -24,8 +24,8 @@ Context Machine::run() {
         auto act = context_.getStep()->execute(context_);
         if (act) {
             act->make(model_, context_);
-            context_.getOldStep()->process(context_);
         }
+        context_.getStep()->process(context_);
     }
     return context_;
 }

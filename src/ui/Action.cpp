@@ -16,14 +16,12 @@ void ValidateIDAction::make(TaskManager &model, Context &context) {
     context.setID(TaskID::Create(context.arg()));
     context.setArg("");
     if (!context.id() || !model.Validate(context.id().value())) {
-        context.revertStep();
         context.setID(TaskID::invalidID());
     }
 }
 
 void ValidateNoArgAction::make(TaskManager &model, Context &context) {
     if (!context.arg().empty()){
-        context.revertStep();
         context.setID(std::nullopt);
     }
     else
@@ -39,7 +37,6 @@ void ValidateLabelArgAction::make(TaskManager &model, Context &context) {
         }
         else {
             context.setID(TaskID::invalidID());
-            context.revertStep();
         }
     }
     else {

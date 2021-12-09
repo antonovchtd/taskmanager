@@ -30,39 +30,49 @@ std::shared_ptr<Factory> Step::factory() const {
 
 std::shared_ptr<Action> HomeStep::execute(Context &c) {
     std::stringstream ss{reader()->read(" > ")};
-    std::string command, arg;
-    ss >> command >> arg;
-    c.setStep(factory()->createStep(command));
+    std::string arg;
+    ss >> command_ >> arg;
     c.setArg(arg);
-    return c.getStep()->getValidateArgAction();
+    return getValidateArgAction();
+}
+
+std::string HomeStep::command() const {
+    return command_;
 }
 
 void HomeStep::process(Context &c) {
     if (c.id().has_value()) {
-        if (!c.id()->isValidOrNull())
+        if (!c.id()->isValidOrNull()) {
             printer()->print("Invalid ID. Try again.\n");
+            command_ = "";
+        }
     } else {
         printer()->print("This function takes no argument.\n");
+        command_ = "";
     }
+    c.setStep(factory()->createStep(command_));
 }
 
 std::shared_ptr<Action> HomeStep::getValidateArgAction() {
-    return factory()->getValidateNoArgAction();
+    if (command_ == "edit" || command_ == "subtask" ||
+        command_ == "delete" || command_ == "complete" ||
+        command_ == "label") {
+        return factory()->getValidateIDAction();
+    } else if (command_ == "show") {
+        return factory()->getValidateLabelArgAction();
+    } else {
+        return factory()->getValidateNoArgAction();
+    }
 }
 
 std::shared_ptr<Action> HelpStep::execute(Context &c) {
     FileReader fr("../src/model/help.txt");
     printer()->print(fr.read(""));
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void HelpStep::process(Context &c) {
-    // do nothing
-}
-
-std::shared_ptr<Action> HelpStep::getValidateArgAction() {
-    return factory()->getValidateNoArgAction();
+    c.setStep(factory()->nextStep(*this));
 }
 
 std::shared_ptr<Action> AddStep::execute(Context &c) {
@@ -70,17 +80,13 @@ std::shared_ptr<Action> AddStep::execute(Context &c) {
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setData(input_context.data());
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void AddStep::process(Context &c) {
     printer()->print("Added Task with ID " + c.id().value().to_string() + ".\n");
     c.resetTaskData();
-}
-
-std::shared_ptr<Action> AddStep::getValidateArgAction() {
-    return factory()->getValidateNoArgAction();
+    c.setStep(factory()->nextStep(*this));
 }
 
 bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title) {
@@ -162,16 +168,11 @@ std::shared_ptr<Action> ReadTaskDataStep::execute(Context &c) {
     }
     c.setDueDate(due_date.value());
 
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void ReadTaskDataStep::process(Context &c) {
-    // do nothing
-}
-
-std::shared_ptr<Action> ReadTaskDataStep::getValidateArgAction() {
-    return factory()->getValidateNoArgAction();
+    c.setStep(factory()->nextStep(*this));
 }
 
 std::shared_ptr<Action> EditStep::execute(Context &c) {
@@ -179,16 +180,12 @@ std::shared_ptr<Action> EditStep::execute(Context &c) {
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setData(input_context.data());
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void EditStep::process(Context &c) {
     printer()->print("Edited Task with ID " + c.id().value().to_string() + ".\n");
-}
-
-std::shared_ptr<Action> EditStep::getValidateArgAction() {
-    return factory()->getValidateIDAction();
+    c.setStep(factory()->nextStep(*this));
 }
 
 std::shared_ptr<Action> SubtaskStep::execute(Context &c) {
@@ -196,33 +193,23 @@ std::shared_ptr<Action> SubtaskStep::execute(Context &c) {
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setData(input_context.data());
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void SubtaskStep::process(Context &c) {
     printer()->print("Added Subtask with ID " + c.id().value().to_string() + ".\n");
-}
-
-std::shared_ptr<Action> SubtaskStep::getValidateArgAction() {
-    return factory()->getValidateIDAction();
+    c.setStep(factory()->nextStep(*this));
 }
 
 std::shared_ptr<Action> QuitStep::execute(Context &c) {
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void QuitStep::process(Context &c) {
-    // do nothing
-}
-
-std::shared_ptr<Action> QuitStep::getValidateArgAction() {
-    return factory()->getValidateNoArgAction();
+    c.setStep(factory()->nextStep(*this));
 }
 
 std::shared_ptr<Action> ShowStep::execute(Context &c) {
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
@@ -248,44 +235,33 @@ void ShowStep::process(Context &c) {
         if (!kv.second.second.parent().isValid())
             ShowStep::recursivePrint(kv, c, "");
     }
-}
-
-std::shared_ptr<Action> ShowStep::getValidateArgAction() {
-    return factory()->getValidateLabelArgAction();
+    c.setStep(factory()->nextStep(*this));
 }
 
 std::shared_ptr<Action> CompleteStep::execute(Context &c) {
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void CompleteStep::process(Context &c) {
     printer()->print("Marked Task with ID " + c.id().value().to_string() + " as completed.\n");
-}
-
-std::shared_ptr<Action> CompleteStep::getValidateArgAction() {
-    return factory()->getValidateIDAction();
+    c.setStep(factory()->nextStep(*this));
 }
 
 std::shared_ptr<Action> DeleteStep::execute(Context &c) {
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void DeleteStep::process(Context &c) {
     printer()->print("Deleted Task with ID " + c.id().value().to_string() + ".\n");
-}
-
-std::shared_ptr<Action> DeleteStep::getValidateArgAction() {
-    return factory()->getValidateIDAction();
+    c.setStep(factory()->nextStep(*this));
 }
 
 std::shared_ptr<Action> ConfirmDeleteStep::execute(Context &c) {
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void ConfirmDeleteStep::process(Context &c) {
+    c.setStep(factory()->nextStep(*this));
     std::string reply;
     if (c.askConfirmation())
         while (true){
@@ -293,11 +269,9 @@ void ConfirmDeleteStep::process(Context &c) {
                                    " has subtasks. Confirm to delete all. [Y]/N > ");
             if (reply.empty() || reply == "Y" || reply == "y") {
                 c.setStep(factory()->getDeleteStep());
-                c.setOldStep(factory()->getHomeStep());
                 break;
             } else if (reply == "N" || reply == "n") {
                 c.setStep(factory()->getHomeStep());
-                c.setOldStep(factory()->getHomeStep());
                 break;
             } else {
                 printer()->print("Wrong option. Type Y or N.\n");
@@ -305,25 +279,16 @@ void ConfirmDeleteStep::process(Context &c) {
         }
     else {
         c.setStep(factory()->getDeleteStep());
-        c.setOldStep(factory()->getHomeStep());
     }
 
 }
 
-std::shared_ptr<Action> ConfirmDeleteStep::getValidateArgAction() {
-    return factory()->getValidateIDAction();
-}
-
 std::shared_ptr<Action> LabelStep::execute(Context &c) {
     c.setLabel(reader()->read("[Add Label]\n    >> "));
-    c.setStep(factory()->nextStep(*this));
     return factory()->getAction(*this);
 }
 
 void LabelStep::process(Context &c) {
     printer()->print("Added label to Task with ID " + c.id().value().to_string() + ".\n");
-}
-
-std::shared_ptr<Action> LabelStep::getValidateArgAction() {
-    return factory()->getValidateIDAction();
+    c.setStep(factory()->nextStep(*this));
 }
