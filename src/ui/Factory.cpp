@@ -190,7 +190,7 @@ std::shared_ptr<Step> Factory::getStep(const State &s) {
 }
 
 std::shared_ptr<Action> Factory::getAction(const HelpStep &) {
-    return nullptr;
+    return getDoNothingAction();
 }
 
 std::shared_ptr<Action> Factory::getAction(const AddStep &) {
@@ -198,7 +198,7 @@ std::shared_ptr<Action> Factory::getAction(const AddStep &) {
 }
 
 std::shared_ptr<Action> Factory::getAction(const ReadTaskDataStep &) {
-    return nullptr;
+    return getDoNothingAction();
 }
 
 std::shared_ptr<Action> Factory::getAction(const EditStep &) {
@@ -210,7 +210,7 @@ std::shared_ptr<Action> Factory::getAction(const SubtaskStep &) {
 }
 
 std::shared_ptr<Action> Factory::getAction(const QuitStep &) {
-    return nullptr;
+    return getDoNothingAction();
 }
 
 std::shared_ptr<Action> Factory::getAction(const ShowStep &) {
@@ -231,6 +231,10 @@ std::shared_ptr<Action> Factory::getAction(const ConfirmDeleteStep &) {
 
 std::shared_ptr<Action> Factory::getAction(const LabelStep &) {
     return getLabelAction();
+}
+
+std::shared_ptr<Action> Factory::getDoNothingAction(){
+    FACTORY_GEN_MAP_GETTER(actions_, Action, ActionLabel::DONOTHING, DoNothingAction)
 }
 
 std::shared_ptr<Action> Factory::getAddTaskAction(){

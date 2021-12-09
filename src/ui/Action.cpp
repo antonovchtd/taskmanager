@@ -8,6 +8,10 @@ void AddTaskAction::make(TaskManager &model, Context &context) {
     context.setID(model.Add(Task::Create(context.data())));
 }
 
+void DoNothingAction::make(TaskManager &model, Context &context) {
+    // do nothing
+}
+
 void AddSubtaskAction::make(TaskManager &model, Context &context) {
     context.setID(model.AddSubtask(Task::Create(context.data()), *context.id()));
 }

@@ -36,6 +36,7 @@ public:
     };
 
     enum class ActionLabel{
+        DONOTHING,
         ADDTASK,
         ADDSUBTASK,
         VALIDATEID,
@@ -100,6 +101,7 @@ public:
     std::shared_ptr<Action> getAction(const ConfirmDeleteStep &);
     std::shared_ptr<Action> getAction(const LabelStep &);
 
+    std::shared_ptr<Action> getDoNothingAction();
     std::shared_ptr<Action> getAddTaskAction();
     std::shared_ptr<Action> getAddSubtaskAction();
     std::shared_ptr<Action> getValidateIDAction();

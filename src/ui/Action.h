@@ -14,6 +14,11 @@ public:
     virtual void make(TaskManager &, Context &) = 0;
 };
 
+class DoNothingAction : public Action {
+public:
+    void make(TaskManager &, Context &) override;
+};
+
 class AddTaskAction : public Action {
 public:
     void make(TaskManager &, Context &) override;
