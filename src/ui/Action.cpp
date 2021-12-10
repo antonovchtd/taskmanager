@@ -3,6 +3,7 @@
 //
 
 #include "Action.h"
+#include "Context.h"
 
 Action::Action(const std::shared_ptr<TaskManager> &model, const Data &data) :
                 model_(model), data_(data) {

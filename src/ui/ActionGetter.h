@@ -5,9 +5,22 @@
 #ifndef TASKMANAGER_SRC_UI_ACTIONGETTER_H_
 #define TASKMANAGER_SRC_UI_ACTIONGETTER_H_
 
-#include "Step.h"
 #include "Factory.h"
 #include "Action.h"
+//#include "Step.h"
+
+class HomeStep;
+class HelpStep;
+class AddStep;
+class ReadTaskDataStep;
+class EditStep;
+class SubtaskStep;
+class QuitStep;
+class ShowStep;
+class CompleteStep;
+class DeleteStep;
+class ConfirmDeleteStep;
+class LabelStep;
 
 class ActionGetter {
 public:

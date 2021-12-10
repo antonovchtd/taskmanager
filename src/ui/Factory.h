@@ -9,7 +9,6 @@
 #include <string>
 #include <map>
 
-#include "Step.h"
 #include "Action.h"
 #include "../model/TaskManager.h"
 #include "../io/AbstractReader.h"
@@ -18,6 +17,8 @@
 #include "../io/AbstractPrinter.h"
 #include "../io/ConsolePrinter.h"
 #include "../io/FilePrinter.h"
+
+class Step;
 
 class Factory : public std::enable_shared_from_this<Factory> {
 public:
