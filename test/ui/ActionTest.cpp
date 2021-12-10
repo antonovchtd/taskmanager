@@ -80,7 +80,7 @@ TEST_F(ActionTest, makeValidateNoArgActionSomeID)
     ValidateNoArgAction via;
     via.make(tm, c);
     EXPECT_FALSE(c.id());
-    EXPECT_EQ(c.getStep(), c.getOldStep());
+    EXPECT_EQ(c.step(), c.getOldStep());
 }
 
 TEST_F(ActionTest, makeValidateNoArgActionNoID)
@@ -126,8 +126,8 @@ TEST_F(ActionTest, makeShowActionNoArg)
     ShowAction sa;
     c.setArg("");
     sa.make(tm, c);
-    ASSERT_EQ(1,c.getTasks().size());
-    EXPECT_EQ(c.getTasks()[id].first.title(), "test");
+    ASSERT_EQ(1, c.tasks().size());
+    EXPECT_EQ(c.tasks()[id].first.title(), "test");
 }
 
 TEST_F(ActionTest, makeShowActionLabelArg)
@@ -141,8 +141,8 @@ TEST_F(ActionTest, makeShowActionLabelArg)
     ShowAction sa;
     c.setArg(label);
     sa.make(tm, c);
-    ASSERT_EQ(1,c.getTasks().size());
-    EXPECT_EQ(c.getTasks()[id].first.title(), "test");
+    ASSERT_EQ(1, c.tasks().size());
+    EXPECT_EQ(c.tasks()[id].first.title(), "test");
 }
 
 TEST_F(ActionTest, makeCompleteTaskAction)

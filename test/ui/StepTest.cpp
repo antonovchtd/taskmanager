@@ -24,7 +24,7 @@ using testing::SaveArg;
     Context c; \
     auto action = hs->execute(c); \
     EXPECT_EQ(action, f->act()); \
-    EXPECT_EQ(c.getStep(), f->step()); \
+    EXPECT_EQ(c.step(), f->step()); \
     EXPECT_EQ(c.getOldStep(), nullptr);
 
 #define STEPTEST_GEN_WIZARD_STEP_CALL(getter, act) \
@@ -56,7 +56,7 @@ using testing::SaveArg;
     timeinfo->tm_year = 122;\
     EXPECT_EQ(c.data().due_date, mktime(timeinfo));\
     EXPECT_EQ(action, f->act());\
-    EXPECT_EQ(c.getStep(), f->getHomeStep());\
+    EXPECT_EQ(c.step(), f->getHomeStep());\
 
 #define STEPTEST_GEN_PROCESS_CALL_ACK_ID(getter)\
     auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),\
@@ -435,7 +435,7 @@ TEST_F(StepTest, processShowStep)
 
     auto ss = f->getShowStep();
     Context c;
-    c.setTasks(tm.getTasks());
+    c.setTasks(tm.tasks());
     ss->process(c);
     EXPECT_EQ(out, "1 – test, Priority: Medium, Due: Wed Dec 31 23:59:59 2025");
 }
@@ -458,7 +458,7 @@ TEST_F(StepTest, processShowStepWithChildren)
 
     auto ss = f->getShowStep();
     Context c;
-    c.setTasks(tm.getTasks());
+    c.setTasks(tm.tasks());
     ss->process(c);
     EXPECT_EQ(out1, "1 – test, Priority: Medium, Due: Wed Dec 31 23:59:59 2025");
     EXPECT_EQ(out3, "    2 – sub, Priority: Low, Due: Wed Dec 31 23:59:59 2025");

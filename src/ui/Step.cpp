@@ -222,13 +222,13 @@ void ShowStep::recursivePrint(const std::pair<TaskID, std::pair<Task, Node>> &kv
 
     printer()->print("\n");
     for (const auto &id : kv.second.second.children()) {
-        auto ch = std::make_pair(id, c.getTasks().at(id));
+        auto ch = std::make_pair(id, c.tasks().at(id));
         recursivePrint(ch, c, prefix + "    ");
     }
 }
 
 void ShowStep::process(Context &c) {
-    auto tasks = c.getTasks();
+    auto tasks = c.tasks();
     for (const auto &kv : tasks) {
         if (!kv.second.second.parent())
             ShowStep::recursivePrint(kv, c, "");
@@ -262,7 +262,7 @@ void ConfirmDeleteStep::process(Context &c) {
     // proceed to DeleteStep
     c.setStep(factory()->nextStep(*this));
     std::string reply;
-    auto ch = c.getTasks()[*c.id()].second.children();
+    auto ch = c.tasks()[*c.id()].second.children();
     if (!ch.empty())
         while (true){
             reply = reader()->read("Task " + c.id().value().to_string() +
@@ -272,7 +272,7 @@ void ConfirmDeleteStep::process(Context &c) {
                 break;
             } else if (reply == "N" || reply == "n") {
                 // disregard nextStep and go to HomeStep
-                c.setStep(factory()->getHomeStep());
+                c.setStep(factory()->lazyInitStep(Factory::State::HOME));
                 break;
             } else {
                 printer()->print("Wrong option. Type Y or N.\n");

@@ -4,7 +4,7 @@
 
 #include "Context.h"
 
-std::shared_ptr<Step> Context::getStep() const {
+std::shared_ptr<Step> Context::step() const {
     return step_;
 }
 
@@ -16,7 +16,7 @@ std::optional<TaskID> Context::id() const {
     return id_;
 }
 
-std::map<TaskID, std::pair<Task, Node>> Context::getTasks() const {
+std::map<TaskID, std::pair<Task, Node>> Context::tasks() const {
     return tasks_;
 }
 

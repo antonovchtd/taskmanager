@@ -14,10 +14,10 @@
 
 class Context{
 public:
-    std::shared_ptr<Step> getStep() const;
+    std::shared_ptr<Step> step() const;
     Task::Data data() const;
     std::optional<TaskID> id() const;
-    std::map<TaskID, std::pair<Task, Node>> getTasks() const;
+    std::map<TaskID, std::pair<Task, Node>> tasks() const;
 
 public:
     void setStep(const std::shared_ptr<Step> &);
@@ -35,7 +35,6 @@ private:
     Task::Data data_;
     std::optional<TaskID> id_;
     std::shared_ptr<Step> step_;
-
     std::map<TaskID, std::pair<Task, Node>> tasks_;
 };
 

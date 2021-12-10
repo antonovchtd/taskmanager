@@ -6,23 +6,23 @@
 
 Machine::Machine() {
     factory_ = Factory::create();
-    context_.setStep(factory_->getStep(Factory::State::HOME));
+    context_.setStep(factory_->lazyInitStep(Factory::State::HOME));
 }
 
 Machine::Machine(const Factory::State &s) : Machine() {
-    context_.setStep(factory_->getStep(s));
+    context_.setStep(factory_->lazyInitStep(s));
 }
 
 Machine::Machine(const std::shared_ptr<Factory> &f, const Factory::State &s) : factory_(f) {
-    context_.setStep(factory_->getStep(s));
+    context_.setStep(factory_->lazyInitStep(s));
 }
 
 Context Machine::run() {
 
-    while (context_.getStep()){
-        auto act = context_.getStep()->execute(context_);
+    while (context_.step()){
+        auto act = context_.step()->execute(context_);
         act->make(context_);
-        context_.getStep()->process(context_);
+        context_.step()->process(context_);
     }
     return context_;
 }

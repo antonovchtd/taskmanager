@@ -4,11 +4,6 @@
 
 #include "Factory.h"
 
-#define FACTORY_GEN_MAP_GETTER(map, cls, state, step) \
-  if (!map[state])                                    \
-      map[state] = std::shared_ptr<cls>{new step};    \
-  return map[state];
-
 Factory::Factory() :
         reader_(std::shared_ptr<AbstractReader>(new ConsoleReader)),
         printer_(std::shared_ptr<AbstractPrinter>(new ConsolePrinter)),
@@ -43,10 +38,6 @@ std::shared_ptr<AbstractPrinter> Factory::printer() const {
     return printer_;
 }
 
-std::map<Factory::ActionLabel, std::shared_ptr<Action>> Factory::actions() const {
-    return actions_;
-}
-
 std::shared_ptr<AbstractReader> Factory::reader() const {
     return reader_;
 }
@@ -57,52 +48,48 @@ std::shared_ptr<TaskManager> Factory::model() const {
 
 std::shared_ptr<Step> Factory::createStep(const std::string &command) {
     if (command == "add") {
-        return getAddStep();
+        return lazyInitStep(Factory::State::ADD);
     } else if (command == "help") {
-        return getHelpStep();
+        return lazyInitStep(Factory::State::HELP);
     } else if (command == "quit") {
-        return getQuitStep();
+        return lazyInitStep(Factory::State::QUIT);
     } else if (command == "show") {
-        return getShowStep();
+        return lazyInitStep(Factory::State::SHOW);
     } else if (command == "edit") {
-        return getEditStep();
+        return lazyInitStep(Factory::State::EDIT);
     } else if (command == "subtask") {
-        return getSubtaskStep();
+        return lazyInitStep(Factory::State::SUBTASK);
     } else if (command == "complete") {
-        return getCompleteStep();
+        return lazyInitStep(Factory::State::COMPLETE);
     } else if (command == "delete") {
-        return getConfirmDeleteStep();
+        return lazyInitStep(Factory::State::CONFIRMDELETE);
     } else if (command == "label") {
-        return getLabelStep();
+        return lazyInitStep(Factory::State::LABEL);
     } else {
         if (!command.empty())
             printer()->print("Wrong command. Try again. Type `help` for help.\n");
-        return getHomeStep();
+        return lazyInitStep(Factory::State::HOME);
     }
 }
 
-std::shared_ptr<Step> Factory::nextStep() {
-    return getHomeStep();
-}
-
 std::shared_ptr<Step> Factory::nextStep(const HelpStep &) {
-    return getHomeStep();
+    return lazyInitStep(Factory::State::HOME);
 }
 
 std::shared_ptr<Step> Factory::nextStep(const AddStep &) {
-    return getHomeStep();
+    return lazyInitStep(Factory::State::HOME);
 }
 
 std::shared_ptr<Step> Factory::nextStep(const ReadTaskDataStep &) {
-    return getQuitStep();
+    return lazyInitStep(Factory::State::QUIT);
 }
 
 std::shared_ptr<Step> Factory::nextStep(const EditStep &) {
-    return getHomeStep();
+    return lazyInitStep(Factory::State::HOME);
 }
 
 std::shared_ptr<Step> Factory::nextStep(const SubtaskStep &) {
-    return getHomeStep();
+    return lazyInitStep(Factory::State::HOME);
 }
 
 std::shared_ptr<Step> Factory::nextStep(const QuitStep &) {
@@ -110,99 +97,92 @@ std::shared_ptr<Step> Factory::nextStep(const QuitStep &) {
 }
 
 std::shared_ptr<Step> Factory::nextStep(const ShowStep &) {
-    return getHomeStep();
+    return lazyInitStep(Factory::State::HOME);
 }
 
 std::shared_ptr<Step> Factory::nextStep(const CompleteStep &) {
-    return getHomeStep();
+    return lazyInitStep(Factory::State::HOME);
 }
 
 std::shared_ptr<Step> Factory::nextStep(const DeleteStep &) {
-    return getHomeStep();
+    return lazyInitStep(Factory::State::HOME);
 }
 
 std::shared_ptr<Step> Factory::nextStep(const ConfirmDeleteStep &) {
-    return getDeleteStep();
+    return lazyInitStep(Factory::State::DELETE);
 }
 
 std::shared_ptr<Step> Factory::nextStep(const LabelStep &) {
-    return getHomeStep();
+    return lazyInitStep(Factory::State::HOME);
 }
 
-std::shared_ptr<Step> Factory::getHomeStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::HOME, HomeStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getHelpStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::HELP, HelpStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getAddStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::ADD, AddStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getReadTaskDataStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::READTASK, ReadTaskDataStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getQuitStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::QUIT, QuitStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getEditStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::EDIT, EditStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getSubtaskStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::SUBTASK, SubtaskStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getShowStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::SHOW, ShowStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getCompleteStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::COMPLETE, CompleteStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getDeleteStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::DELETE, DeleteStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getConfirmDeleteStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::CONFIRMDELETE, ConfirmDeleteStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getLabelStep() {
-    FACTORY_GEN_MAP_GETTER(steps_, Step, State::LABEL, LabelStep(reader_, printer_, shared_from_this()))
-}
-
-std::shared_ptr<Step> Factory::getStep(const State &s) {
+std::shared_ptr<Step> Factory::getNewStep(const State &s) {
     switch (s){
         case State::HOME:
-            return getHomeStep();
+            return std::shared_ptr<HomeStep>{new HomeStep(reader_, printer_, shared_from_this())};
         case State::HELP:
-            return getHelpStep();
+            return std::shared_ptr<HelpStep>{new HelpStep(reader_, printer_, shared_from_this())};
         case State::ADD:
-            return getAddStep();
+            return std::shared_ptr<AddStep>{new AddStep(reader_, printer_, shared_from_this())};
         case State::SUBTASK:
-            return getSubtaskStep();
+            return std::shared_ptr<SubtaskStep>{new SubtaskStep(reader_, printer_, shared_from_this())};
         case State::READTASK:
-            return getReadTaskDataStep();
+            return std::shared_ptr<ReadTaskDataStep>{new ReadTaskDataStep(reader_, printer_, shared_from_this())};
         case State::EDIT:
-            return getEditStep();
+            return std::shared_ptr<EditStep>{new EditStep(reader_, printer_, shared_from_this())};
         case State::QUIT:
-            return getQuitStep();
+            return std::shared_ptr<QuitStep>{new QuitStep(reader_, printer_, shared_from_this())};
         case State::SHOW:
-            return getShowStep();
+            return std::shared_ptr<ShowStep>{new ShowStep(reader_, printer_, shared_from_this())};
         case State::COMPLETE:
-            return getCompleteStep();
+            return std::shared_ptr<CompleteStep>{new CompleteStep(reader_, printer_, shared_from_this())};
         case State::DELETE:
-            return getDeleteStep();
+            return std::shared_ptr<DeleteStep>{new DeleteStep(reader_, printer_, shared_from_this())};
         case State::CONFIRMDELETE:
-            return getConfirmDeleteStep();
+            return std::shared_ptr<ConfirmDeleteStep>{new ConfirmDeleteStep(reader_, printer_, shared_from_this())};
         case State::LABEL:
-            return getLabelStep();
+            return std::shared_ptr<LabelStep>{new LabelStep(reader_, printer_, shared_from_this())};
+    }
+}
+
+std::shared_ptr<Step> Factory::lazyInitStep(const Factory::State &state) {
+    if (steps_.find(state) == steps_.end())
+        steps_[state] = getNewStep(state);
+    return steps_[state];
+}
+
+std::shared_ptr<Action> Factory::lazyInitAction(const Factory::ActionLabel &label) {
+    if (actions_.find(label) == actions_.end())
+        actions_[label] = getNewAction(label);
+    return actions_[label];
+}
+
+std::shared_ptr<Action> Factory::getNewAction(const Factory::ActionLabel &label) {
+    switch (label){
+        case Factory::ActionLabel::DONOTHING:
+            return std::make_shared<DoNothingAction>(model_);
+        case Factory::ActionLabel::ADDTASK:
+            return std::make_shared<AddTaskAction>(model_);
+        case Factory::ActionLabel::ADDSUBTASK:
+            return std::make_shared<AddSubtaskAction>(model_);
+        case Factory::ActionLabel::VALIDATEID:
+            return std::make_shared<ValidateIDAction>(model_);
+        case Factory::ActionLabel::VALIDATENOID:
+            return std::make_shared<ValidateNoArgAction>(model_);
+        case Factory::ActionLabel::VALIDATELABEL:
+            return std::make_shared<ValidateLabelArgAction>(model_);
+        case Factory::ActionLabel::EDIT:
+            return std::make_shared<EditTaskAction>(model_);
+        case Factory::ActionLabel::SHOW:
+            return std::make_shared<ShowAction>(model_);
+        case Factory::ActionLabel::COMPLETE:
+            return std::make_shared<CompleteTaskAction>(model_);
+        case Factory::ActionLabel::DELETE:
+            return std::make_shared<DeleteAction>(model_);
+        case Factory::ActionLabel::CONFIRMDELETE:
+            return std::make_shared<ConfirmDeleteAction>(model_);
+        case Factory::ActionLabel::LABEL:
+            return std::make_shared<LabelAction>(model_);
     }
 }
 
@@ -253,38 +233,3 @@ std::shared_ptr<Action> Factory::getAction(const LabelStep &) {
     return lazyInitAction(Factory::ActionLabel::LABEL);
 }
 
-std::shared_ptr<Action> Factory::lazyInitAction(const Factory::ActionLabel &label) {
-    if (actions_.find(label) == actions_.end())
-        actions_[label] = std::shared_ptr<Action>{getNewAction(label)};
-    auto action = actions_[label];
-    return action;
-}
-
-std::shared_ptr<Action> Factory::getNewAction(const Factory::ActionLabel &label) {
-    switch (label){
-        case Factory::ActionLabel::DONOTHING:
-            return std::make_shared<DoNothingAction>(model_);
-        case Factory::ActionLabel::ADDTASK:
-            return std::make_shared<AddTaskAction>(model_);
-        case Factory::ActionLabel::ADDSUBTASK:
-            return std::make_shared<AddSubtaskAction>(model_);
-        case Factory::ActionLabel::VALIDATEID:
-            return std::make_shared<ValidateIDAction>(model_);
-        case Factory::ActionLabel::VALIDATENOID:
-            return std::make_shared<ValidateNoArgAction>(model_);
-        case Factory::ActionLabel::VALIDATELABEL:
-            return std::make_shared<ValidateLabelArgAction>(model_);
-        case Factory::ActionLabel::EDIT:
-            return std::make_shared<EditTaskAction>(model_);
-        case Factory::ActionLabel::SHOW:
-            return std::make_shared<ShowAction>(model_);
-        case Factory::ActionLabel::COMPLETE:
-            return std::make_shared<CompleteTaskAction>(model_);
-        case Factory::ActionLabel::DELETE:
-            return std::make_shared<DeleteAction>(model_);
-        case Factory::ActionLabel::CONFIRMDELETE:
-            return std::make_shared<ConfirmDeleteAction>(model_);
-        case Factory::ActionLabel::LABEL:
-            return std::make_shared<LabelAction>(model_);
-    }
-}

@@ -18,7 +18,7 @@ TEST_F(ContextTest, shouldSetAndGetStep)
     Context c;
     auto f = Factory::create();
     c.setStep(f->getStep(Factory::State::HOME));
-    EXPECT_EQ(c.getStep(), f->getStep(Factory::State::HOME));
+    EXPECT_EQ(c.step(), f->getStep(Factory::State::HOME));
 }
 
 TEST_F(ContextTest, shouldSetAndGetOldStep)
@@ -37,7 +37,7 @@ TEST_F(ContextTest, shouldChangeStep)
     c.setStep(f->getStep(Factory::State::HOME));
     c.setStep(f->getStep(Factory::State::HELP));
     EXPECT_EQ(c.getOldStep(), f->getStep(Factory::State::HOME));
-    EXPECT_EQ(c.getStep(), f->getStep(Factory::State::HELP));
+    EXPECT_EQ(c.step(), f->getStep(Factory::State::HELP));
 }
 
 TEST_F(ContextTest, shouldRevertStep)
@@ -47,7 +47,7 @@ TEST_F(ContextTest, shouldRevertStep)
     c.setStep(f->getStep(Factory::State::HOME));
     c.setStep(f->getStep(Factory::State::HELP));
     c.revertStep();
-    EXPECT_EQ(c.getOldStep(), c.getStep());
+    EXPECT_EQ(c.getOldStep(), c.step());
 }
 
 TEST_F(ContextTest, shouldSetID)
@@ -67,7 +67,7 @@ TEST_F(ContextTest, shouldSetTasks)
                                 false));
     Context c;
     c.setTasks(tm.getTasks());
-    auto tasks = c.getTasks();
+    auto tasks = c.tasks();
     ASSERT_EQ(1, tasks.size());
     EXPECT_EQ(tm[id].first, tasks[id].first);
 }
