@@ -57,6 +57,9 @@ public:
 private:
     Factory();
     Factory(const std::shared_ptr<AbstractReader> &, const std::shared_ptr<AbstractPrinter> &);
+    Factory(const std::shared_ptr<AbstractReader> &,
+            const std::shared_ptr<AbstractPrinter> &,
+            const std::shared_ptr<TaskManager> &);
 
 public:
 
@@ -117,12 +120,14 @@ public:
 public:
     std::shared_ptr<AbstractReader> reader() const;
     std::shared_ptr<AbstractPrinter> printer() const;
+    std::shared_ptr<TaskManager> model() const;
 
 private:
     std::map<State, std::shared_ptr<Step>> steps_;
     std::map<ActionLabel, std::shared_ptr<Action>> actions_;
     std::shared_ptr<AbstractReader> reader_;
     std::shared_ptr<AbstractPrinter> printer_;
+    std::shared_ptr<TaskManager> model_;
 };
 
 #endif //TASKMANAGER_SRC_UI_FACTORY_H_

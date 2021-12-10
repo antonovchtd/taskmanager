@@ -9,8 +9,7 @@ Machine::Machine() {
     context_.setStep(factory_->getStep(Factory::State::HOME));
 }
 
-Machine::Machine(const Factory::State &s) {
-    factory_ = Factory::create();
+Machine::Machine(const Factory::State &s) : Machine() {
     context_.setStep(factory_->getStep(s));
 }
 
@@ -22,12 +21,12 @@ Context Machine::run() {
 
     while (context_.getStep()){
         auto act = context_.getStep()->execute(context_);
-        act->make(model_, context_);
+        act->make(context_);
         context_.getStep()->process(context_);
     }
     return context_;
 }
 
-TaskManager Machine::model() const {
-    return model_;
+std::shared_ptr<TaskManager> Machine::model() const {
+    return factory_->model();
 }

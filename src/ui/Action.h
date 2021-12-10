@@ -2,77 +2,95 @@
 // Created by Anton O. on 11/30/21.
 //
 
-#ifndef TASKMANAGER_SRC_ACTION_H_
-#define TASKMANAGER_SRC_ACTION_H_
+#ifndef TASKMANAGER_SRC_UI_ACTION_H_
+#define TASKMANAGER_SRC_UI_ACTION_H_
 
 #include "../model/TaskManager.h"
 #include "../ui/Context.h"
 
 class Action {
 public:
-    Action() = default;
-    virtual void make(TaskManager &, Context &) = 0;
+    explicit Action(const std::shared_ptr<TaskManager> &);
+    virtual void make(Context &) = 0;
+    
+public:
+    std::shared_ptr<TaskManager> model() const;
+    
+private:
+    std::shared_ptr<TaskManager> model_;
 };
 
 class DoNothingAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class AddTaskAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class ValidateIDAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class ValidateNoArgAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class ValidateLabelArgAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class EditTaskAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class AddSubtaskAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class ShowAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class CompleteTaskAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class DeleteAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class ConfirmDeleteAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 class LabelAction : public Action {
 public:
-    void make(TaskManager &, Context &) override;
+    using Action::Action;
+    void make(Context &) override;
 };
 
 
-#endif //TASKMANAGER_SRC_ACTION_H_
+#endif //TASKMANAGER_SRC_UI_ACTION_H_

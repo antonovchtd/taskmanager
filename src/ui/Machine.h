@@ -19,12 +19,11 @@ public:
     Context run();
 
 public:
-    TaskManager model() const;
+    std::shared_ptr<TaskManager> model() const;
 
 private:
     Context context_;
     std::shared_ptr<Factory> factory_;
-    TaskManager model_;
 };
 
 
