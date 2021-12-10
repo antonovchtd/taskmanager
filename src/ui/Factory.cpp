@@ -72,50 +72,6 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
     }
 }
 
-std::shared_ptr<Step> Factory::nextStep(const HelpStep &) {
-    return lazyInitStep(Factory::State::HOME);
-}
-
-std::shared_ptr<Step> Factory::nextStep(const AddStep &) {
-    return lazyInitStep(Factory::State::HOME);
-}
-
-std::shared_ptr<Step> Factory::nextStep(const ReadTaskDataStep &) {
-    return lazyInitStep(Factory::State::QUIT);
-}
-
-std::shared_ptr<Step> Factory::nextStep(const EditStep &) {
-    return lazyInitStep(Factory::State::HOME);
-}
-
-std::shared_ptr<Step> Factory::nextStep(const SubtaskStep &) {
-    return lazyInitStep(Factory::State::HOME);
-}
-
-std::shared_ptr<Step> Factory::nextStep(const QuitStep &) {
-    return nullptr;
-}
-
-std::shared_ptr<Step> Factory::nextStep(const ShowStep &) {
-    return lazyInitStep(Factory::State::HOME);
-}
-
-std::shared_ptr<Step> Factory::nextStep(const CompleteStep &) {
-    return lazyInitStep(Factory::State::HOME);
-}
-
-std::shared_ptr<Step> Factory::nextStep(const DeleteStep &) {
-    return lazyInitStep(Factory::State::HOME);
-}
-
-std::shared_ptr<Step> Factory::nextStep(const ConfirmDeleteStep &) {
-    return lazyInitStep(Factory::State::DELETE);
-}
-
-std::shared_ptr<Step> Factory::nextStep(const LabelStep &) {
-    return lazyInitStep(Factory::State::HOME);
-}
-
 std::shared_ptr<Step> Factory::getNewStep(const State &s) {
     switch (s){
         case State::HOME:
@@ -185,51 +141,3 @@ std::shared_ptr<Action> Factory::getNewAction(const Factory::ActionLabel &label)
             return std::make_shared<LabelAction>(model_);
     }
 }
-
-std::shared_ptr<Action> Factory::getAction(const HelpStep &) {
-    return lazyInitAction(Factory::ActionLabel::DONOTHING);
-}
-
-std::shared_ptr<Action> Factory::getAction(const AddStep &) {
-    return lazyInitAction(Factory::ActionLabel::ADDTASK);
-}
-
-std::shared_ptr<Action> Factory::getAction(const ReadTaskDataStep &) {
-    return lazyInitAction(Factory::ActionLabel::DONOTHING);
-}
-
-std::shared_ptr<Action> Factory::getAction(const EditStep &) {
-    return lazyInitAction(Factory::ActionLabel::EDIT);
-}
-
-std::shared_ptr<Action> Factory::getAction(const SubtaskStep &) {
-    return lazyInitAction(Factory::ActionLabel::ADDSUBTASK);
-}
-
-std::shared_ptr<Action> Factory::getAction(const QuitStep &) {
-    return lazyInitAction(Factory::ActionLabel::DONOTHING);
-}
-
-std::shared_ptr<Action> Factory::getAction(const ShowStep &) {
-    std::shared_ptr<Action> action = lazyInitAction(Factory::ActionLabel::SHOW);
-    std::shared_ptr<Action> labelAction = lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
-    action->setActionData(labelAction->data());
-    return action;
-}
-
-std::shared_ptr<Action> Factory::getAction(const CompleteStep &) {
-    return lazyInitAction(Factory::ActionLabel::COMPLETE);
-}
-
-std::shared_ptr<Action> Factory::getAction(const DeleteStep &) {
-    return lazyInitAction(Factory::ActionLabel::DELETE);
-}
-
-std::shared_ptr<Action> Factory::getAction(const ConfirmDeleteStep &) {
-    return lazyInitAction(Factory::ActionLabel::CONFIRMDELETE);
-}
-
-std::shared_ptr<Action> Factory::getAction(const LabelStep &) {
-    return lazyInitAction(Factory::ActionLabel::LABEL);
-}
-

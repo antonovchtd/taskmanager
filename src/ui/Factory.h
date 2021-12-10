@@ -10,7 +10,8 @@
 #include <map>
 
 #include "Step.h"
-#include "../ui/Action.h"
+#include "Action.h"
+#include "../model/TaskManager.h"
 #include "../io/AbstractReader.h"
 #include "../io/ConsoleReader.h"
 #include "../io/FileReader.h"
@@ -56,44 +57,20 @@ public:
 
 private:
     Factory();
-    Factory(const std::shared_ptr<AbstractReader> &, const std::shared_ptr<AbstractPrinter> &);
+    Factory(const std::shared_ptr<AbstractReader> &,
+            const std::shared_ptr<AbstractPrinter> &);
     Factory(const std::shared_ptr<AbstractReader> &,
             const std::shared_ptr<AbstractPrinter> &,
             const std::shared_ptr<TaskManager> &);
 
 public:
-
     std::shared_ptr<Step> createStep(const std::string &command);
 
-    std::shared_ptr<Step> nextStep(const HelpStep &);
-    std::shared_ptr<Step> nextStep(const AddStep &);
-    std::shared_ptr<Step> nextStep(const ReadTaskDataStep &);
-    std::shared_ptr<Step> nextStep(const EditStep &);
-    std::shared_ptr<Step> nextStep(const SubtaskStep &);
-    std::shared_ptr<Step> nextStep(const QuitStep &);
-    std::shared_ptr<Step> nextStep(const ShowStep &);
-    std::shared_ptr<Step> nextStep(const CompleteStep &);
-    std::shared_ptr<Step> nextStep(const DeleteStep &);
-    std::shared_ptr<Step> nextStep(const ConfirmDeleteStep &);
-    std::shared_ptr<Step> nextStep(const LabelStep &);
-
     std::shared_ptr<Step> getNewStep(const State &s);
-
     std::shared_ptr<Step> lazyInitStep(const Factory::State &state);
-    std::shared_ptr<Action> lazyInitAction(const Factory::ActionLabel &label);
 
     std::shared_ptr<Action> getNewAction(const Factory::ActionLabel &);
-    std::shared_ptr<Action> getAction(const HelpStep &);
-    std::shared_ptr<Action> getAction(const AddStep &);
-    std::shared_ptr<Action> getAction(const ReadTaskDataStep &);
-    std::shared_ptr<Action> getAction(const EditStep &);
-    std::shared_ptr<Action> getAction(const SubtaskStep &);
-    std::shared_ptr<Action> getAction(const QuitStep &);
-    std::shared_ptr<Action> getAction(const ShowStep &);
-    std::shared_ptr<Action> getAction(const CompleteStep &);
-    std::shared_ptr<Action> getAction(const DeleteStep &);
-    std::shared_ptr<Action> getAction(const ConfirmDeleteStep &);
-    std::shared_ptr<Action> getAction(const LabelStep &);
+    std::shared_ptr<Action> lazyInitAction(const Factory::ActionLabel &label);
 
 public:
     std::shared_ptr<AbstractReader> reader() const;

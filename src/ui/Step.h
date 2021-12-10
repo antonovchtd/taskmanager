@@ -19,6 +19,8 @@
 #include "../io/AbstractReader.h"
 #include "../io/FileReader.h"
 #include "../io/AbstractPrinter.h"
+#include "ActionGetter.h"
+#include "StepSwitcher.h"
 
 class Context;
 class Action;

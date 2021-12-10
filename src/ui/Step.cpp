@@ -2,9 +2,7 @@
 // Created by Anton O. on 11/22/21.
 //
 
-#include "Context.h"
 #include "Step.h"
-#include "Factory.h"
 #include "Machine.h"
 
 Step::Step(const std::shared_ptr<AbstractReader> &reader,
@@ -66,11 +64,11 @@ std::shared_ptr<Action> HomeStep::getValidateArgAction(const std::string &arg) {
 std::shared_ptr<Action> HelpStep::execute(Context &c) {
     FileReader fr("../src/model/help.txt");
     printer()->print(fr.read(""));
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void HelpStep::process(Context &c) {
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
 std::shared_ptr<Action> AddStep::execute(Context &c) {
@@ -78,13 +76,13 @@ std::shared_ptr<Action> AddStep::execute(Context &c) {
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setData(input_context.data());
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void AddStep::process(Context &c) {
     printer()->print("Added Task with ID " + c.id().value().to_string() + ".\n");
     c.resetTaskData();
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
 bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title) {
@@ -166,11 +164,11 @@ std::shared_ptr<Action> ReadTaskDataStep::execute(Context &c) {
     }
     c.setDueDate(due_date.value());
 
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void ReadTaskDataStep::process(Context &c) {
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
 std::shared_ptr<Action> EditStep::execute(Context &c) {
@@ -178,12 +176,12 @@ std::shared_ptr<Action> EditStep::execute(Context &c) {
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setData(input_context.data());
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void EditStep::process(Context &c) {
     printer()->print("Edited Task with ID " + c.id().value().to_string() + ".\n");
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
 std::shared_ptr<Action> SubtaskStep::execute(Context &c) {
@@ -191,24 +189,24 @@ std::shared_ptr<Action> SubtaskStep::execute(Context &c) {
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setData(input_context.data());
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void SubtaskStep::process(Context &c) {
     printer()->print("Added Subtask with ID " + c.id().value().to_string() + ".\n");
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
 std::shared_ptr<Action> QuitStep::execute(Context &c) {
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void QuitStep::process(Context &c) {
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
 std::shared_ptr<Action> ShowStep::execute(Context &c) {
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void ShowStep::recursivePrint(const std::pair<TaskID, std::pair<Task, Node>> &kv,
@@ -233,34 +231,34 @@ void ShowStep::process(Context &c) {
         if (!kv.second.second.parent())
             ShowStep::recursivePrint(kv, c, "");
     }
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
 std::shared_ptr<Action> CompleteStep::execute(Context &c) {
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void CompleteStep::process(Context &c) {
     printer()->print("Marked Task with ID " + c.id().value().to_string() + " as completed.\n");
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
 std::shared_ptr<Action> DeleteStep::execute(Context &c) {
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void DeleteStep::process(Context &c) {
     printer()->print("Deleted Task with ID " + c.id().value().to_string() + ".\n");
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
 std::shared_ptr<Action> ConfirmDeleteStep::execute(Context &c) {
-    return factory()->getAction(*this);
+    return ActionGetter::getAction(*this, factory());
 }
 
 void ConfirmDeleteStep::process(Context &c) {
     // proceed to DeleteStep
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
     std::string reply;
     auto ch = c.tasks()[*c.id()].second.children();
     if (!ch.empty())
@@ -282,7 +280,7 @@ void ConfirmDeleteStep::process(Context &c) {
 }
 
 std::shared_ptr<Action> LabelStep::execute(Context &c) {
-    std::shared_ptr<Action> action = factory()->getAction(*this);
+    std::shared_ptr<Action> action = ActionGetter::getAction(*this, factory());
     std::string label = reader()->read("[Add Label]\n    >> ");
     action->setActionData(Action::Data{label});
     return action;
@@ -290,5 +288,5 @@ std::shared_ptr<Action> LabelStep::execute(Context &c) {
 
 void LabelStep::process(Context &c) {
     printer()->print("Added label to Task with ID " + c.id().value().to_string() + ".\n");
-    c.setStep(factory()->nextStep(*this));
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
