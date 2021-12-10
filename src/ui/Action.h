@@ -10,14 +10,23 @@
 
 class Action {
 public:
+    struct Data {
+        std::string arg;
+    };
+
+public:
     explicit Action(const std::shared_ptr<TaskManager> &);
+    Action(const std::shared_ptr<TaskManager> &, const Data &);
     virtual void make(Context &) = 0;
     
 public:
     std::shared_ptr<TaskManager> model() const;
-    
+    Action::Data data() const;
+    void setActionData(const Action::Data &data);
+
 private:
     std::shared_ptr<TaskManager> model_;
+    Action::Data data_;
 };
 
 class DoNothingAction : public Action {

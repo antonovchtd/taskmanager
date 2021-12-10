@@ -19,7 +19,7 @@
 class TaskManager {
 public:
     TaskManager();
-    explicit TaskManager(std::shared_ptr<IDGenerator> generator);
+    explicit TaskManager(const std::shared_ptr<IDGenerator> &generator);
 
 public:
     std::pair<Task, Node>& operator[](TaskID);

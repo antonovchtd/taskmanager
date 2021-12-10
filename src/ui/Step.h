@@ -53,10 +53,7 @@ public:
     void process(Context &c) override;
 
 public:
-    std::shared_ptr<Action> getValidateArgAction();
-
-public:
-    std::string command() const;
+    std::shared_ptr<Action> getValidateArgAction(const std::string &arg);
 
 private:
     std::string command_;

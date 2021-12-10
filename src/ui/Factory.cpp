@@ -43,6 +43,10 @@ std::shared_ptr<AbstractPrinter> Factory::printer() const {
     return printer_;
 }
 
+std::map<Factory::ActionLabel, std::shared_ptr<Action>> Factory::actions() const {
+    return actions_;
+}
+
 std::shared_ptr<AbstractReader> Factory::reader() const {
     return reader_;
 }
@@ -203,113 +207,81 @@ std::shared_ptr<Step> Factory::getStep(const State &s) {
 }
 
 std::shared_ptr<Action> Factory::getAction(const HelpStep &) {
-    return getDoNothingAction();
+    return lazyInitAction(Factory::ActionLabel::DONOTHING);
 }
 
 std::shared_ptr<Action> Factory::getAction(const AddStep &) {
-    return getAddTaskAction();
+    return lazyInitAction(Factory::ActionLabel::ADDTASK);
 }
 
 std::shared_ptr<Action> Factory::getAction(const ReadTaskDataStep &) {
-    return getDoNothingAction();
+    return lazyInitAction(Factory::ActionLabel::DONOTHING);
 }
 
 std::shared_ptr<Action> Factory::getAction(const EditStep &) {
-    return getEditAction();
+    return lazyInitAction(Factory::ActionLabel::EDIT);
 }
 
 std::shared_ptr<Action> Factory::getAction(const SubtaskStep &) {
-    return getAddSubtaskAction();
+    return lazyInitAction(Factory::ActionLabel::ADDSUBTASK);
 }
 
 std::shared_ptr<Action> Factory::getAction(const QuitStep &) {
-    return getDoNothingAction();
+    return lazyInitAction(Factory::ActionLabel::DONOTHING);
 }
 
 std::shared_ptr<Action> Factory::getAction(const ShowStep &) {
-    return getShowAction();
+    return lazyInitAction(Factory::ActionLabel::SHOW);
 }
 
 std::shared_ptr<Action> Factory::getAction(const CompleteStep &) {
-    return getCompleteAction();
+    return lazyInitAction(Factory::ActionLabel::COMPLETE);
 }
 
 std::shared_ptr<Action> Factory::getAction(const DeleteStep &) {
-    return getDeleteAction();
+    return lazyInitAction(Factory::ActionLabel::DELETE);
 }
 
 std::shared_ptr<Action> Factory::getAction(const ConfirmDeleteStep &) {
-    return getConfirmDeleteAction();
+    return lazyInitAction(Factory::ActionLabel::CONFIRMDELETE);
 }
 
 std::shared_ptr<Action> Factory::getAction(const LabelStep &) {
-    return getLabelAction();
+    return lazyInitAction(Factory::ActionLabel::LABEL);
 }
 
-std::shared_ptr<Action> Factory::getDoNothingAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action, ActionLabel::DONOTHING, DoNothingAction(model_))
+std::shared_ptr<Action> Factory::lazyInitAction(const Factory::ActionLabel &label) {
+    if (actions_.find(label) == actions_.end())
+        actions_[label] = std::shared_ptr<Action>{getNewAction(label)};
+    auto action = actions_[label];
+    return action;
 }
 
-std::shared_ptr<Action> Factory::getAddTaskAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action, ActionLabel::ADDTASK, AddTaskAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getAddSubtaskAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::ADDSUBTASK,
-                           AddSubtaskAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getValidateIDAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::VALIDATEID,
-                           ValidateIDAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getValidateNoArgAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::VALIDATENOID,
-                           ValidateNoArgAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getValidateLabelArgAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::VALIDATELABEL,
-                           ValidateLabelArgAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getEditAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::EDIT,
-                           EditTaskAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getShowAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::SHOW,
-                           ShowAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getCompleteAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::COMPLETE,
-                           CompleteTaskAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getDeleteAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::DELETE,
-                           DeleteAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getConfirmDeleteAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::CONFIRMDELETE,
-                           ConfirmDeleteAction(model_))
-}
-
-std::shared_ptr<Action> Factory::getLabelAction(){
-    FACTORY_GEN_MAP_GETTER(actions_, Action,
-                           ActionLabel::LABEL,
-                           LabelAction(model_))
+std::shared_ptr<Action> Factory::getNewAction(const Factory::ActionLabel &label) {
+    switch (label){
+        case Factory::ActionLabel::DONOTHING:
+            return std::make_shared<DoNothingAction>(model_);
+        case Factory::ActionLabel::ADDTASK:
+            return std::make_shared<AddTaskAction>(model_);
+        case Factory::ActionLabel::ADDSUBTASK:
+            return std::make_shared<AddSubtaskAction>(model_);
+        case Factory::ActionLabel::VALIDATEID:
+            return std::make_shared<ValidateIDAction>(model_);
+        case Factory::ActionLabel::VALIDATENOID:
+            return std::make_shared<ValidateNoArgAction>(model_);
+        case Factory::ActionLabel::VALIDATELABEL:
+            return std::make_shared<ValidateLabelArgAction>(model_);
+        case Factory::ActionLabel::EDIT:
+            return std::make_shared<EditTaskAction>(model_);
+        case Factory::ActionLabel::SHOW:
+            return std::make_shared<ShowAction>(model_);
+        case Factory::ActionLabel::COMPLETE:
+            return std::make_shared<CompleteTaskAction>(model_);
+        case Factory::ActionLabel::DELETE:
+            return std::make_shared<DeleteAction>(model_);
+        case Factory::ActionLabel::CONFIRMDELETE:
+            return std::make_shared<ConfirmDeleteAction>(model_);
+        case Factory::ActionLabel::LABEL:
+            return std::make_shared<LabelAction>(model_);
+    }
 }

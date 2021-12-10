@@ -374,7 +374,7 @@ TEST_F(StepTest, getValidateArgActionReadTaskDataStep)
     auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
               std::shared_ptr<AbstractPrinter>(new MockPrinter));
     auto rtds = f->getReadTaskDataStep();
-    auto action = rtds->getValidateArgAction();
+    auto action = rtds->getValidateArgAction(<#initializer#>);
     EXPECT_EQ(action, f->getValidateNoArgAction());
 }
 

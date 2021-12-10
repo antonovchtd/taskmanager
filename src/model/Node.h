@@ -11,22 +11,23 @@
 class Node{
 public:
     Node();
-    Node(TaskID parent);
+    Node(const TaskID &parent);
 
 public:
-    TaskID parent() const;
+    std::optional<TaskID> parent() const;
     std::string label() const;
     std::vector<TaskID> children() const;
 
 public:
-    void SetParent(const TaskID&);
-    void removeChild(const TaskID&);
-    void removeChildren();
-    void AddChild(const TaskID&);
+    void SetParent(const TaskID &);
+    void RemoveParent();
+    void RemoveChild(const TaskID &id);
+    void RemoveChildren();
+    void AddChild(const TaskID &);
     void SetLabel(const std::string &);
 
 private:
-    TaskID parent_;
+    std::optional<TaskID> parent_;
     std::vector<TaskID> children_;
     std::string label_;
 };

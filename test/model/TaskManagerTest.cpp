@@ -72,7 +72,7 @@ TEST_F(TaskManagerTest, shouldChangeParent)
                           id);
     ASSERT_EQ(3, tm.size());
     tm[id_ch].second.SetParent(id2);
-    tm[id].second.removeChild(id_ch);
+    tm[id].second.RemoveChild(id_ch);
     tm[id2].second.AddChild(id_ch);
     EXPECT_EQ(id2, tm[id_ch].second.parent());
     auto children = tm[id].second.children();
@@ -101,7 +101,7 @@ TEST_F(TaskManagerTest, shouldRemoveAllChildren)
                         false),
           id);
     ASSERT_EQ(3, tm.size());
-    tm[id].second.removeChildren();
+    tm[id].second.RemoveChildren();
     auto children = tm[id].second.children();
     EXPECT_TRUE(children.empty());
 }

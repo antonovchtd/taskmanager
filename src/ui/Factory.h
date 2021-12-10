@@ -92,6 +92,9 @@ public:
     std::shared_ptr<Step> getConfirmDeleteStep();
     std::shared_ptr<Step> getLabelStep();
 
+    std::shared_ptr<Action> lazyInitAction(const Factory::ActionLabel &label);
+
+    std::shared_ptr<Action> getNewAction(const Factory::ActionLabel &);
     std::shared_ptr<Action> getAction(const HelpStep &);
     std::shared_ptr<Action> getAction(const AddStep &);
     std::shared_ptr<Action> getAction(const ReadTaskDataStep &);
@@ -104,20 +107,8 @@ public:
     std::shared_ptr<Action> getAction(const ConfirmDeleteStep &);
     std::shared_ptr<Action> getAction(const LabelStep &);
 
-    std::shared_ptr<Action> getDoNothingAction();
-    std::shared_ptr<Action> getAddTaskAction();
-    std::shared_ptr<Action> getAddSubtaskAction();
-    std::shared_ptr<Action> getValidateIDAction();
-    std::shared_ptr<Action> getValidateNoArgAction();
-    std::shared_ptr<Action> getValidateLabelArgAction();
-    std::shared_ptr<Action> getEditAction();
-    std::shared_ptr<Action> getShowAction();
-    std::shared_ptr<Action> getCompleteAction();
-    std::shared_ptr<Action> getDeleteAction();
-    std::shared_ptr<Action> getConfirmDeleteAction();
-    std::shared_ptr<Action> getLabelAction();
-
 public:
+    std::map<Factory::ActionLabel, std::shared_ptr<Action>> actions() const;
     std::shared_ptr<AbstractReader> reader() const;
     std::shared_ptr<AbstractPrinter> printer() const;
     std::shared_ptr<TaskManager> model() const;

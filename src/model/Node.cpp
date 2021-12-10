@@ -4,17 +4,17 @@
 
 #include "Node.h"
 
-Node::Node() : parent_(TaskID::invalidID()) {
+Node::Node() : parent_(std::nullopt) {
 }
 
-Node::Node(TaskID parent) : parent_(parent) {
+Node::Node(const TaskID &parent) : parent_(parent) {
 }
 
-void Node::AddChild(const TaskID& id) {
+void Node::AddChild(const TaskID &id) {
     children_.push_back(id);
 }
 
-void Node::removeChild(const TaskID& id) {
+void Node::RemoveChild(const TaskID &id) {
     std::vector<TaskID>::iterator ch;
     for (ch = children_.begin(); ch != children_.end(); ++ch) {
         if (*ch == id)
@@ -24,11 +24,15 @@ void Node::removeChild(const TaskID& id) {
         children_.erase(ch);
 }
 
-void Node::removeChildren() {
+void Node::RemoveChildren() {
     children_.clear();
 }
 
-TaskID Node::parent() const {
+void Node::RemoveParent() {
+    parent_ = std::nullopt;
+}
+
+std::optional<TaskID> Node::parent() const {
     return parent_;
 }
 

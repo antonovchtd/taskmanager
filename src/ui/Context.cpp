@@ -30,7 +30,7 @@ void Context::setStep(const std::shared_ptr<Step> &s) {
 
 void Context::resetTaskData() {
     data_ = Task::Data{};
-    id_ = TaskID::invalidID();
+    id_ = std::nullopt;
 }
 
 void Context::setTitle(const std::string &title) {
@@ -59,14 +59,6 @@ void Context::setTasks(const std::map<TaskID, std::pair<Task, Node>> &tasks) {
 
 void Context::setLabel(const std::string &s) {
     label_ = s;
-}
-
-void Context::setArg(const std::string &arg) {
-    arg_ = arg;
-}
-
-const std::string &Context::arg() const {
-    return arg_;
 }
 
 bool Context::askConfirmation() const {

@@ -32,12 +32,7 @@ std::shared_ptr<Action> HomeStep::execute(Context &c) {
     std::stringstream ss{reader()->read(" > ")};
     std::string arg;
     ss >> command_ >> arg;
-    c.setArg(arg);
-    return getValidateArgAction();
-}
-
-std::string HomeStep::command() const {
-    return command_;
+    return getValidateArgAction(arg);
 }
 
 void HomeStep::process(Context &c) {
@@ -53,16 +48,19 @@ void HomeStep::process(Context &c) {
     c.setStep(factory()->createStep(command_));
 }
 
-std::shared_ptr<Action> HomeStep::getValidateArgAction() {
+std::shared_ptr<Action> HomeStep::getValidateArgAction(const std::string &arg) {
+    std::shared_ptr<Action> action;
     if (command_ == "edit" || command_ == "subtask" ||
         command_ == "delete" || command_ == "complete" ||
         command_ == "label") {
-        return factory()->getValidateIDAction();
+        action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATEID);
     } else if (command_ == "show") {
-        return factory()->getValidateLabelArgAction();
+        action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
     } else {
-        return factory()->getValidateNoArgAction();
+        action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATENOID);
     }
+    action->setActionData(Action::Data{arg});
+    return action;
 }
 
 std::shared_ptr<Action> HelpStep::execute(Context &c) {
@@ -232,7 +230,7 @@ void ShowStep::recursivePrint(const std::pair<TaskID, std::pair<Task, Node>> &kv
 void ShowStep::process(Context &c) {
     auto tasks = c.getTasks();
     for (const auto &kv : tasks) {
-        if (!kv.second.second.parent().isValid())
+        if (!kv.second.second.parent())
             ShowStep::recursivePrint(kv, c, "");
     }
     c.setStep(factory()->nextStep(*this));

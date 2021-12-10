@@ -4,12 +4,26 @@
 
 #include "Action.h"
 
-Action::Action(const std::shared_ptr<TaskManager> &model) : model_(model) {
+Action::Action(const std::shared_ptr<TaskManager> &model, const Data &data) :
+                model_(model), data_(data) {
     
+}
+
+Action::Action(const std::shared_ptr<TaskManager> &model) :
+                model_(model) {
+
 }
 
 std::shared_ptr<TaskManager> Action::model() const {
     return model_;
+}
+
+Action::Data Action::data() const {
+    return data_;
+}
+
+void Action::setActionData(const Action::Data &data) {
+    data_ = data;
 }
 
 void AddTaskAction::make(Context &context) {
@@ -25,15 +39,14 @@ void AddSubtaskAction::make(Context &context) {
 }
 
 void ValidateIDAction::make(Context &context) {
-    context.setID(TaskID::Create(context.arg()));
-    context.setArg("");
-    if (!context.id() || !model()->Validate(context.id().value())) {
+    context.setID(TaskID::Create(data().arg));
+    if (!context.id() || !model()->Validate(*context.id())) {
         context.setID(TaskID::invalidID());
     }
 }
 
 void ValidateNoArgAction::make(Context &context) {
-    if (!context.arg().empty()){
+    if (!data().arg.empty()){
         context.setID(std::nullopt);
     }
     else
@@ -42,7 +55,7 @@ void ValidateNoArgAction::make(Context &context) {
 
 void ValidateLabelArgAction::make(Context &context) {
     // context.arg() can be empty, can be something, no check for ID though
-    TaskID id = TaskID::Create(context.arg());
+    TaskID id = TaskID::Create(data().arg);
     if (id.isValid()) {
         if (model()->Validate(id)) {
             context.setID(id);
@@ -52,6 +65,7 @@ void ValidateLabelArgAction::make(Context &context) {
         }
     }
     else {
+        context.setLabel(data().arg);
         context.setID(TaskID::nullid());
     }
 }
@@ -61,12 +75,12 @@ void EditTaskAction::make(Context &context) {
 }
 
 void ShowAction::make(Context &context) {
-    if (context.arg().empty())
+    if (context.label().empty())
         context.setTasks(model()->getTasks());
     else if (context.id().has_value() && context.id()->isValid())
         context.setTasks(model()->getTasks(*context.id()));
     else
-        context.setTasks(model()->getTasks(context.arg()));
+        context.setTasks(model()->getTasks(context.label()));
 }
 
 void CompleteTaskAction::make(Context &context) {
