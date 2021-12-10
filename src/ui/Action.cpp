@@ -91,10 +91,7 @@ void DeleteAction::make(Context &context) {
 }
 
 void ConfirmDeleteAction::make(Context &context) {
-    if ((*model())[context.id().value()].second.children().empty())
-        context.setAskConfirmation(false);
-    else
-        context.setAskConfirmation(true);
+    context.setTasks(model()->getTasks(*context.id()));
 }
 
 void LabelAction::make(Context &context) {

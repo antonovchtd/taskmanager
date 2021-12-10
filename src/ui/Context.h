@@ -18,7 +18,6 @@ public:
     Task::Data data() const;
     std::optional<TaskID> id() const;
     std::map<TaskID, std::pair<Task, Node>> getTasks() const;
-    bool askConfirmation() const;
 
 public:
     void setStep(const std::shared_ptr<Step> &);
@@ -28,7 +27,6 @@ public:
     void setData(const Task::Data &);
     void setID(const std::optional<TaskID> &);
     void setTasks(const std::map<TaskID, std::pair<Task, Node>> &);
-    void setAskConfirmation(bool);
 
 public:
     void resetTaskData();
@@ -39,7 +37,6 @@ private:
     std::shared_ptr<Step> step_;
 
     std::map<TaskID, std::pair<Task, Node>> tasks_;
-    bool askConfirmation_;
 };
 
 #endif //TASKMANAGER_SRC_UI_CONTEXT_H_

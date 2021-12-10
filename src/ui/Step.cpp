@@ -259,25 +259,25 @@ std::shared_ptr<Action> ConfirmDeleteStep::execute(Context &c) {
 }
 
 void ConfirmDeleteStep::process(Context &c) {
+    // proceed to DeleteStep
     c.setStep(factory()->nextStep(*this));
     std::string reply;
-    if (c.askConfirmation())
+    auto ch = c.getTasks()[*c.id()].second.children();
+    if (!ch.empty())
         while (true){
             reply = reader()->read("Task " + c.id().value().to_string() +
-                                   " has subtasks. Confirm to delete all. [Y]/N > ");
+                                   " has " + std::to_string(ch.size()) +
+                                   " subtask(s). Confirm to delete all. [Y]/N > ");
             if (reply.empty() || reply == "Y" || reply == "y") {
-                c.setStep(factory()->getDeleteStep());
                 break;
             } else if (reply == "N" || reply == "n") {
+                // disregard nextStep and go to HomeStep
                 c.setStep(factory()->getHomeStep());
                 break;
             } else {
                 printer()->print("Wrong option. Type Y or N.\n");
             }
         }
-    else {
-        c.setStep(factory()->getDeleteStep());
-    }
 
 }
 

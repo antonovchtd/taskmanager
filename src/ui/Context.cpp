@@ -52,11 +52,3 @@ void Context::setID(const std::optional<TaskID> &id) {
 void Context::setTasks(const std::map<TaskID, std::pair<Task, Node>> &tasks) {
     tasks_ = tasks;
 }
-
-bool Context::askConfirmation() const {
-    return askConfirmation_;
-}
-
-void Context::setAskConfirmation(bool tf) {
-    askConfirmation_ = tf;
-}
