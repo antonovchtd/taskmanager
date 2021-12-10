@@ -20,10 +20,6 @@ std::map<TaskID, std::pair<Task, Node>> Context::getTasks() const {
     return tasks_;
 }
 
-std::string Context::label() const {
-    return label_;
-}
-
 void Context::setStep(const std::shared_ptr<Step> &s) {
     step_ = s;
 }
@@ -55,10 +51,6 @@ void Context::setID(const std::optional<TaskID> &id) {
 
 void Context::setTasks(const std::map<TaskID, std::pair<Task, Node>> &tasks) {
     tasks_ = tasks;
-}
-
-void Context::setLabel(const std::string &s) {
-    label_ = s;
 }
 
 bool Context::askConfirmation() const {

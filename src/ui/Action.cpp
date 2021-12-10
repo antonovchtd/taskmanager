@@ -54,7 +54,7 @@ void ValidateNoArgAction::make(Context &context) {
 }
 
 void ValidateLabelArgAction::make(Context &context) {
-    // context.arg() can be empty, can be something, no check for ID though
+    // arg can be empty, can be something, no check for ID though
     TaskID id = TaskID::Create(data().arg);
     if (id.isValid()) {
         if (model()->Validate(id)) {
@@ -65,7 +65,6 @@ void ValidateLabelArgAction::make(Context &context) {
         }
     }
     else {
-        context.setLabel(data().arg);
         context.setID(TaskID::nullid());
     }
 }
@@ -75,12 +74,12 @@ void EditTaskAction::make(Context &context) {
 }
 
 void ShowAction::make(Context &context) {
-    if (context.label().empty())
+    if (data().arg.empty())
         context.setTasks(model()->getTasks());
     else if (context.id().has_value() && context.id()->isValid())
         context.setTasks(model()->getTasks(*context.id()));
     else
-        context.setTasks(model()->getTasks(context.label()));
+        context.setTasks(model()->getTasks(data().arg));
 }
 
 void CompleteTaskAction::make(Context &context) {
@@ -99,5 +98,5 @@ void ConfirmDeleteAction::make(Context &context) {
 }
 
 void LabelAction::make(Context &context) {
-    (*model())[context.id().value()].second.SetLabel(context.label());
+    (*model())[context.id().value()].second.SetLabel(data().arg);
 }

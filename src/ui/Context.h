@@ -18,7 +18,6 @@ public:
     Task::Data data() const;
     std::optional<TaskID> id() const;
     std::map<TaskID, std::pair<Task, Node>> getTasks() const;
-    std::string label() const;
     bool askConfirmation() const;
 
 public:
@@ -29,7 +28,6 @@ public:
     void setData(const Task::Data &);
     void setID(const std::optional<TaskID> &);
     void setTasks(const std::map<TaskID, std::pair<Task, Node>> &);
-    void setLabel(const std::string &);
     void setAskConfirmation(bool);
 
 public:
@@ -41,7 +39,6 @@ private:
     std::shared_ptr<Step> step_;
 
     std::map<TaskID, std::pair<Task, Node>> tasks_;
-    std::string label_;
     bool askConfirmation_;
 };
 

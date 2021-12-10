@@ -231,7 +231,10 @@ std::shared_ptr<Action> Factory::getAction(const QuitStep &) {
 }
 
 std::shared_ptr<Action> Factory::getAction(const ShowStep &) {
-    return lazyInitAction(Factory::ActionLabel::SHOW);
+    std::shared_ptr<Action> action = lazyInitAction(Factory::ActionLabel::SHOW);
+    std::shared_ptr<Action> labelAction = lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
+    action->setActionData(labelAction->data());
+    return action;
 }
 
 std::shared_ptr<Action> Factory::getAction(const CompleteStep &) {

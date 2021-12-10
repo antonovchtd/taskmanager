@@ -282,8 +282,10 @@ void ConfirmDeleteStep::process(Context &c) {
 }
 
 std::shared_ptr<Action> LabelStep::execute(Context &c) {
-    c.setLabel(reader()->read("[Add Label]\n    >> "));
-    return factory()->getAction(*this);
+    std::shared_ptr<Action> action = factory()->getAction(*this);
+    std::string label = reader()->read("[Add Label]\n    >> ");
+    action->setActionData(Action::Data{label});
+    return action;
 }
 
 void LabelStep::process(Context &c) {
