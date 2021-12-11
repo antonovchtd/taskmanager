@@ -68,10 +68,10 @@ public:
     std::shared_ptr<Step> createStep(const std::string &command);
 
     std::shared_ptr<Step> getNewStep(const State &s);
-    std::shared_ptr<Step> lazyInitStep(const Factory::State &state);
+    std::shared_ptr<Step> lazyInitStep(const State &state);
 
-    std::shared_ptr<Action> getNewAction(const Factory::ActionLabel &);
-    std::shared_ptr<Action> lazyInitAction(const Factory::ActionLabel &label);
+    std::shared_ptr<Action> getNewAction(const ActionLabel &);
+    std::shared_ptr<Action> lazyInitAction(const ActionLabel &label);
 
 public:
     std::shared_ptr<AbstractReader> reader() const;
