@@ -214,9 +214,6 @@ void ShowStep::recursivePrint(const std::pair<TaskID, std::pair<Task, Node>> &kv
     printer()->print(prefix + kv.first.to_string() +
                      " – " + kv.second.first.to_string());
 
-    if (!kv.second.second.label().empty())
-        printer()->print(" :L " + kv.second.second.label());
-
     printer()->print("\n");
     for (const auto &id : kv.second.second.children()) {
         auto ch = std::make_pair(id, c.tasks().at(id));

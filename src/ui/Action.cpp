@@ -96,5 +96,5 @@ void ConfirmDeleteAction::make(Context &context) {
 }
 
 void LabelAction::make(Context &context) {
-    (*model())[context.id().value()].second.SetLabel(data().arg);
+    (*model()).SetLabel(*context.id(), data().arg);
 }

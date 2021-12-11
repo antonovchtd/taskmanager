@@ -4,22 +4,25 @@
 
 #include "Task.h"
 
-Task::Task(std::string title, Task::Priority p, time_t due_date, bool complete_flag) :
-        title_{std::move(title)},
+Task::Task(const std::string &title, Task::Priority p, time_t due_date,
+           const std::string &label, bool complete_flag) :
+        title_{title},
         priority_{p},
         due_date_{due_date},
+        label_{label},
         is_complete_(complete_flag)
 {
 }
 
 Task Task::Create(const Task::Data &d) {
-    return Task::Create(d.title, d.priority, d.due_date, d.is_complete);
+    return Task::Create(d.title, d.priority, d.due_date, d.label, d.is_complete);
 }
 
-Task Task::Create(const std::string &title, Task::Priority p, time_t due_date, bool complete_flag) {
+Task Task::Create(const std::string &title, Task::Priority p, time_t due_date,
+                  const std::string &label, bool complete_flag) {
     if (title.empty())
         throw std::runtime_error("Empty title string.");
-    return {title, p, due_date, complete_flag};
+    return {title, p, due_date, label, complete_flag};
 }
 
 time_t Task::dueDate() const {
@@ -38,14 +41,19 @@ bool Task::isComplete() const {
     return is_complete_;
 }
 
+std::string Task::label() const {
+    return label_;
+}
+
 bool Task::operator==(const Task& rhs) const {
     return title_ == rhs.title()
         && priority_ == rhs.priority()
+        && label_ == rhs.label()
         && due_date_ == rhs.dueDate();
 }
 
 Task::Data Task::data() const {
-    return Task::Data{title_, priority_, due_date_, is_complete_};
+    return Task::Data{title_, priority_, due_date_, label_,is_complete_};
 }
 
 std::string Task::to_string() const {
@@ -63,5 +71,10 @@ std::string Task::to_string() const {
     if (is_complete_) {
         os << " [completed]";
     }
+
+    if (!label_.empty()) {
+        os << " L: " << label_;
+    }
+
     return os.str();
 }

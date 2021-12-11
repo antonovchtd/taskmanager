@@ -36,16 +36,8 @@ std::optional<TaskID> Node::parent() const {
     return parent_;
 }
 
-std::string Node::label() const {
-    return label_;
-}
-
 std::vector<TaskID> Node::children() const {
     return children_;
-}
-
-void Node::SetLabel(const std::string &s) {
-    label_ = s;
 }
 
 void Node::SetParent(const TaskID &id) {

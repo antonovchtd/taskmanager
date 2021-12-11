@@ -38,7 +38,7 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks() const {
 std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks(const std::string &label) const {
     decltype(tasks_) tasks;
     for (const auto &kv : tasks_) {
-        if (kv.second.second.label() == label) {
+        if (kv.second.first.label() == label) {
             tasks.insert(kv);
             tasks.at(kv.first).second.RemoveParent();
             tasks.at(kv.first).second.RemoveChildren();
@@ -77,8 +77,9 @@ void TaskManager::Edit(const TaskID &id, const Task &t) {
 }
 
 void TaskManager::Complete(const TaskID &id) {
-    Task t = tasks_.at(id).first;
-    this->Edit(id, Task::Create(t.title(), t.priority(), t.dueDate(), true));
+    Task::Data data = tasks_.at(id).first.data();
+    data.is_complete = true;
+    Edit(id, Task::Create(data));
     for (auto const &ch : tasks_.at(id).second.children())
         Complete(ch);
 }
@@ -96,5 +97,7 @@ size_t TaskManager::size() const {
 }
 
 void TaskManager::SetLabel(const TaskID &id, const std::string &label) {
-    tasks_.at(id).second.SetLabel(label);
+    Task::Data data = tasks_.at(id).first.data();
+    data.label = label;
+    Edit(id, Task::Create(data));
 }

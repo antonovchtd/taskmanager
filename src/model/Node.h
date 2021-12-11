@@ -15,7 +15,6 @@ public:
 
 public:
     std::optional<TaskID> parent() const;
-    std::string label() const;
     std::vector<TaskID> children() const;
 
 public:
@@ -24,12 +23,10 @@ public:
     void RemoveChild(const TaskID &id);
     void RemoveChildren();
     void AddChild(const TaskID &);
-    void SetLabel(const std::string &);
 
 private:
     std::optional<TaskID> parent_;
     std::vector<TaskID> children_;
-    std::string label_;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_NODE_H_
