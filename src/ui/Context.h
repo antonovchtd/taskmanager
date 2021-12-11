@@ -28,9 +28,6 @@ public:
     void setID(const std::optional<TaskID> &);
     void setTasks(const std::map<TaskID, std::pair<Task, Node>> &);
 
-public:
-    void resetTaskData();
-
 private:
     Task::Data data_;
     std::optional<TaskID> id_;

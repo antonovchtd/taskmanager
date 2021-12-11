@@ -27,7 +27,6 @@ public:
     };
 
 public:
-    Task();
     static Task Create(const std::string& title, Task::Priority p, time_t due_date, bool complete_flag);
     static Task Create(const Task::Data&);
 

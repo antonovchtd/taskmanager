@@ -81,7 +81,6 @@ std::shared_ptr<Action> AddStep::execute(Context &c) {
 
 void AddStep::process(Context &c) {
     printer()->print("Added Task with ID " + c.id().value().to_string() + ".\n");
-    c.resetTaskData();
     c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
@@ -260,7 +259,7 @@ void ConfirmDeleteStep::process(Context &c) {
     // proceed to DeleteStep
     c.setStep(StepSwitcher::nextStep(*this, factory()));
     std::string reply;
-    auto ch = c.tasks()[*c.id()].second.children();
+    auto ch = c.tasks().at(*c.id()).second.children();
     if (!ch.empty())
         while (true){
             reply = reader()->read("Task " + c.id().value().to_string() +

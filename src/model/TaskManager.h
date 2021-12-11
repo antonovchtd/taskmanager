@@ -31,7 +31,7 @@ public:
 public:
     TaskID Add(const Task &);
     TaskID AddSubtask(const Task &, const TaskID &);
-    void Edit(const TaskID &, Task);
+    void Edit(const TaskID &id, const Task &t);
     void Complete(const TaskID &);
     void Delete(const TaskID &id, bool deleteChildren = false);
     bool Validate(const TaskID &id) const;

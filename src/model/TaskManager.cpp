@@ -15,7 +15,7 @@ TaskID TaskManager::Add(const Task &t) {
     if (Validate(id))
         throw std::runtime_error("TaskManager::Add attempts to overwrite task");
 
-    tasks_[id] = std::make_pair(t, Node());
+    tasks_.insert(std::make_pair(id, std::make_pair(t, Node())));
     return id;
 }
 
@@ -26,8 +26,8 @@ TaskID TaskManager::AddSubtask(const Task &t, const TaskID &parent) {
     if (parent.isValid() && !Validate(parent))
         throw std::runtime_error("TaskManager::AddSubtask invalid parent ID");
 
-    tasks_[id] = std::make_pair(t, Node(parent));
-    tasks_[parent].second.AddChild(id);
+    tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
+    tasks_.at(parent).second.AddChild(id);
     return id;
 }
 
@@ -40,8 +40,8 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks(const std::string 
     for (const auto &kv : tasks_) {
         if (kv.second.second.label() == label) {
             tasks.insert(kv);
-            tasks[kv.first].second.RemoveParent();
-            tasks[kv.first].second.RemoveChildren();
+            tasks.at(kv.first).second.RemoveParent();
+            tasks.at(kv.first).second.RemoveChildren();
         }
     }
     return tasks;
@@ -49,12 +49,12 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks(const std::string 
 
 std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks(const TaskID &id) {
     decltype(tasks_) tasks;
-    tasks[id] = tasks_[id];
-    tasks[id].second.RemoveParent();
-    for (const auto &ch : tasks[id].second.children()) {
+    tasks.insert(std::make_pair(id, tasks_.at(id)));
+    tasks.at(id).second.RemoveParent();
+    for (const auto &ch : tasks.at(id).second.children()) {
         auto ch_tasks = getTasks(ch);
         for (auto it = ch_tasks.begin(); it != ch_tasks.end(); it++) {
-            it->second.second.SetParent(*tasks_[ch].second.parent());
+            it->second.second.SetParent(*tasks_.at(ch).second.parent());
         }
         tasks.insert(ch_tasks.begin(), ch_tasks.end());
     }
@@ -62,29 +62,29 @@ std::map<TaskID, std::pair<Task, Node>> TaskManager::getTasks(const TaskID &id) 
 }
 
 void TaskManager::Delete(const TaskID &id, bool deleteChildren) {
-    if (!tasks_[id].second.children().empty() && !deleteChildren)
+    if (!tasks_.at(id).second.children().empty() && !deleteChildren)
         throw std::runtime_error("TaskManager::Delete attempts to delete task with subtasks");
-    std::optional<TaskID> ancestor = tasks_[id].second.parent();
+    std::optional<TaskID> ancestor = tasks_.at(id).second.parent();
     if (ancestor && Validate(ancestor.value()))
-        tasks_[ancestor.value()].second.RemoveChild(id);
-    for (auto const &ch : tasks_[id].second.children())
+        tasks_.at(ancestor.value()).second.RemoveChild(id);
+    for (auto const &ch : tasks_.at(id).second.children())
         Delete(ch, true);
     tasks_.erase(id);
 }
 
-void TaskManager::Edit(const TaskID &id, Task t) {
-    tasks_[id].first = std::move(t);
+void TaskManager::Edit(const TaskID &id, const Task &t) {
+    tasks_.at(id).first = t;
 }
 
 void TaskManager::Complete(const TaskID &id) {
-    Task t = tasks_[id].first;
+    Task t = tasks_.at(id).first;
     this->Edit(id, Task::Create(t.title(), t.priority(), t.dueDate(), true));
-    for (auto const &ch : tasks_[id].second.children())
+    for (auto const &ch : tasks_.at(id).second.children())
         Complete(ch);
 }
 
 std::pair<Task, Node>& TaskManager::operator[](TaskID id) {
-    return tasks_[id];
+    return tasks_.at(id);
 }
 
 bool TaskManager::Validate(const TaskID &id) const{
@@ -96,5 +96,5 @@ size_t TaskManager::size() const {
 }
 
 void TaskManager::SetLabel(const TaskID &id, const std::string &label) {
-    tasks_[id].second.SetLabel(label);
+    tasks_.at(id).second.SetLabel(label);
 }

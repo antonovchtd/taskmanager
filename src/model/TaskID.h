@@ -21,9 +21,9 @@ public:
     int value() const;
     std::string to_string() const;
 
-    bool operator==(const TaskID&) const;
-    bool operator!=(const TaskID&) const;
-    bool operator<(const TaskID&) const;
+    bool operator==(const TaskID &) const;
+    bool operator!=(const TaskID &) const;
+    bool operator<(const TaskID &) const;
 
 private:
     int value_;

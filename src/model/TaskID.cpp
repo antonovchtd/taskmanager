@@ -38,7 +38,7 @@ bool TaskID::isValidOrNull() const {
     return value_ >= 0;
 }
 
-bool TaskID::operator==(const TaskID& rhs) const {
+bool TaskID::operator==(const TaskID &rhs) const {
     return value_ == rhs.value();
 }
 
@@ -46,10 +46,10 @@ std::string TaskID::to_string() const {
     return std::to_string(value_);
 }
 
-bool TaskID::operator!=(const TaskID& rhs) const {
+bool TaskID::operator!=(const TaskID &rhs) const {
     return !(*this == rhs);
 }
 
-bool TaskID::operator<(const TaskID& rhs) const {
+bool TaskID::operator<(const TaskID &rhs) const {
     return value_ < rhs.value();
 }

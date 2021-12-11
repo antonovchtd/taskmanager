@@ -4,9 +4,6 @@
 
 #include "Task.h"
 
-Task::Task() : Task("Default", Priority::NONE, 0, false) {
-}
-
 Task::Task(std::string title, Task::Priority p, time_t due_date, bool complete_flag) :
         title_{std::move(title)},
         priority_{p},

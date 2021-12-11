@@ -24,11 +24,6 @@ void Context::setStep(const std::shared_ptr<Step> &s) {
     step_ = s;
 }
 
-void Context::resetTaskData() {
-    data_ = Task::Data{};
-    id_ = std::nullopt;
-}
-
 void Context::setTitle(const std::string &title) {
     data_.title = title;
 }
