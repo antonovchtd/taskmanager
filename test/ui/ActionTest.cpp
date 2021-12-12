@@ -2,7 +2,8 @@
 // Created by Anton O. on 12/5/21.
 //
 
-#include "../../src/controller/Action.h"
+#include "../../src/ui/Action.h"
+#include "../../src/ui/Context.h"
 
 #include <gtest/gtest.h>
 
@@ -13,171 +14,199 @@ class ActionTest : public ::testing::Test
 
 TEST_F(ActionTest, makeAddTaskAction)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    c.setData(Task::Data{"test", Task::Priority::HIGH, time(nullptr), false});
-    AddTaskAction ata;
-    ata.make(tm, c);
-    ASSERT_EQ(1,tm.size());
-    EXPECT_TRUE(tm.Validate(c.id().value()));
+    c.setData(Task::Data{"test", Task::Priority::HIGH, time(nullptr), "label", false});
+    AddTaskAction ata(ptr);
+    ata.make(c);
+    ASSERT_EQ(1, ptr->size());
+    EXPECT_TRUE(ptr->Validate(*c.id()));
 }
 
 TEST_F(ActionTest, makeAddSubtaskAction)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    c.setData(Task::Data{"sub", Task::Priority::MEDIUM, time(nullptr), false});
-    AddSubtaskAction asa;
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "l", false));
+    c.setData(Task::Data{"sub", Task::Priority::MEDIUM, time(nullptr), "l", false});
+    AddSubtaskAction asa(ptr);
     c.setID(id);
-    asa.make(tm, c);
-    ASSERT_EQ(2,tm.size());
-    EXPECT_TRUE(tm.Validate(c.id().value()));
-    EXPECT_NE(id, c.id().value());
+    asa.make(c);
+    ASSERT_EQ(2, ptr->size());
+    EXPECT_TRUE(ptr->Validate(*c.id()));
+    EXPECT_NE(id, *c.id());
 }
 
 TEST_F(ActionTest, makeValidateIDActionValidID)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    c.setArg(id.to_string());
-    ValidateIDAction via;
-    via.make(tm, c);
-    EXPECT_EQ(id, c.id().value());
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    ValidateIDAction via(ptr, Action::Data{id.to_string()});
+    via.make(c);
+    EXPECT_EQ(id, *c.id());
 }
 
 TEST_F(ActionTest, makeValidateIDActionInvalidID)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    c.setArg(id.to_string() + "0");
-    ValidateIDAction via;
-    via.make(tm, c);
-    EXPECT_EQ(c.id(), TaskID::invalidID());
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    ValidateIDAction via(ptr, Action::Data{id.to_string() + "0"});
+    via.make(c);
+    EXPECT_EQ(TaskID::invalidID(), *c.id());
 }
 
 TEST_F(ActionTest, makeValidateIDActionNoID)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    c.setArg("");
-    ValidateIDAction via;
-    via.make(tm, c);
-    EXPECT_EQ(c.id(), TaskID::invalidID());
+    ValidateIDAction via(ptr, Action::Data{""});
+    via.make(c);
+    EXPECT_EQ(TaskID::invalidID(), *c.id());
+}
+
+TEST_F(ActionTest, makeValidateIDActionString)
+{
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
+    Context c;
+    ValidateIDAction via(ptr, Action::Data{"bad"});
+    via.make(c);
+    EXPECT_EQ(TaskID::invalidID(), *c.id());
 }
 
 TEST_F(ActionTest, makeValidateNoArgActionSomeID)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    auto f = Factory::create();
-    c.setOldStep(f->getHomeStep());
-    c.setStep(f->getHelpStep());
-    c.setArg("1");
-    ValidateNoArgAction via;
-    via.make(tm, c);
-    EXPECT_FALSE(c.id());
-    EXPECT_EQ(c.step(), c.getOldStep());
+    ValidateNoArgAction vnaa(ptr, Action::Data{"1"});
+    vnaa.make(c);
+    EXPECT_EQ(std::nullopt, c.id());
 }
 
 TEST_F(ActionTest, makeValidateNoArgActionNoID)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    c.setArg("");
-    ValidateNoArgAction via;
-    via.make(tm, c);
-    EXPECT_EQ(c.id(), TaskID::nullid());
+    ValidateNoArgAction vnaa(ptr, Action::Data{""});
+    vnaa.make(c);
+    EXPECT_EQ(TaskID::nullid(), *c.id());
 }
 
-TEST_F(ActionTest, makeValidateLabelArgAction)
+TEST_F(ActionTest, makeValidateLabelArgActionEmptyStr)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    c.setArg("");
-    ValidateLabelArgAction vlaa;
-    vlaa.make(tm, c);
-    EXPECT_EQ(c.id(), TaskID::nullid());
+    ValidateLabelArgAction vlaa(ptr, Action::Data{""});
+    vlaa.make(c);
+    EXPECT_EQ(TaskID::nullid(), *c.id());
+}
+
+TEST_F(ActionTest, makeValidateLabelArgActionValidID)
+{
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
+    Context c;
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    ValidateLabelArgAction vlaa(ptr, Action::Data{id.to_string()});
+    vlaa.make(c);
+    EXPECT_EQ(id, *c.id());
+}
+
+TEST_F(ActionTest, makeValidateLabelArgActionInvalidID)
+{
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
+    Context c;
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    ValidateLabelArgAction vlaa(ptr, Action::Data{id.to_string() + "0"});
+    vlaa.make(c);
+    EXPECT_EQ(TaskID::invalidID(), *c.id());
 }
 
 TEST_F(ActionTest, makeEditTaskAction)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    c.setData(Task::Data{"edited", Task::Priority::MEDIUM, time(nullptr), false});
-    EditTaskAction eta;
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    c.setData(Task::Data{"edited", Task::Priority::MEDIUM, time(nullptr), "", false});
+    EditTaskAction eta(ptr);
     c.setID(id);
-    eta.make(tm, c);
-    ASSERT_EQ(1,tm.size());
-    EXPECT_TRUE(tm.Validate(c.id().value()));
-    EXPECT_EQ(id, c.id().value());
-    EXPECT_EQ(tm[id].first.title(), "edited");
+    eta.make(c);
+    ASSERT_EQ(1, ptr->size());
+    EXPECT_TRUE(ptr->Validate(*c.id()));
+    EXPECT_EQ(id, *c.id());
+    EXPECT_EQ((*ptr)[id].first.title(), "edited");
+    EXPECT_EQ((*ptr)[id].first.priority(), Task::Priority::MEDIUM);
 }
 
 TEST_F(ActionTest, makeShowActionNoArg)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    ShowAction sa;
-    c.setArg("");
-    sa.make(tm, c);
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    ShowAction sa(ptr, Action::Data{""});
+    sa.make(c);
     ASSERT_EQ(1, c.tasks().size());
-    EXPECT_EQ(c.tasks()[id].first.title(), "test");
+    EXPECT_EQ(c.tasks().at(id).first.title(), "test");
 }
 
 TEST_F(ActionTest, makeShowActionLabelArg)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
     std::string label = "l";
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    tm.Add(Task::Create("test 2", Task::Priority::MEDIUM, time(nullptr), false));
-    tm.SetLabel(id, label);
-    ShowAction sa;
-    c.setArg(label);
-    sa.make(tm, c);
+    ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    TaskID id = ptr->Add(Task::Create("test 2", Task::Priority::MEDIUM, time(nullptr), label, false));
+    ShowAction sa(ptr, Action::Data{label});
+    sa.make(c);
     ASSERT_EQ(1, c.tasks().size());
-    EXPECT_EQ(c.tasks()[id].first.title(), "test");
+    EXPECT_EQ(c.tasks().at(id).first.title(), "test 2");
+}
+
+TEST_F(ActionTest, makeShowActionIDArg)
+{
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
+    Context c;
+    TaskID id = ptr->Add(Task::Create("test 1", Task::Priority::HIGH, time(nullptr), "", false));
+    ptr->Add(Task::Create("test 2", Task::Priority::MEDIUM, time(nullptr), "", false));
+    ShowAction sa(ptr, Action::Data{id.to_string()});
+    c.setID(id);
+    sa.make(c);
+    ASSERT_EQ(1, c.tasks().size());
+    EXPECT_EQ(c.tasks().at(id).first.title(), "test 1");
 }
 
 TEST_F(ActionTest, makeCompleteTaskAction)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    CompleteTaskAction ca;
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    CompleteTaskAction ca(ptr);
     c.setID(id);
-    ca.make(tm, c);
-    ASSERT_EQ(1,tm.size());
-    EXPECT_TRUE(tm[id].first.isComplete());
+    ca.make(c);
+    ASSERT_EQ(1, ptr->size());
+    EXPECT_TRUE((*ptr)[id].first.isComplete());
 }
 
 TEST_F(ActionTest, makeDeleteTaskAction)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    DeleteAction da;
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    DeleteAction da(ptr);
     c.setID(id);
-    da.make(tm, c);
-    EXPECT_EQ(0, tm.size());
+    da.make(c);
+    EXPECT_EQ(0, ptr->size());
 }
 
 TEST_F(ActionTest, makeLabelAction)
 {
-    TaskManager tm;
+    auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
     std::string label = "l";
-    TaskID id = tm.Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), false));
-    LabelAction la;
+    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    LabelAction la(ptr, Action::Data{label});
     c.setID(id);
-    c.setLabel(label);
-    la.make(tm, c);
-    ASSERT_EQ(1, tm.size());
-    EXPECT_EQ(label, tm[id].second.label());
+    la.make(c);
+    ASSERT_EQ(1, ptr->size());
+    EXPECT_EQ(label, (*ptr)[id].first.label());
 }

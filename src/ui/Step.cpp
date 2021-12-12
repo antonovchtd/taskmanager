@@ -86,7 +86,7 @@ void AddStep::process(Context &c) {
 
 bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title) {
     if (title.empty()) {
-        printer()->print("Title cannot be empty!\n");
+        printer()->print("    Title cannot be empty!\n");
         return false;
     }
     return true;

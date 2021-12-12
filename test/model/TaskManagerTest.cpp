@@ -28,6 +28,7 @@ TEST_F(TaskManagerTest, shouldAddTask)
     TaskID id = tm.Add(Task::Create("TestTitle",
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
+                                    "label",
                                     false));
     ASSERT_EQ(1, tm.size());
     EXPECT_TRUE(tm.Validate(id));
@@ -39,10 +40,12 @@ TEST_F(TaskManagerTest, shouldAddSubtask)
     TaskID id = tm.Add(Task::Create("TestTitle",
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
+                                    "label",
                                     false));
     TaskID id_ch = tm.AddSubtask(Task::Create("SubTask",
                                         Task::Priority::NONE,
                                         time(nullptr) + 5,
+                                        "label",
                                         false),
                           id);
     ASSERT_EQ(2, tm.size());
@@ -60,14 +63,17 @@ TEST_F(TaskManagerTest, shouldChangeParent)
     TaskID id = tm.Add(Task::Create("TestTitle",
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
+                                    "label",
                                     false));
     TaskID id2 = tm.Add(Task::Create("TestTitle 2",
                                     Task::Priority::NONE,
                                     time(nullptr) + 100,
+                                    "label",
                                     false));
     TaskID id_ch = tm.AddSubtask(Task::Create("SubTask",
                                         Task::Priority::NONE,
                                         time(nullptr) + 5,
+                                        "label",
                                         false),
                           id);
     ASSERT_EQ(3, tm.size());
@@ -89,15 +95,18 @@ TEST_F(TaskManagerTest, shouldRemoveAllChildren)
     TaskID id = tm.Add(Task::Create("TestTitle",
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
+                                    "label",
                                     false));
     tm.AddSubtask(Task::Create("Subtask",
                         Task::Priority::NONE,
                         time(nullptr) + 100,
+                        "label",
                         false),
             id);
     tm.AddSubtask(Task::Create("SubTask 2",
                         Task::Priority::NONE,
                         time(nullptr) + 5,
+                        "label",
                         false),
           id);
     ASSERT_EQ(3, tm.size());
@@ -109,10 +118,15 @@ TEST_F(TaskManagerTest, shouldRemoveAllChildren)
 TEST_F(TaskManagerTest, shouldEdit)
 {
     TaskManager tm;
-    TaskID id = tm.Add(Task{});
-    Task t = Task::Create("My Test Task",
+    TaskID id = tm.Add(Task::Create("My Test Task",
+                                    Task::Priority::MEDIUM,
+                                    time(nullptr),
+                                    "label",
+                                    false));
+    Task t = Task::Create("Edited",
                           Task::Priority::MEDIUM,
                           time(nullptr),
+                          "label",
                           false);
     tm.Edit(id, t);
     EXPECT_EQ(t, tm[id].first);
@@ -124,6 +138,7 @@ TEST_F(TaskManagerTest, shouldDeleteTask)
     TaskID id = tm.Add(Task::Create("TestTitle",
                                     Task::Priority::NONE,
                                     time(nullptr),
+                                    "label",
                                     false));
     tm.Delete(id, false);
     EXPECT_FALSE(tm.Validate(id));
@@ -135,6 +150,7 @@ TEST_F(TaskManagerTest, shouldCompleteTask)
     TaskID id = tm.Add(Task::Create("TestTitle",
                                   Task::Priority::NONE,
                                     time(nullptr),
+                                    "label",
                                     false));
     tm.Complete(id);
     EXPECT_TRUE(tm[id].first.isComplete());
@@ -152,6 +168,7 @@ TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtAddingTasksSameID)
     Task t = Task::Create("My Test Task 1",
                           Task::Priority::MEDIUM,
                           time(nullptr),
+                          "label",
                           false);
     tm.Add(t);
     EXPECT_THROW(tm.Add(t), std::runtime_error);
@@ -161,8 +178,8 @@ TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtDeletingTaskWithChildren)
 {
     TaskManager tm;
     Task::Priority p = Task::Priority::NONE;
-    TaskID id = tm.Add(Task::Create("Task",p,time(nullptr),false));
-    tm.AddSubtask(Task::Create("Subtask", p,time(nullptr), false), id);
+    TaskID id = tm.Add(Task::Create("Task", p, time(nullptr), "", false));
+    tm.AddSubtask(Task::Create("Subtask", p, time(nullptr), "", false), id);
     ASSERT_EQ(2, tm.size());
     EXPECT_THROW(tm.Delete(id, false), std::runtime_error);
 
@@ -172,8 +189,8 @@ TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
 {
     TaskManager tm;
     Task::Priority p = Task::Priority::NONE;
-    TaskID id1 = tm.Add(Task::Create("Task",p,time(nullptr),false));
-    TaskID id2 = tm.AddSubtask(Task::Create("Subtask", p,time(nullptr), false), id1);
+    TaskID id1 = tm.Add(Task::Create("Task", p, time(nullptr), "", false));
+    TaskID id2 = tm.AddSubtask(Task::Create("Subtask", p, time(nullptr), "", false), id1);
     ASSERT_EQ(2, tm.size());
     tm.Delete(id2, false);
     ASSERT_EQ(1, tm.size());
@@ -183,10 +200,10 @@ TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
 TEST_F(TaskManagerTest, shouldAddLabel){
     TaskManager tm;
     Task::Priority p = Task::Priority::NONE;
-    TaskID id = tm.Add(Task::Create("Task",p,time(nullptr),false));
+    TaskID id = tm.Add(Task::Create("Task", p, time(nullptr), "", false));
     std::string label = "testing";
     tm.SetLabel(id, label);
-    EXPECT_EQ(label, tm[id].second.label());
+    EXPECT_EQ(label, tm[id].first.label());
 }
 
 TEST_F(TaskManagerTest, shouldReturnTasks){
@@ -194,23 +211,26 @@ TEST_F(TaskManagerTest, shouldReturnTasks){
     TaskID id = tm.Add(Task::Create("TestTitle",
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
+                                    "",
                                     false));
     TaskID id2 = tm.AddSubtask(Task::Create("Subtask",
                                     Task::Priority::NONE,
                                     time(nullptr) + 100,
+                                    "",
                                     false),
                        id);
     TaskID id3 = tm.AddSubtask(Task::Create("SubTask 2",
                                     Task::Priority::NONE,
                                     time(nullptr) + 5,
+                                    "",
                                     false),
                        id);
 
     auto tasks = tm.getTasks();
     ASSERT_EQ(3, tasks.size());
-    EXPECT_EQ(tm[id].first, tasks[id].first);
-    EXPECT_EQ(tm[id2].first, tasks[id2].first);
-    EXPECT_EQ(tm[id3].first, tasks[id3].first);
+    EXPECT_EQ(tm[id].first, tasks.at(id).first);
+    EXPECT_EQ(tm[id2].first, tasks.at(id2).first);
+    EXPECT_EQ(tm[id3].first, tasks.at(id3).first);
 }
 
 TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
@@ -218,15 +238,18 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
     TaskID id = tm.Add(Task::Create("TestTitle",
                                     Task::Priority::NONE,
                                     time(nullptr) + 10,
+                                    "",
                                     false));
     TaskID id2 = tm.AddSubtask(Task::Create("Subtask",
                                      Task::Priority::NONE,
                                      time(nullptr) + 100,
+                                     "",
                                      false),
                         id);
     TaskID id3 = tm.AddSubtask(Task::Create("SubTask 2",
                                      Task::Priority::NONE,
                                      time(nullptr) + 5,
+                                     "",
                                      false),
                         id);
 
@@ -234,5 +257,5 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
     tm.SetLabel(id2, label);
     auto tasks = tm.getTasks(label);
     ASSERT_EQ(1, tasks.size());
-    EXPECT_EQ(tm[id2].first, tasks[id2].first);
+    EXPECT_EQ(tm[id2].first, tasks.at(id2).first);
 }
