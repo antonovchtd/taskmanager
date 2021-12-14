@@ -29,8 +29,8 @@ void Context::setTitle(const std::string &title) {
 }
 
 void Context::setDueDate(const time_t & dd) {
-    auto ts = google::protobuf::util::TimeUtil::TimeTToTimestamp(dd);
-    task_.set_allocated_due_date(&ts);
+//    auto ts = google::protobuf::util::TimeUtil::TimeTToTimestamp(dd);
+    task_.set_due_date(dd);
 }
 
 void Context::setPriority(const ProtoTask::Task::Priority &p) {

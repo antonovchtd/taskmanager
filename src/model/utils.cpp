@@ -30,7 +30,8 @@ std::string to_string(const ProtoTask::Task &t) {
     const std::string priorityName[] = { "None", "Low", "Medium", "High"};
     os << t.title() << ", Priority: " <<
        priorityName[static_cast<int>(t.priority())];
-    time_t dd = t.due_date().seconds();
+//    time_t dd = t.due_date().seconds();
+    time_t dd = t.due_date();
     std::string str_time = std::string(asctime(localtime(&dd)));
     str_time.pop_back();
     os << ", Due: " << str_time;
