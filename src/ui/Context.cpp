@@ -8,15 +8,15 @@ std::shared_ptr<Step> Context::step() const {
     return step_;
 }
 
-Task::Data Context::data() const {
-    return data_;
+ProtoTask::Task Context::task() const {
+    return task_;
 }
 
-std::optional<TaskID> Context::id() const {
+std::optional<ProtoTask::TaskID> Context::id() const {
     return id_;
 }
 
-std::map<TaskID, std::pair<Task, Node>> Context::tasks() const {
+std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Context::tasks() const {
     return tasks_;
 }
 
@@ -25,25 +25,26 @@ void Context::setStep(const std::shared_ptr<Step> &s) {
 }
 
 void Context::setTitle(const std::string &title) {
-    data_.title = title;
+    task_.set_title(title);
 }
 
 void Context::setDueDate(const time_t & dd) {
-    data_.due_date = dd;
+    auto ts = google::protobuf::util::TimeUtil::TimeTToTimestamp(dd);
+    task_.set_allocated_due_date(&ts);
 }
 
-void Context::setPriority(const Task::Priority &p) {
-    data_.priority = p;
+void Context::setPriority(const ProtoTask::Task::Priority &p) {
+    task_.set_priority(p);
 }
 
-void Context::setData(const Task::Data &d) {
-    data_ = d;
+void Context::setTask(const ProtoTask::Task &t) {
+    task_ = t;
 }
 
-void Context::setID(const std::optional<TaskID> &id) {
+void Context::setID(const std::optional<ProtoTask::TaskID> &id) {
     id_ = id;
 }
 
-void Context::setTasks(const std::map<TaskID, std::pair<Task, Node>> &tasks) {
+void Context::setTasks(const std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &tasks) {
     tasks_ = tasks;
 }

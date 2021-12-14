@@ -35,7 +35,7 @@ std::shared_ptr<Action> HomeStep::execute(Context &c) {
 
 void HomeStep::process(Context &c) {
     if (c.id().has_value()) {
-        if (!c.id()->isValidOrNull()) {
+        if (c.id()->has_is_invalid() && c.id()->is_invalid()) {
             printer()->print("Invalid ID. Try again.\n");
             command_ = "";
         }
@@ -75,12 +75,12 @@ std::shared_ptr<Action> AddStep::execute(Context &c) {
     printer()->print("[Add Task]\n");
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
-    c.setData(input_context.data());
+    c.setTask(input_context.task());
     return ActionGetter::getAction(*this, factory());
 }
 
 void AddStep::process(Context &c) {
-    printer()->print("Added Task with ID " + c.id().value().to_string() + ".\n");
+    printer()->print("Added Task with ID " + std::to_string(c.id()->num()) + ".\n");
     c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
@@ -92,7 +92,7 @@ bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title)
     return true;
 }
 
-std::optional<Task::Priority> ReadTaskDataStep::stringToPriority(const Context &c, const std::string &priority) {
+std::optional<ProtoTask::Task::Priority> ReadTaskDataStep::stringToPriority(const Context &c, const std::string &priority) {
     int pint;
     try {
         pint = priority.empty() ? 0 : std::stoi(priority);
@@ -100,7 +100,7 @@ std::optional<Task::Priority> ReadTaskDataStep::stringToPriority(const Context &
         pint = -1;
     }
     if (pint >= 0 && pint <= 3)
-        return static_cast<Task::Priority>(pint);
+        return static_cast<ProtoTask::Task::Priority>(pint);
     else {
         printer()->print("    Wrong priority option. Try again.\n");
         return std::nullopt;
@@ -151,17 +151,17 @@ std::shared_ptr<Action> ReadTaskDataStep::execute(Context &c) {
     } while (!validateTitle(c, title));
     c.setTitle(title);
 
-    std::optional<Task::Priority> priority{std::nullopt};
+    std::optional<ProtoTask::Task::Priority> priority{std::nullopt};
     while (!priority) {
         priority = stringToPriority(c, reader()->read("    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > "));
     }
-    c.setPriority(priority.value());
+    c.setPriority(*priority);
 
     std::optional<time_t> due_date;
     while (!due_date) {
         due_date = ReadTaskDataStep::stringToTime(c, reader()->read("    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} > "));
     }
-    c.setDueDate(due_date.value());
+    c.setDueDate(*due_date);
 
     return ActionGetter::getAction(*this, factory());
 }
@@ -174,12 +174,12 @@ std::shared_ptr<Action> EditStep::execute(Context &c) {
     printer()->print("[Edit Task]\n");
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
-    c.setData(input_context.data());
+    c.setTask(input_context.task());
     return ActionGetter::getAction(*this, factory());
 }
 
 void EditStep::process(Context &c) {
-    printer()->print("Edited Task with ID " + c.id().value().to_string() + ".\n");
+    printer()->print("Edited Task with ID " + std::to_string(c.id()->num()) + ".\n");
     c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
@@ -187,12 +187,12 @@ std::shared_ptr<Action> SubtaskStep::execute(Context &c) {
     printer()->print("[Add Subtask]\n");
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
-    c.setData(input_context.data());
+    c.setTask(input_context.task());
     return ActionGetter::getAction(*this, factory());
 }
 
 void SubtaskStep::process(Context &c) {
-    printer()->print("Added Subtask with ID " + c.id().value().to_string() + ".\n");
+    printer()->print("Added Subtask with ID " + std::to_string(c.id()->num()) + ".\n");
     c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
@@ -208,11 +208,11 @@ std::shared_ptr<Action> ShowStep::execute(Context &c) {
     return ActionGetter::getAction(*this, factory());
 }
 
-void ShowStep::recursivePrint(const std::pair<TaskID, std::pair<Task, Node>> &kv,
+void ShowStep::recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &kv,
                               const Context &c,
                               const std::string &prefix) {
-    printer()->print(prefix + kv.first.to_string() +
-                     " – " + kv.second.first.to_string());
+    printer()->print(prefix + std::to_string(kv.first.num()) +
+                     " – " + to_string(kv.second.first));
 
     printer()->print("\n");
     for (const auto &id : kv.second.second.children()) {
@@ -235,7 +235,7 @@ std::shared_ptr<Action> CompleteStep::execute(Context &c) {
 }
 
 void CompleteStep::process(Context &c) {
-    printer()->print("Marked Task with ID " + c.id().value().to_string() + " as completed.\n");
+    printer()->print("Marked Task with ID " + std::to_string(c.id()->num()) + " as completed.\n");
     c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
@@ -244,7 +244,7 @@ std::shared_ptr<Action> DeleteStep::execute(Context &c) {
 }
 
 void DeleteStep::process(Context &c) {
-    printer()->print("Deleted Task with ID " + c.id().value().to_string() + ".\n");
+    printer()->print("Deleted Task with ID " + std::to_string(c.id()->num()) + ".\n");
     c.setStep(StepSwitcher::nextStep(*this, factory()));
 }
 
@@ -259,7 +259,7 @@ void ConfirmDeleteStep::process(Context &c) {
     auto ch = c.tasks().at(*c.id()).second.children();
     if (!ch.empty())
         while (true){
-            reply = reader()->read("Task " + c.id().value().to_string() +
+            reply = reader()->read("Task " + std::to_string(c.id()->num()) +
                                    " has " + std::to_string(ch.size()) +
                                    " subtask(s). Confirm to delete all. [Y]/N > ");
             if (reply.empty() || reply == "Y" || reply == "y") {
@@ -283,6 +283,6 @@ std::shared_ptr<Action> LabelStep::execute(Context &c) {
 }
 
 void LabelStep::process(Context &c) {
-    printer()->print("Added label to Task with ID " + c.id().value().to_string() + ".\n");
+    printer()->print("Added label to Task with ID " + std::to_string(c.id()->num()) + ".\n");
     c.setStep(StepSwitcher::nextStep(*this, factory()));
 }

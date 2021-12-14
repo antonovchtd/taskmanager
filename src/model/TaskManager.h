@@ -5,16 +5,18 @@
 #ifndef TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 #define TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 
-
 #include <iostream>
 #include <cstdlib>
 #include <map>
 #include <utility>
+#include <fstream>
 
 #include "Task.h"
 #include "TaskID.h"
 #include "IDGenerator.h"
 #include "Node.h"
+#include "Task.pb.h"
+#include "utils.h"
 
 class TaskManager {
 public:
@@ -22,23 +24,27 @@ public:
     explicit TaskManager(const std::shared_ptr<IDGenerator> &generator);
 
 public:
-    std::pair<Task, Node>& operator[](TaskID);
-    std::map<TaskID, std::pair<Task, Node>> getTasks() const;
-    std::map<TaskID, std::pair<Task, Node>> getTasks(const std::string &label) const;
-    std::map<TaskID, std::pair<Task, Node>> getTasks(const TaskID &id);
+    std::pair<ProtoTask::Task, Node>& operator[](ProtoTask::TaskID);
+    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> getTasks() const;
+    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> getTasks(const std::string &label) const;
+    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> getTasks(const ProtoTask::TaskID &id);
     size_t size() const;
 
 public:
-    TaskID Add(const Task &);
-    TaskID AddSubtask(const Task &, const TaskID &);
-    void Edit(const TaskID &id, const Task &t);
-    void Complete(const TaskID &);
-    void Delete(const TaskID &id, bool deleteChildren = false);
-    bool Validate(const TaskID &id) const;
-    void SetLabel(const TaskID &, const std::string &);
+    ProtoTask::TaskID Add(const ProtoTask::Task &);
+    ProtoTask::TaskID AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &);
+    void Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t);
+    void Complete(const ProtoTask::TaskID &);
+    void Delete(const ProtoTask::TaskID &id, bool deleteChildren = false);
+    bool Validate(const ProtoTask::TaskID &id) const;
+    void SetLabel(const ProtoTask::TaskID &, const std::string &);
+
+public:
+    void read(std::istream &is);
+    void readFromFile(const std::string &filename);
 
 private:
-    std::map<TaskID, std::pair<Task, Node>> tasks_;
+    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> tasks_;
     std::shared_ptr<IDGenerator> gen_;
 };
 

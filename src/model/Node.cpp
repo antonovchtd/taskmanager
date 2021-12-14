@@ -7,16 +7,16 @@
 Node::Node() : parent_(std::nullopt) {
 }
 
-Node::Node(const TaskID &parent) : parent_(parent) {
+Node::Node(const ProtoTask::TaskID &parent) : parent_(parent) {
 }
 
-void Node::AddChild(const TaskID &id) {
+void Node::AddChild(const ProtoTask::TaskID &id) {
     children_.push_back(id);
 }
 
-void Node::RemoveChild(const TaskID &id) {
-    std::vector<TaskID>::iterator ch;
-    for (ch = children_.begin(); ch != children_.end(); ++ch) {
+void Node::RemoveChild(const ProtoTask::TaskID &id) {
+    std::vector<ProtoTask::TaskID>::const_iterator ch;
+    for (ch = children_.cbegin(); ch != children_.cend(); ++ch) {
         if (*ch == id)
             break;
     }
@@ -32,14 +32,14 @@ void Node::RemoveParent() {
     parent_ = std::nullopt;
 }
 
-std::optional<TaskID> Node::parent() const {
+std::optional<ProtoTask::TaskID> Node::parent() const {
     return parent_;
 }
 
-std::vector<TaskID> Node::children() const {
+std::vector<ProtoTask::TaskID> Node::children() const {
     return children_;
 }
 
-void Node::SetParent(const TaskID &id) {
+void Node::SetParent(const ProtoTask::TaskID &id) {
     parent_ = id;
 }

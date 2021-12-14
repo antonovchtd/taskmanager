@@ -16,8 +16,6 @@
  *      title: ...
  */
 
-#include "model/Task.h"
-#include "model/TaskManager.h"
 #include "ui/Machine.h"
 
 int main() {

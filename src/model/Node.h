@@ -6,27 +6,28 @@
 #define TASKMANAGER_SRC_MODEL_NODE_H_
 
 #include <vector>
-#include "TaskID.h"
+#include "Task.pb.h"
+#include "utils.h"
 
 class Node{
 public:
     Node();
-    Node(const TaskID &parent);
+    Node(const ProtoTask::TaskID &parent);
 
 public:
-    std::optional<TaskID> parent() const;
-    std::vector<TaskID> children() const;
+    std::optional<ProtoTask::TaskID> parent() const;
+    std::vector<ProtoTask::TaskID> children() const;
 
 public:
-    void SetParent(const TaskID &);
+    void SetParent(const ProtoTask::TaskID &);
     void RemoveParent();
-    void RemoveChild(const TaskID &id);
+    void RemoveChild(const ProtoTask::TaskID &id);
     void RemoveChildren();
-    void AddChild(const TaskID &);
+    void AddChild(const ProtoTask::TaskID &);
 
 private:
-    std::optional<TaskID> parent_;
-    std::vector<TaskID> children_;
+    std::optional<ProtoTask::TaskID> parent_;
+    std::vector<ProtoTask::TaskID> children_;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_NODE_H_

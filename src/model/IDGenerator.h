@@ -5,7 +5,7 @@
 #ifndef TASKMANAGER_SRC_MODEL_IDGENERATOR_H_
 #define TASKMANAGER_SRC_MODEL_IDGENERATOR_H_
 
-#include "TaskID.h"
+#include "Task.pb.h"
 
 class IDGenerator{
 public:
@@ -13,7 +13,7 @@ public:
     explicit IDGenerator(int last);
     IDGenerator(const IDGenerator&) = default;
 
-    virtual TaskID genID();
+    virtual ProtoTask::TaskID genID();
     virtual ~IDGenerator() = default;
 
 protected:

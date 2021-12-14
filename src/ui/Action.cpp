@@ -28,7 +28,7 @@ void Action::setActionData(const Action::Data &data) {
 }
 
 void AddTaskAction::make(Context &context) {
-    context.setID(model()->Add(Task::Create(context.data())));
+    context.setID(model()->Add(context.task()));
 }
 
 void DoNothingAction::make(Context &context) {
@@ -36,59 +36,67 @@ void DoNothingAction::make(Context &context) {
 }
 
 void AddSubtaskAction::make(Context &context) {
-    context.setID(model()->AddSubtask(Task::Create(context.data()), *context.id()));
+    context.setID(model()->AddSubtask(context.task(), *context.id()));
 }
 
 void ValidateIDAction::make(Context &context) {
-    context.setID(TaskID::Create(data().arg));
-    if (!context.id() || !model()->Validate(*context.id())) {
-        context.setID(TaskID::invalidID());
+    ProtoTask::TaskID id;
+    try {
+        id.set_num(std::stoi(data().arg));
+    } catch (const std::invalid_argument &) {
+        id.set_is_invalid(true);
     }
+    if (!model()->Validate(id)) {
+        id.set_is_invalid(true);
+    }
+    context.setID(id);
 }
 
 void ValidateNoArgAction::make(Context &context) {
     if (!data().arg.empty()){
         context.setID(std::nullopt);
     }
-    else
-        context.setID(TaskID::nullid());
+    else {
+        ProtoTask::TaskID id;
+        id.set_is_invalid(false);
+        context.setID(id);
+    }
 }
 
 void ValidateLabelArgAction::make(Context &context) {
     // arg can be empty, can be something, no check for ID though
-    TaskID id = TaskID::Create(data().arg);
-    if (id.isValid()) {
-        if (model()->Validate(id)) {
-            context.setID(id);
-        }
-        else {
-            context.setID(TaskID::invalidID());
-        }
+    ProtoTask::TaskID id;
+    try {
+        id.set_num(std::stoi(data().arg));
+    } catch (const std::invalid_argument &) {
+        id.set_is_invalid(false);
     }
-    else {
-        context.setID(TaskID::nullid());
-    }
+    if (id.has_num())
+        if (!model()->Validate(id))
+            id.set_is_invalid(true);
+
+    context.setID(id);
 }
 
 void EditTaskAction::make(Context &context) {
-    model()->Edit(context.id().value(), Task::Create(context.data()));
+    model()->Edit(*context.id(), context.task());
 }
 
 void ShowAction::make(Context &context) {
     if (data().arg.empty())
         context.setTasks(model()->getTasks());
-    else if (context.id().has_value() && context.id()->isValid())
+    else if (context.id().has_value() && context.id()->has_num())
         context.setTasks(model()->getTasks(*context.id()));
     else
         context.setTasks(model()->getTasks(data().arg));
 }
 
 void CompleteTaskAction::make(Context &context) {
-    model()->Complete(context.id().value());
+    model()->Complete(*context.id());
 }
 
 void DeleteAction::make(Context &context) {
-    model()->Delete(context.id().value(), true);
+    model()->Delete(*context.id(), true);
 }
 
 void ConfirmDeleteAction::make(Context &context) {

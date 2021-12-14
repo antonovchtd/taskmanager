@@ -13,8 +13,7 @@
 #include <optional>
 #include <sstream>
 
-#include "../model/Task.h"
-#include "../model/TaskID.h"
+#include "../model/Task.pb.h"
 #include "../model/Node.h"
 #include "../io/AbstractReader.h"
 #include "../io/FileReader.h"
@@ -84,7 +83,7 @@ public:
 public:
     std::optional<time_t> stringToTime(const Context &c, const std::string &datestring);
     bool validateTitle(const Context &c, const std::string &title);
-    std::optional<Task::Priority> stringToPriority(const Context &c, const std::string &priority);
+    std::optional<ProtoTask::Task::Priority> stringToPriority(const Context &c, const std::string &priority);
 };
 
 class EditStep : public Step {
@@ -113,7 +112,7 @@ public:
     using Step::Step;
     std::shared_ptr<Action> execute(Context &c) override;
     void process(Context &c) override;
-    void recursivePrint(const std::pair<TaskID, std::pair<Task, Node>> &kv,
+    void recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &kv,
                         const Context &c,
                         const std::string &prefix);
 };
