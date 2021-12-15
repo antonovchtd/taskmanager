@@ -10,7 +10,9 @@
 
 bool operator==(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
 bool operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
-bool operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
+namespace ProtoTask {
+    bool operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
+}
 bool operator>(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
 std::string to_string(const ProtoTask::Task &t);
 

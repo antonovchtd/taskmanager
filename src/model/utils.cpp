@@ -14,7 +14,7 @@ bool operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
     return !(lhs == rhs);
 }
 
-bool operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
+bool ProtoTask::operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
     if (lhs.has_num() && rhs.has_num())
         return lhs.num() < rhs.num();
     return false;
