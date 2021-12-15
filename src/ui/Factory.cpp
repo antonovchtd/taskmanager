@@ -66,6 +66,10 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
         return lazyInitStep(Factory::State::CONFIRMDELETE);
     } else if (command == "label") {
         return lazyInitStep(Factory::State::LABEL);
+    } else if (command == "save") {
+        return lazyInitStep(Factory::State::SAVE);
+    } else if (command == "load") {
+        return lazyInitStep(Factory::State::LOAD);
     } else {
         if (!command.empty())
             printer()->print("Wrong command. Try again. Type `help` for help.\n");
@@ -99,6 +103,10 @@ std::shared_ptr<Step> Factory::getNewStep(const State &s) {
             return std::shared_ptr<ConfirmDeleteStep>{new ConfirmDeleteStep(reader_, printer_, shared_from_this())};
         case State::LABEL:
             return std::shared_ptr<LabelStep>{new LabelStep(reader_, printer_, shared_from_this())};
+        case State::SAVE:
+            return std::shared_ptr<SaveStep>{new SaveStep(reader_, printer_, shared_from_this())};
+        case State::LOAD:
+            return std::shared_ptr<LoadStep>{new LoadStep(reader_, printer_, shared_from_this())};
     }
 }
 
@@ -140,5 +148,9 @@ std::shared_ptr<Action> Factory::getNewAction(const Factory::ActionLabel &label)
             return std::make_shared<ConfirmDeleteAction>(model_);
         case Factory::ActionLabel::LABEL:
             return std::make_shared<LabelAction>(model_);
+        case Factory::ActionLabel::SAVE:
+            return std::make_shared<SaveAction>(model_);
+        case Factory::ActionLabel::LOAD:
+            return std::make_shared<LoadAction>(model_);
     }
 }

@@ -15,17 +15,21 @@
 #include "Node.h"
 #include "Task.pb.h"
 #include "utils.h"
+#include "../persistence/Persistor.h"
 
 class TaskManager {
 public:
     TaskManager();
     explicit TaskManager(const std::shared_ptr<IDGenerator> &generator);
+    TaskManager(const std::shared_ptr<IDGenerator> &generator,
+                const std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &tasks);
 
 public:
     std::pair<ProtoTask::Task, Node>& operator[](ProtoTask::TaskID);
     std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> getTasks() const;
     std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> getTasks(const std::string &label) const;
     std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> getTasks(const ProtoTask::TaskID &id);
+    std::shared_ptr<IDGenerator> gen() const;
     size_t size() const;
 
 public:
@@ -38,8 +42,8 @@ public:
     void SetLabel(const ProtoTask::TaskID &, const std::string &);
 
 public:
-    void read(std::istream &is);
-    void readFromFile(const std::string &filename);
+    void save(const std::string &filename);
+    void load(const std::string &filename);
 
 private:
     std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> tasks_;

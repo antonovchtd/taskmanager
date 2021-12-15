@@ -10,14 +10,15 @@
 class IDGenerator{
 public:
     IDGenerator();
-    explicit IDGenerator(int last);
+    explicit IDGenerator(const ProtoTask::IDGeneratorState &last);
     IDGenerator(const IDGenerator&) = default;
 
-    virtual ProtoTask::TaskID genID();
-    virtual ~IDGenerator() = default;
+    ProtoTask::IDGeneratorState state() const;
 
-protected:
-    int last_;
+    ProtoTask::TaskID genID();
+
+private:
+    ProtoTask::IDGeneratorState last_;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_IDGENERATOR_H_

@@ -102,5 +102,17 @@ public:
     void make(Context &) override;
 };
 
+class SaveAction : public Action {
+public:
+    using Action::Action;
+    void make(Context &) override;
+};
+
+class LoadAction : public Action {
+public:
+    using Action::Action;
+    void make(Context &) override;
+};
+
 
 #endif //TASKMANAGER_SRC_UI_ACTION_H_

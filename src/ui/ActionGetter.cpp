@@ -51,4 +51,18 @@ std::shared_ptr<Action> ActionGetter::getAction(const LabelStep &, const std::sh
     return factory->lazyInitAction(Factory::ActionLabel::LABEL);
 }
 
+std::shared_ptr<Action> ActionGetter::getAction(const SaveStep &, const std::shared_ptr<Factory> &factory) {
+    std::shared_ptr<Action> action = factory->lazyInitAction(Factory::ActionLabel::SAVE);
+    std::shared_ptr<Action> labelAction = factory->lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
+    action->setActionData(labelAction->data());
+    return action;
+}
+
+std::shared_ptr<Action> ActionGetter::getAction(const LoadStep &, const std::shared_ptr<Factory> &factory) {
+    std::shared_ptr<Action> action = factory->lazyInitAction(Factory::ActionLabel::LOAD);
+    std::shared_ptr<Action> labelAction = factory->lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
+    action->setActionData(labelAction->data());
+    return action;
+}
+
 

@@ -47,3 +47,11 @@ std::shared_ptr<Step> StepSwitcher::nextStep(const ConfirmDeleteStep &, const st
 std::shared_ptr<Step> StepSwitcher::nextStep(const LabelStep &, const std::shared_ptr<Factory> &factory) {
     return factory->lazyInitStep(Factory::State::HOME);
 }
+
+std::shared_ptr<Step> StepSwitcher::nextStep(const SaveStep &, const std::shared_ptr<Factory> &factory) {
+    return factory->lazyInitStep(Factory::State::HOME);
+}
+
+std::shared_ptr<Step> StepSwitcher::nextStep(const LoadStep &, const std::shared_ptr<Factory> &factory) {
+    return factory->lazyInitStep(Factory::State::HOME);
+}

@@ -12,7 +12,7 @@
 class Node{
 public:
     Node();
-    Node(const ProtoTask::TaskID &parent);
+    explicit Node(const ProtoTask::TaskID &parent);
 
 public:
     std::optional<ProtoTask::TaskID> parent() const;

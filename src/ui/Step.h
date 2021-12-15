@@ -145,4 +145,18 @@ public:
     void process(Context &c) override;
 };
 
+class SaveStep : public Step {
+public:
+    using Step::Step;
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+};
+
+class LoadStep : public Step {
+public:
+    using Step::Step;
+    std::shared_ptr<Action> execute(Context &c) override;
+    void process(Context &c) override;
+};
+
 #endif //TASKMANAGER_SRC_UI_STATE_H_

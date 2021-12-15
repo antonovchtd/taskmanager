@@ -9,6 +9,10 @@ TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator))
 
 TaskManager::TaskManager(const std::shared_ptr<IDGenerator> &generator) : gen_(generator) {
 }
+TaskManager::TaskManager(const std::shared_ptr<IDGenerator> &generator,
+                         const std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &tasks) :
+                         gen_(generator), tasks_(tasks) {
+}
 
 ProtoTask::TaskID TaskManager::Add(const ProtoTask::Task &t) {
     ProtoTask::TaskID id = gen_->genID();
@@ -102,17 +106,26 @@ void TaskManager::SetLabel(const ProtoTask::TaskID &id, const std::string &label
     Edit(id, t);
 }
 
-void TaskManager::readFromFile(const std::string &filename) {
-    std::ifstream file(filename);
+void TaskManager::load(const std::string &filename) {
+    std::ifstream file(filename, std::ios::binary);
     if (file.is_open()) {
-        read(file);
+        *this = Persistor::load(file);
         file.close();
     }
     else
         throw std::runtime_error("Could not open file " + filename + ".");
 }
 
-void TaskManager::read(std::istream &is) {
-    ProtoTask::TaskEntity te;
-    te.ParseFromIstream(&is);
+void TaskManager::save(const std::string &filename) {
+    std::ofstream file(filename, std::ios::trunc | std::ios::binary);
+    if (file.is_open()) {
+        Persistor::save(*this, file);
+        file.close();
+    }
+    else
+        throw std::runtime_error("Could not open file " + filename + ".");
+}
+
+std::shared_ptr<IDGenerator> TaskManager::gen() const {
+    return gen_;
 }

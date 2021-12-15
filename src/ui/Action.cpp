@@ -106,3 +106,13 @@ void ConfirmDeleteAction::make(Context &context) {
 void LabelAction::make(Context &context) {
     model()->SetLabel(*context.id(), data().arg);
 }
+
+void SaveAction::make(Context &context) {
+    std::string filename = data().arg.empty() ? "data.bin" : data().arg;
+    model()->save(filename);
+}
+
+void LoadAction::make(Context &context) {
+    std::string filename = data().arg.empty() ? "data.bin" : data().arg;
+    model()->load(filename);
+}

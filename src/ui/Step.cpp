@@ -52,7 +52,7 @@ std::shared_ptr<Action> HomeStep::getValidateArgAction(const std::string &arg) {
         command_ == "delete" || command_ == "complete" ||
         command_ == "label") {
         action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATEID);
-    } else if (command_ == "show") {
+    } else if (command_ == "show" || command_ == "save" || command_ == "load") {
         action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
     } else {
         action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATENOID);
@@ -284,5 +284,23 @@ std::shared_ptr<Action> LabelStep::execute(Context &c) {
 
 void LabelStep::process(Context &c) {
     printer()->print("Added label to Task with ID " + std::to_string(c.id()->num()) + ".\n");
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
+}
+
+std::shared_ptr<Action> SaveStep::execute(Context &c) {
+    return ActionGetter::getAction(*this, factory());
+}
+
+void SaveStep::process(Context &c) {
+    printer()->print("Saved to file successfully.\n");
+    c.setStep(StepSwitcher::nextStep(*this, factory()));
+}
+
+std::shared_ptr<Action> LoadStep::execute(Context &c) {
+    return ActionGetter::getAction(*this, factory());
+}
+
+void LoadStep::process(Context &c) {
+    printer()->print("Loaded from file successfully.\n");
     c.setStep(StepSwitcher::nextStep(*this, factory()));
 }

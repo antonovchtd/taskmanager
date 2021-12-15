@@ -21,6 +21,8 @@ class CompleteStep;
 class DeleteStep;
 class ConfirmDeleteStep;
 class LabelStep;
+class SaveStep;
+class LoadStep;
 
 class ActionGetter {
 public:
@@ -35,6 +37,8 @@ public:
     static std::shared_ptr<Action> getAction(const DeleteStep &, const std::shared_ptr<Factory> &);
     static std::shared_ptr<Action> getAction(const ConfirmDeleteStep &, const std::shared_ptr<Factory> &);
     static std::shared_ptr<Action> getAction(const LabelStep &, const std::shared_ptr<Factory> &);
+    static std::shared_ptr<Action> getAction(const SaveStep &, const std::shared_ptr<Factory> &);
+    static std::shared_ptr<Action> getAction(const LoadStep &, const std::shared_ptr<Factory> &);
 };
 
 #endif //TASKMANAGER_SRC_UI_ACTIONGETTER_H_

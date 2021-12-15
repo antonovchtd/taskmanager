@@ -34,7 +34,9 @@ public:
         COMPLETE,
         DELETE,
         CONFIRMDELETE,
-        LABEL
+        LABEL,
+        SAVE,
+        LOAD
     };
 
     enum class ActionLabel{
@@ -49,7 +51,9 @@ public:
         COMPLETE,
         DELETE,
         CONFIRMDELETE,
-        LABEL
+        LABEL,
+        SAVE,
+        LOAD
     };
 
 public:
