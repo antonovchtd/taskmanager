@@ -3,8 +3,6 @@
 //
 
 #include "../../src/ui/Machine.h"
-#include "../../src/ui/Step.h"
-#include "../../src/ui/Action.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -61,13 +59,17 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteDelete)
     TaskManager tm = *m.model();
     ASSERT_EQ(2, tm.size());
 
-    ASSERT_TRUE(tm.Validate(TaskID(1)));
-    EXPECT_TRUE(tm[TaskID(1)].first.isComplete());
+    ProtoTask::TaskID id;
+    id.set_num(1);
+    ASSERT_TRUE(tm.Validate(id));
+    EXPECT_TRUE(tm[id].first.is_complete());
 
-    ASSERT_TRUE(tm.Validate(TaskID(2)));
-    EXPECT_FALSE(tm[TaskID(2)].first.isComplete());
+    id.set_num(2);
+    ASSERT_TRUE(tm.Validate(id));
+    EXPECT_FALSE(tm[id].first.is_complete());
 
-    EXPECT_FALSE(tm.Validate(TaskID(3)));
+    id.set_num(3);
+    EXPECT_FALSE(tm.Validate(id));
 }
 
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
@@ -102,30 +104,36 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
     ASSERT_EQ(3, tm.size());
 
     // check completeness
-    ASSERT_TRUE(tm.Validate(TaskID(1)));
-    EXPECT_TRUE(tm[TaskID(1)].first.isComplete());
+    ProtoTask::TaskID id;
+    id.set_num(1);
+    ASSERT_TRUE(tm.Validate(id));
+    EXPECT_TRUE(tm[id].first.is_complete());
 
-    ASSERT_TRUE(tm.Validate(TaskID(2)));
-    EXPECT_TRUE(tm[TaskID(2)].first.isComplete());
+    ProtoTask::TaskID id2;
+    id2.set_num(2);
+    ASSERT_TRUE(tm.Validate(id2));
+    EXPECT_TRUE(tm[id2].first.is_complete());
 
-    ASSERT_TRUE(tm.Validate(TaskID(3)));
-    EXPECT_TRUE(tm[TaskID(3)].first.isComplete());
+    ProtoTask::TaskID id3;
+    id3.set_num(3);
+    ASSERT_TRUE(tm.Validate(id3));
+    EXPECT_TRUE(tm[id3].first.is_complete());
 
     // check parents
-    EXPECT_EQ(tm[TaskID(1)].second.parent(), std::nullopt);
-    EXPECT_EQ(tm[TaskID(2)].second.parent(), TaskID(1));
-    EXPECT_EQ(tm[TaskID(3)].second.parent(), TaskID(2));
+    EXPECT_EQ(tm[id].second.parent(), std::nullopt);
+    EXPECT_EQ(tm[id2].second.parent(), id);
+    EXPECT_EQ(tm[id3].second.parent(), id2);
 
     // check children
-    auto ch1 = tm[TaskID(1)].second.children();
+    auto ch1 = tm[id].second.children();
     ASSERT_EQ(1, ch1.size());
-    EXPECT_EQ(ch1[0], TaskID(2));
+    EXPECT_EQ(ch1[0], id2);
 
-    auto ch2 = tm[TaskID(2)].second.children();
+    auto ch2 = tm[id2].second.children();
     ASSERT_EQ(1, ch2.size());
-    EXPECT_EQ(ch2[0], TaskID(3));
+    EXPECT_EQ(ch2[0], id3);
 
-    auto ch3 = tm[TaskID(3)].second.children();
+    auto ch3 = tm[id3].second.children();
     ASSERT_EQ(0, ch3.size());
 
 }
@@ -165,29 +173,35 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
     ASSERT_EQ(3, tm.size());
 
     // check labels
-    ASSERT_TRUE(tm.Validate(TaskID(1)));
-    EXPECT_EQ("", tm[TaskID(1)].first.label());
+    ProtoTask::TaskID id;
+    id.set_num(1);
+    ASSERT_TRUE(tm.Validate(id));
+    EXPECT_EQ("", tm[id].first.label());
 
-    ASSERT_TRUE(tm.Validate(TaskID(2)));
-    EXPECT_EQ("l2", tm[TaskID(2)].first.label());
+    ProtoTask::TaskID id2;
+    id2.set_num(2);
+    ASSERT_TRUE(tm.Validate(id2));
+    EXPECT_EQ("l2", tm[id2].first.label());
 
-    ASSERT_TRUE(tm.Validate(TaskID(3)));
-    EXPECT_EQ("l3", tm[TaskID(3)].first.label());
+    ProtoTask::TaskID id3;
+    id3.set_num(3);
+    ASSERT_TRUE(tm.Validate(id3));
+    EXPECT_EQ("l3", tm[id3].first.label());
 
     // check parents
-    EXPECT_EQ(tm[TaskID(1)].second.parent(), std::nullopt);
-    EXPECT_EQ(tm[TaskID(2)].second.parent(), TaskID(1));
-    EXPECT_EQ(tm[TaskID(3)].second.parent(), std::nullopt);
+    EXPECT_EQ(tm[id].second.parent(), std::nullopt);
+    EXPECT_EQ(tm[id2].second.parent(), id);
+    EXPECT_EQ(tm[id3].second.parent(), std::nullopt);
 
     // check children
-    auto ch1 = tm[TaskID(1)].second.children();
+    auto ch1 = tm[id].second.children();
     ASSERT_EQ(1, ch1.size());
-    EXPECT_EQ(ch1[0], TaskID(2));
+    EXPECT_EQ(ch1[0], id2);
 
-    auto ch2 = tm[TaskID(2)].second.children();
+    auto ch2 = tm[id2].second.children();
     ASSERT_EQ(0, ch2.size());
 
-    auto ch3 = tm[TaskID(3)].second.children();
+    auto ch3 = tm[id3].second.children();
     ASSERT_EQ(0, ch3.size());
 
 }
@@ -226,9 +240,13 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
     TaskManager tm = *m.model();
     ASSERT_EQ(1, tm.size());
 
-    ASSERT_FALSE(tm.Validate(TaskID(1)));
-    ASSERT_TRUE(tm.Validate(TaskID(2)));
-    EXPECT_FALSE(tm.Validate(TaskID(3)));
+    ProtoTask::TaskID id;
+    id.set_num(1);
+    ASSERT_FALSE(tm.Validate(id));
+    id.set_num(2);
+    ASSERT_TRUE(tm.Validate(id));
+    id.set_num(3);
+    EXPECT_FALSE(tm.Validate(id));
 }
 
 TEST_F(IntegrationTest, shouldCreateNothingWithBadInput)

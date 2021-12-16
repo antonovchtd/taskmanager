@@ -16,7 +16,13 @@ TEST_F(ActionTest, makeAddTaskAction)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    c.setData(Task::Data{"test", Task::Priority::HIGH, time(nullptr), "label", false});
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("label");
+    t.set_is_complete(false);
+    c.setTask(t);
     AddTaskAction ata(ptr);
     ata.make(c);
     ASSERT_EQ(1, ptr->size());
@@ -27,8 +33,17 @@ TEST_F(ActionTest, makeAddSubtaskAction)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "l", false));
-    c.setData(Task::Data{"sub", Task::Priority::MEDIUM, time(nullptr), "l", false});
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("label");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+    t.set_title("sub");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_MEDIUM);
+
+    c.setTask(t);
     AddSubtaskAction asa(ptr);
     c.setID(id);
     asa.make(c);
@@ -41,8 +56,14 @@ TEST_F(ActionTest, makeValidateIDActionValidID)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
-    ValidateIDAction via(ptr, Action::Data{id.to_string()});
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("label");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+    ValidateIDAction via(ptr, Action::Data{std::to_string(id.num())});
     via.make(c);
     EXPECT_EQ(id, *c.id());
 }
@@ -51,10 +72,16 @@ TEST_F(ActionTest, makeValidateIDActionInvalidID)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
-    ValidateIDAction via(ptr, Action::Data{id.to_string() + "0"});
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("label");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+    ValidateIDAction via(ptr, Action::Data{std::to_string(id.num()) + "0"});
     via.make(c);
-    EXPECT_EQ(TaskID::invalidID(), *c.id());
+    EXPECT_TRUE(c.id()->has_is_invalid() && c.id()->is_invalid());
 }
 
 TEST_F(ActionTest, makeValidateIDActionNoID)
@@ -63,7 +90,7 @@ TEST_F(ActionTest, makeValidateIDActionNoID)
     Context c;
     ValidateIDAction via(ptr, Action::Data{""});
     via.make(c);
-    EXPECT_EQ(TaskID::invalidID(), *c.id());
+    EXPECT_TRUE(c.id()->has_is_invalid() && c.id()->is_invalid());
 }
 
 TEST_F(ActionTest, makeValidateIDActionString)
@@ -72,7 +99,7 @@ TEST_F(ActionTest, makeValidateIDActionString)
     Context c;
     ValidateIDAction via(ptr, Action::Data{"bad"});
     via.make(c);
-    EXPECT_EQ(TaskID::invalidID(), *c.id());
+    EXPECT_TRUE(c.id()->has_is_invalid() && c.id()->is_invalid());
 }
 
 TEST_F(ActionTest, makeValidateNoArgActionSomeID)
@@ -90,7 +117,7 @@ TEST_F(ActionTest, makeValidateNoArgActionNoID)
     Context c;
     ValidateNoArgAction vnaa(ptr, Action::Data{""});
     vnaa.make(c);
-    EXPECT_EQ(TaskID::nullid(), *c.id());
+    EXPECT_TRUE(c.id()->has_is_invalid() && !c.id()->is_invalid());
 }
 
 TEST_F(ActionTest, makeValidateLabelArgActionEmptyStr)
@@ -99,15 +126,21 @@ TEST_F(ActionTest, makeValidateLabelArgActionEmptyStr)
     Context c;
     ValidateLabelArgAction vlaa(ptr, Action::Data{""});
     vlaa.make(c);
-    EXPECT_EQ(TaskID::nullid(), *c.id());
+    EXPECT_TRUE(c.id()->has_is_invalid() && !c.id()->is_invalid());
 }
 
 TEST_F(ActionTest, makeValidateLabelArgActionValidID)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
-    ValidateLabelArgAction vlaa(ptr, Action::Data{id.to_string()});
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("label");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+    ValidateLabelArgAction vlaa(ptr, Action::Data{std::to_string(id.num())});
     vlaa.make(c);
     EXPECT_EQ(id, *c.id());
 }
@@ -116,18 +149,32 @@ TEST_F(ActionTest, makeValidateLabelArgActionInvalidID)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
-    ValidateLabelArgAction vlaa(ptr, Action::Data{id.to_string() + "0"});
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("label");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+    ValidateLabelArgAction vlaa(ptr, Action::Data{std::to_string(id.num()) + "0"});
     vlaa.make(c);
-    EXPECT_EQ(TaskID::invalidID(), *c.id());
+    EXPECT_TRUE(c.id()->has_is_invalid() && c.id()->is_invalid());
 }
 
 TEST_F(ActionTest, makeEditTaskAction)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
-    c.setData(Task::Data{"edited", Task::Priority::MEDIUM, time(nullptr), "", false});
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("label");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+    t.set_title("edited");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_MEDIUM);
+    c.setTask(t);
     EditTaskAction eta(ptr);
     c.setID(id);
     eta.make(c);
@@ -135,14 +182,20 @@ TEST_F(ActionTest, makeEditTaskAction)
     EXPECT_TRUE(ptr->Validate(*c.id()));
     EXPECT_EQ(id, *c.id());
     EXPECT_EQ((*ptr)[id].first.title(), "edited");
-    EXPECT_EQ((*ptr)[id].first.priority(), Task::Priority::MEDIUM);
+    EXPECT_EQ((*ptr)[id].first.priority(), ProtoTask::Task::Priority::Task_Priority_MEDIUM);
 }
 
 TEST_F(ActionTest, makeShowActionNoArg)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("label");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
     ShowAction sa(ptr, Action::Data{""});
     sa.make(c);
     ASSERT_EQ(1, c.tasks().size());
@@ -154,8 +207,20 @@ TEST_F(ActionTest, makeShowActionLabelArg)
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
     std::string label = "l";
-    ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
-    TaskID id = ptr->Add(Task::Create("test 2", Task::Priority::MEDIUM, time(nullptr), label, false));
+
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("");
+    t.set_is_complete(false);
+    ptr->Add(t);
+
+    t.set_title("test 2");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_MEDIUM);
+    t.set_label(label);
+    ProtoTask::TaskID id = ptr->Add(t);
+
     ShowAction sa(ptr, Action::Data{label});
     sa.make(c);
     ASSERT_EQ(1, c.tasks().size());
@@ -166,9 +231,19 @@ TEST_F(ActionTest, makeShowActionIDArg)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test 1", Task::Priority::HIGH, time(nullptr), "", false));
-    ptr->Add(Task::Create("test 2", Task::Priority::MEDIUM, time(nullptr), "", false));
-    ShowAction sa(ptr, Action::Data{id.to_string()});
+    ProtoTask::Task t;
+    t.set_title("test 1");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+
+    t.set_title("test 2");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_MEDIUM);
+
+    ptr->Add(t);
+    ShowAction sa(ptr, Action::Data{std::to_string(id.num())});
     c.setID(id);
     sa.make(c);
     ASSERT_EQ(1, c.tasks().size());
@@ -179,19 +254,33 @@ TEST_F(ActionTest, makeCompleteTaskAction)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    ProtoTask::Task t;
+    t.set_title("test");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+
     CompleteTaskAction ca(ptr);
     c.setID(id);
     ca.make(c);
     ASSERT_EQ(1, ptr->size());
-    EXPECT_TRUE((*ptr)[id].first.isComplete());
+    EXPECT_TRUE((*ptr)[id].first.is_complete());
 }
 
 TEST_F(ActionTest, makeDeleteTaskAction)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
+    ProtoTask::Task t;
+    t.set_title("test 1");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+
     DeleteAction da(ptr);
     c.setID(id);
     da.make(c);
@@ -202,8 +291,15 @@ TEST_F(ActionTest, makeLabelAction)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
+    ProtoTask::Task t;
+    t.set_title("test 1");
+    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_due_date(time(nullptr));
+    t.set_label("");
+    t.set_is_complete(false);
+    ProtoTask::TaskID id = ptr->Add(t);
+
     std::string label = "l";
-    TaskID id = ptr->Add(Task::Create("test", Task::Priority::HIGH, time(nullptr), "", false));
     LabelAction la(ptr, Action::Data{label});
     c.setID(id);
     la.make(c);
