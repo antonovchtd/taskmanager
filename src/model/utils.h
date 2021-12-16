@@ -8,12 +8,13 @@
 #include <sstream>
 #include "Task.pb.h"
 
-bool operator==(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
-bool operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
 namespace ProtoTask {
-    bool operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
-}
+bool operator==(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
+bool operator==(const ProtoTask::Task &lhs, const ProtoTask::Task &rhs);
+bool operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
+bool operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
 bool operator>(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
+}
 std::string to_string(const ProtoTask::Task &t);
 
 #endif //TASKMANAGER_SRC_MODEL_UTILS_H_

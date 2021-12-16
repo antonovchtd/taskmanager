@@ -12,12 +12,13 @@ public:
     IDGenerator();
     explicit IDGenerator(const ProtoTask::IDGeneratorState &last);
     IDGenerator(const IDGenerator&) = default;
+    virtual ~IDGenerator() = default;
 
     ProtoTask::IDGeneratorState state() const;
 
-    ProtoTask::TaskID genID();
+    virtual ProtoTask::TaskID genID();
 
-private:
+protected:
     ProtoTask::IDGeneratorState last_;
 };
 

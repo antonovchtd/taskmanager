@@ -4,13 +4,20 @@
 
 #include "utils.h"
 
-bool operator==(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
+bool ProtoTask::operator==(const ProtoTask::Task &lhs, const ProtoTask::Task &rhs) {
+    return rhs.title() == lhs.title() &&
+           rhs.priority() == lhs.priority() &&
+           rhs.is_complete() == lhs.is_complete() &&
+           rhs.label() == lhs.label() &&
+           rhs.due_date() == lhs.due_date();
+}
+bool ProtoTask::operator==(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
     if (rhs.has_num() && lhs.has_num())
         return rhs.num() == lhs.num();
     return false;
 }
 
-bool operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
+bool ProtoTask::operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
     return !(lhs == rhs);
 }
 
@@ -19,7 +26,7 @@ bool ProtoTask::operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID 
         return lhs.num() < rhs.num();
     return false;
 }
-bool operator>(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
+bool ProtoTask::operator>(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
     if (lhs.has_num() && rhs.has_num())
         return lhs.num() > rhs.num();
     return false;
