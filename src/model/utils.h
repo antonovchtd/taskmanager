@@ -24,5 +24,7 @@ ProtoTask::Task create(const std::string &title,
 }
 std::string to_string(const ProtoTask::Task &t);
 bool operator==(const Node &lhs, const Node &rhs);
+bool operator==(const std::vector<ProtoTask::TaskID> &lhs, const std::vector<ProtoTask::TaskID> &rhs);
+bool operator!=(const std::vector<ProtoTask::TaskID> &lhs, const std::vector<ProtoTask::TaskID> &rhs);
 
 #endif //TASKMANAGER_SRC_MODEL_UTILS_H_

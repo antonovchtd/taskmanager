@@ -83,3 +83,16 @@ bool operator==(const Node &lhs, const Node &rhs) {
     }
     return true;
 }
+
+bool operator==(const std::vector<ProtoTask::TaskID> &lhs, const std::vector<ProtoTask::TaskID> &rhs) {
+    for (const auto &id : lhs) {
+        auto it = std::find(rhs.cbegin(), rhs.cend(), id);
+        if (it == rhs.cend())
+            return false;
+    }
+    return true;
+}
+
+bool operator!=(const std::vector<ProtoTask::TaskID> &lhs, const std::vector<ProtoTask::TaskID> &rhs) {
+    return !(lhs == rhs);
+}
