@@ -3,6 +3,7 @@
 //
 
 #include "utils.h"
+#include "Node.h"
 
 bool ProtoTask::operator==(const ProtoTask::Task &lhs, const ProtoTask::Task &rhs) {
     return rhs.title() == lhs.title() &&
@@ -54,4 +55,31 @@ std::string to_string(const ProtoTask::Task &t) {
     }
 
     return os.str();
+}
+
+ProtoTask::Task ProtoTask::create(const std::string &title,
+                       const ProtoTask::Task::Priority &priority,
+                       const time_t &due_date,
+                       const std::string &label,
+                       bool is_complete) {
+    ProtoTask::Task t;
+    t.set_title(title);
+    t.set_priority(priority);
+    t.set_due_date(due_date);
+    t.set_label(label);
+    t.set_is_complete(is_complete);
+    return t;
+}
+
+bool operator==(const Node &lhs, const Node &rhs) {
+    if (rhs.children() != lhs.children())
+        return false;
+    else {
+        if (lhs.parent().has_value() && rhs.parent().has_value()) {
+            return *lhs.parent() == *rhs.parent();
+        } else if (!(!lhs.parent().has_value() && !rhs.parent().has_value())) {
+            return false;
+        }
+    }
+    return true;
 }

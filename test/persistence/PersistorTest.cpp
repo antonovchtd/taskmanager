@@ -27,68 +27,30 @@ public:
     MOCK_METHOD(void, print, (const std::string &message), (override));
 };
 
-TEST_F(PersistorTest, shouldSaveAndLoadTask)
+TEST_F(PersistorTest, shouldSaveAndLoadTasksMapWithGeneratorState)
 {
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
-            .Times(17)
-            .WillOnce(Return("add"))
-            .WillOnce(Return("Task 1"))
-            .WillOnce(Return("1"))
-            .WillOnce(Return("21/12"))
-            .WillOnce(Return("subtask 1"))
-            .WillOnce(Return("Subtask 2"))
-            .WillOnce(Return("2"))
-            .WillOnce(Return("22/12"))
-            .WillOnce(Return("subtask 2"))
-            .WillOnce(Return("Subtask 3"))
-            .WillOnce(Return("3"))
-            .WillOnce(Return("23/12"))
-            .WillOnce(Return("complete 1"))
-            .WillOnce(Return("save"))
-            .WillOnce(Return("quit"))
-            .WillOnce(Return("load"))
-            .WillOnce(Return("quit"));
+    TaskManager tm;
+    ProtoTask::Task t = ProtoTask::create("task 1", ProtoTask::Task_Priority_HIGH,
+                                          time(nullptr), "a", false);
+    ProtoTask::Task sub = ProtoTask::create("subtask 2", ProtoTask::Task_Priority_MEDIUM,
+                                          time(nullptr), "b", false);
+    ProtoTask::Task subsub = ProtoTask::create("subsubtask 3", ProtoTask::Task_Priority_LOW,
+                                          time(nullptr), "c", false);
+    auto id1 = tm.Add(t);
+    auto id2 = tm.AddSubtask(sub, id1);
+    auto id3 = tm.AddSubtask(subsub, id2);
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
-            .Times(AtLeast(1));
+    std::string filename = "PersistorTest.bin";
+    std::ofstream ofile(filename, std::ios::trunc | std::ios::binary);
+    Persistor::save(tm, ofile);
+    ofile.close();
+    std::ifstream ifile(filename, std::ios::binary);
+    auto tm_loaded = Persistor::load(ifile);
+    ifile.close();
 
-    Machine m(f, Factory::State::HOME);
-    m.run();
-    Machine m2(f, Factory::State::HOME);
-    m2.run();
-    TaskManager tm = *m2.model();
-    ASSERT_EQ(3, tm.size());
-
-    ProtoTask::TaskID id1, id2, id3;
-    id1.set_num(1);
-    id2.set_num(2);
-    id3.set_num(3);
-
-    ASSERT_TRUE(tm.Validate(id1));
-    EXPECT_TRUE(tm[id1].first.is_complete());
-    EXPECT_EQ(tm[id1].first.title(), "Task 1");
-    EXPECT_EQ(std::nullopt, tm[id1].second.parent());
-    auto ch = tm[id1].second.children();
-    ASSERT_EQ(1, ch.size());
-    auto it = std::find(ch.cbegin(), ch.cend(), id2);
-    EXPECT_NE(it, ch.cend());
-
-    ASSERT_TRUE(tm.Validate(id2));
-    EXPECT_TRUE(tm[id2].first.is_complete());
-    EXPECT_EQ(tm[id2].first.title(), "Subtask 2");
-    EXPECT_EQ(id1, *tm[id2].second.parent());
-    ch = tm[id2].second.children();
-    EXPECT_EQ(1, ch.size());
-    it = std::find(ch.cbegin(), ch.cend(), id3);
-    EXPECT_NE(it, ch.cend());
-
-    ASSERT_TRUE(tm.Validate(id3));
-    EXPECT_TRUE(tm[id3].first.is_complete());
-    EXPECT_EQ(tm[id3].first.title(), "Subtask 3");
-    EXPECT_EQ(0, tm[id3].second.children().size());
-    EXPECT_EQ(id2, *tm[id3].second.parent());
+    ASSERT_EQ(tm.size(), tm_loaded.size());
+    for (const auto &kv : tm.getTasks()) {
+        EXPECT_EQ(kv.second.first, tm_loaded[kv.first].first);
+        EXPECT_EQ(kv.second.second, tm_loaded[kv.first].second);
+    }
 }
