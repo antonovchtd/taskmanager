@@ -17,8 +17,8 @@ class TaskManagerTest : public ::testing::Test
 
 class MockIDGenerator : public IDGenerator {
 public:
-    MockIDGenerator(const ProtoTask::IDGeneratorState &last) {last_ = last;};
-    MockIDGenerator() {last_.set_value(1);};
+    MockIDGenerator(int last) {last_ = last;};
+    MockIDGenerator() {last_ = 1;};
     MOCK_METHOD(ProtoTask::TaskID, genID, (), (override));
 };
 

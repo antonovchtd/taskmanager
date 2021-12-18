@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.20)
 project(taskmanager)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -17,17 +17,22 @@ find_program(_PROTOBUF_PROTOC protoc)
 find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
 find_program(_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
-#
 
 find_package(Threads REQUIRED)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-file(GLOB_RECURSE PROTO_SOURCES CONFIGURE_DEPENDS ${protobuf_example_SOURCE_DIR}/proto/*.proto)
+file(GLOB_RECURSE PROTO_SOURCES CONFIGURE_DEPENDS src/model/*.proto)
 message("PROTO_SOURCES ${PROTO_SOURCES}")
 
-set(PROTO_DIR ${protobuf_example_SOURCE_DIR}/proto)
+set(PROTO_DIR src/model)
 set(GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
+#include_directories(${Protobuf_INCLUDE_DIRS})
+#include_directories(${CMAKE_CURRENT_BINARY_DIR})
+#
+#protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS src/model/Task.proto)
+#message("${PROTO_HDRS}")
 
 macro(compile_proto_file filename)
     get_filename_component(dirname ${filename} PATH)

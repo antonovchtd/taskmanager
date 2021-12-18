@@ -30,7 +30,3 @@ message TaskEntity {
   Task data = 2;
   TaskID parent = 3;
 }
-
-message IDGeneratorState {
-  int32 value = 1;
-}

@@ -4,20 +4,22 @@
 
 #include "IDGenerator.h"
 
-IDGenerator::IDGenerator() {
-    last_.set_value(1);
+IDGenerator::IDGenerator() : last_(1) {
 }
 
-IDGenerator::IDGenerator(const ProtoTask::IDGeneratorState &last) : last_(last) {
+IDGenerator::IDGenerator(int last) : last_(last) {
 }
 
 ProtoTask::TaskID IDGenerator::genID() {
     ProtoTask::TaskID id;
-    id.set_num(last_.value());
-    last_.set_value(last_.value()+1);
+    id.set_num(last_++);
     return id;
 }
 
-ProtoTask::IDGeneratorState IDGenerator::state() const {
+int IDGenerator::state() const {
     return last_;
+}
+
+void IDGenerator::setState(int last) {
+    last_ = last;
 }

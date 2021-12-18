@@ -6,12 +6,14 @@
 #define TASKMANAGER_SRC_PERSISTENCE_SAVER_H_
 
 #include <memory>
+#include <vector>
+#include "../model/Task.pb.h"
 class TaskManager;
 
 class Persistor {
 public:
-    static void save(const TaskManager &, std::ostream &);
-    static TaskManager load(std::istream &);
+    static bool save(const std::string &filename, const std::shared_ptr<TaskManager> &model);
+    static bool load(const std::string &filename, const std::shared_ptr<TaskManager> &model);
 };
 
 

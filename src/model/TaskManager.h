@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <map>
+#include <vector>
 #include <utility>
 #include <fstream>
 
@@ -42,8 +43,8 @@ public:
     void SetLabel(const ProtoTask::TaskID &, const std::string &);
 
 public:
-    void save(const std::string &filename);
-    void load(const std::string &filename);
+    std::vector<ProtoTask::TaskEntity> Export();
+    void Replace(const std::vector<ProtoTask::TaskEntity> &);
 
 private:
     std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> tasks_;

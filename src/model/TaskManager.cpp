@@ -106,24 +106,40 @@ void TaskManager::SetLabel(const ProtoTask::TaskID &id, const std::string &label
     Edit(id, t);
 }
 
-void TaskManager::load(const std::string &filename) {
-    std::ifstream file(filename, std::ios::binary);
-    if (file.is_open()) {
-        *this = Persistor::load(file);
-        file.close();
+std::vector<ProtoTask::TaskEntity> TaskManager::Export() {
+    std::vector<ProtoTask::TaskEntity> vec;
+    for (const auto &kv : tasks_) {
+        ProtoTask::TaskEntity te;
+        te.set_allocated_id(new ProtoTask::TaskID(kv.first));
+        te.set_allocated_data(new ProtoTask::Task(kv.second.first));
+        if (kv.second.second.parent()) {
+            te.set_allocated_parent(new ProtoTask::TaskID(*kv.second.second.parent()));
+        }
+        vec.push_back(te);
     }
-    else
-        throw std::runtime_error("Could not open file " + filename + ".");
+    return vec;
 }
 
-void TaskManager::save(const std::string &filename) {
-    std::ofstream file(filename, std::ios::trunc | std::ios::binary);
-    if (file.is_open()) {
-        Persistor::save(*this, file);
-        file.close();
+void TaskManager::Replace(const std::vector<ProtoTask::TaskEntity> &vec) {
+    tasks_.clear();
+    ProtoTask::TaskID max_id;
+    max_id.set_num(0);
+    for (const auto &te : vec) {
+        Node n;
+        if (te.has_parent())
+            n.SetParent(te.parent());
+        tasks_.insert(std::make_pair(te.id(),
+                                    std::make_pair(te.data(), n)));
+        if (max_id < te.id())
+            max_id = te.id();
     }
-    else
-        throw std::runtime_error("Could not open file " + filename + ".");
+    // record children
+    for (const auto &kv : tasks_)
+        if (kv.second.second.parent())
+            tasks_[*kv.second.second.parent()].second.AddChild(kv.first);
+
+    // set IDGenerator state
+    gen_->setState(max_id.num()+1);
 }
 
 std::shared_ptr<IDGenerator> TaskManager::gen() const {

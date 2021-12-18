@@ -204,6 +204,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
     auto ch3 = tm[id3].second.children();
     ASSERT_EQ(0, ch3.size());
 
+    EXPECT_EQ(4, tm.gen()->state());
 }
 
 TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)

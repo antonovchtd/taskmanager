@@ -109,10 +109,10 @@ void LabelAction::make(Context &context) {
 
 void SaveAction::make(Context &context) {
     std::string filename = data().arg.empty() ? "data.bin" : data().arg;
-    model()->save(filename);
+    Persistor::save(filename, model());
 }
 
 void LoadAction::make(Context &context) {
     std::string filename = data().arg.empty() ? "data.bin" : data().arg;
-    model()->load(filename);
+    Persistor::load(filename, model());
 }
