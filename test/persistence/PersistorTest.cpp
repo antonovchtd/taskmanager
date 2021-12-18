@@ -40,7 +40,7 @@ TEST_F(PersistorTest, shouldSaveAndLoadTasksMapWithGeneratorState)
     auto id2 = tm->AddSubtask(sub, id1);
     auto id3 = tm->AddSubtask(subsub, id2);
 
-    std::string filename = "ad";
+    std::string filename = "PersistorTest.bin";
     Persistor::save(filename, tm);
     auto tm_loaded = std::make_shared<TaskManager>();
     Persistor::load(filename, tm_loaded);

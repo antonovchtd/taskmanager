@@ -27,9 +27,7 @@ class Factory;
 
 class Step{
 public:
-    Step(const std::shared_ptr<AbstractReader> &reader,
-         const std::shared_ptr<AbstractPrinter> &printer,
-         const std::shared_ptr<Factory> &factory);
+    Step(const std::shared_ptr<Factory> &factory);
 
 public:
     virtual std::shared_ptr<Action> execute(Context &c) = 0;
@@ -37,13 +35,9 @@ public:
     virtual ~Step() = default;
 
 public:
-    std::shared_ptr<AbstractReader> reader() const;
-    std::shared_ptr<AbstractPrinter> printer() const;
     std::shared_ptr<Factory> factory() const;
 
 private:
-    std::shared_ptr<AbstractReader> reader_;
-    std::shared_ptr<AbstractPrinter> printer_;
     std::shared_ptr<Factory> factory_;
 };
 
