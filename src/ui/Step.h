@@ -21,7 +21,7 @@
 
 class StepSwitcher;
 class Context;
-class Action;
+class Controller;
 class Factory;
 
 class Step{
@@ -43,6 +43,9 @@ class HomeStep : public Step {
 public:
     using Step::Step;
     std::shared_ptr<Step> execute(Context &c) override;
+    std::string command() const;
+private:
+    std::string command_;
 };
 
 class HelpStep : public Step {

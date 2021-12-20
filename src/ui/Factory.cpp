@@ -8,22 +8,15 @@
 Factory::Factory() :
         reader_(std::shared_ptr<AbstractReader>(new ConsoleReader)),
         printer_(std::shared_ptr<AbstractPrinter>(new ConsolePrinter)),
-        model_(std::shared_ptr<TaskManager>(new TaskManager)) {
+        controller_(std::make_shared<Controller>())  {
 
 }
 
 Factory::Factory(const std::shared_ptr<AbstractReader> &reader,
                  const std::shared_ptr<AbstractPrinter> &printer) :
          reader_(reader), printer_(printer),
-         model_(std::shared_ptr<TaskManager>(new TaskManager)) {
+         controller_(std::make_shared<Controller>()) {
 
-}
-
-Factory::Factory(const std::shared_ptr<AbstractReader> &reader,
-                 const std::shared_ptr<AbstractPrinter> &printer,
-                 const std::shared_ptr<TaskManager> &model) :
-         Factory(reader, printer) {
-    model_ = model;
 }
 
 std::shared_ptr<Factory> Factory::create() {
@@ -43,8 +36,8 @@ std::shared_ptr<AbstractReader> Factory::reader() const {
     return reader_;
 }
 
-std::shared_ptr<TaskManager> Factory::model() const {
-    return model_;
+std::shared_ptr<Controller> Factory::controller() const {
+    return controller_;
 }
 
 std::shared_ptr<Step> Factory::createStep(const std::string &command) {
@@ -116,39 +109,3 @@ std::shared_ptr<Step> Factory::lazyInitStep(const Factory::State &state) {
     return steps_[state];
 }
 
-std::shared_ptr<Action> Factory::lazyInitAction(const Factory::ActionLabel &label) {
-    if (actions_.find(label) == actions_.end())
-        actions_[label] = getNewAction(label);
-    return actions_[label];
-}
-
-std::shared_ptr<Action> Factory::getNewAction(const Factory::ActionLabel &label) {
-    switch (label){
-        case Factory::ActionLabel::ADDTASK:
-            return std::make_shared<AddTaskAction>(model_);
-        case Factory::ActionLabel::ADDSUBTASK:
-            return std::make_shared<AddSubtaskAction>(model_);
-        case Factory::ActionLabel::VALIDATEID:
-            return std::make_shared<GetIDAction>(model_);
-        case Factory::ActionLabel::VALIDATENOARG:
-            return std::make_shared<ValidateNoArgAction>(model_);
-        case Factory::ActionLabel::VALIDATELABEL:
-            return std::make_shared<ValidateLabelOrIDArgAction>(model_);
-        case Factory::ActionLabel::EDIT:
-            return std::make_shared<EditTaskAction>(model_);
-        case Factory::ActionLabel::SHOW:
-            return std::make_shared<ShowAction>(model_);
-        case Factory::ActionLabel::COMPLETE:
-            return std::make_shared<CompleteTaskAction>(model_);
-        case Factory::ActionLabel::DELETE:
-            return std::make_shared<DeleteAction>(model_);
-        case Factory::ActionLabel::CONFIRMDELETE:
-            return std::make_shared<ConfirmDeleteAction>(model_);
-        case Factory::ActionLabel::LABEL:
-            return std::make_shared<LabelAction>(model_);
-        case Factory::ActionLabel::SAVE:
-            return std::make_shared<SaveAction>(model_);
-        case Factory::ActionLabel::LOAD:
-            return std::make_shared<LoadAction>(model_);
-    }
-}

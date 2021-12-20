@@ -19,7 +19,8 @@ struct ActionResult {
         FAILED_TO_OPEN_FILE,
         TAKES_NO_ARG,
         TAKES_ARG,
-        NOT_AN_ID
+        TAKES_ID,
+        TAKES_ALPHA
     };
 
     explicit operator bool() const;

@@ -2,7 +2,7 @@
 // Created by Anton O. on 12/5/21.
 //
 
-#include "../../src/ui/Action.h"
+#include "../../src/ui/Controller.h"
 #include "../../src/ui/Context.h"
 
 #include <gtest/gtest.h>

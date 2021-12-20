@@ -10,6 +10,7 @@
 
 class StepSwitcher {
 public:
+    static std::shared_ptr<Step> nextStep(const HomeStep &, const std::shared_ptr<Factory> &);
     static std::shared_ptr<Step> nextStep(const HelpStep &, const std::shared_ptr<Factory> &);
     static std::shared_ptr<Step> nextStep(const AddStep &, const std::shared_ptr<Factory> &);
     static std::shared_ptr<Step> nextStep(const ReadTaskDataStep &, const std::shared_ptr<Factory> &);

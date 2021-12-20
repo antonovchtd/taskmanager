@@ -4,6 +4,10 @@
 
 #include "StepSwitcher.h"
 
+std::shared_ptr<Step> StepSwitcher::nextStep(const HomeStep &step, const std::shared_ptr<Factory> &factory) {
+    return factory->createStep(step.command());
+}
+
 std::shared_ptr<Step> StepSwitcher::nextStep(const HelpStep &, const std::shared_ptr<Factory> &factory) {
     return factory->lazyInitStep(Factory::State::HOME);
 }

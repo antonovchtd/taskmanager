@@ -16,11 +16,10 @@ Context Machine::run() {
     auto step = factory_->lazyInitStep(initial_step_);
     while (step){
         step = step->execute(context_);
-//        context_.step()->process(context_);
     }
     return context_;
 }
 
 std::shared_ptr<TaskManager> Machine::model() const {
-    return factory_->model();
+    return factory_->controller()->model();
 }

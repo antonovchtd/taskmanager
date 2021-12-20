@@ -28,8 +28,10 @@ std::string ActionResult::message() const {
             return "This function takes no argument.\n";
         case Status::TAKES_ARG:
             return "This function requires an argument.\n";
-        case Status::NOT_AN_ID:
+        case Status::TAKES_ID:
             return "This function requires an ID argument.\n";
+        case Status::TAKES_ALPHA:
+            return "This function requires a word, not an ID argument.\n";
     }
 
 }

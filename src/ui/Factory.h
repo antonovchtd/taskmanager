@@ -9,7 +9,7 @@
 #include <string>
 #include <map>
 
-#include "Action.h"
+#include "Controller.h"
 #include "../model/TaskManager.h"
 #include "../io/AbstractReader.h"
 #include "../io/ConsoleReader.h"
@@ -39,22 +39,6 @@ public:
         LOAD
     };
 
-    enum class ActionLabel{
-        ADDTASK,
-        ADDSUBTASK,
-        VALIDATEID,
-        VALIDATENOARG,
-        VALIDATELABEL,
-        EDIT,
-        SHOW,
-        COMPLETE,
-        DELETE,
-        CONFIRMDELETE,
-        LABEL,
-        SAVE,
-        LOAD
-    };
-
 public:
     static std::shared_ptr<Factory> create();
     static std::shared_ptr<Factory> create(const std::shared_ptr<AbstractReader> &, const std::shared_ptr<AbstractPrinter> &);
@@ -63,9 +47,6 @@ private:
     Factory();
     Factory(const std::shared_ptr<AbstractReader> &,
             const std::shared_ptr<AbstractPrinter> &);
-    Factory(const std::shared_ptr<AbstractReader> &,
-            const std::shared_ptr<AbstractPrinter> &,
-            const std::shared_ptr<TaskManager> &);
 
 public:
     std::shared_ptr<Step> createStep(const std::string &command);
@@ -73,20 +54,16 @@ public:
     std::shared_ptr<Step> getNewStep(const State &s);
     std::shared_ptr<Step> lazyInitStep(const State &state);
 
-    std::shared_ptr<Action> getNewAction(const ActionLabel &);
-    std::shared_ptr<Action> lazyInitAction(const ActionLabel &label);
-
 public:
     std::shared_ptr<AbstractReader> reader() const;
     std::shared_ptr<AbstractPrinter> printer() const;
-    std::shared_ptr<TaskManager> model() const;
+    std::shared_ptr<Controller> controller() const;
 
 private:
     std::map<State, std::shared_ptr<Step>> steps_;
-    std::map<ActionLabel, std::shared_ptr<Action>> actions_;
     std::shared_ptr<AbstractReader> reader_;
     std::shared_ptr<AbstractPrinter> printer_;
-    std::shared_ptr<TaskManager> model_;
+    std::shared_ptr<Controller> controller_;
 };
 
 #endif //TASKMANAGER_SRC_UI_FACTORY_H_

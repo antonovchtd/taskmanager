@@ -8,7 +8,7 @@
 
 #include "../../src/ui/Machine.h"
 #include "../../src/ui/Step.h"
-#include "../../src/ui/Action.h"
+#include "../../src/ui/Controller.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>

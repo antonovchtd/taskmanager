@@ -14,32 +14,49 @@ std::shared_ptr<Factory> Step::factory() const {
     return factory_;
 }
 
+std::string HomeStep::command() const {
+    return command_;
+}
+
+template <typename T>
+std::shared_ptr<Step> processResult (const T &step,
+                                     const ActionResult &result,
+                                     const std::shared_ptr<Factory> &factory,
+                                     const std::string &message) {
+    if (result) {
+        factory->printer()->print(message);
+        if (result.id)
+            factory->printer()->print(" (ID: " + std::to_string(result.id->num()) + ")\n");
+    }
+    else {
+        factory->printer()->print(result.message());
+        return factory->lazyInitStep(Factory::State::HOME);
+    }
+    return StepSwitcher::nextStep(step, factory);
+}
+
 std::shared_ptr<Step> HomeStep::execute(Context &c) {
     std::stringstream ss{factory()->reader()->read(" > ")};
     std::string command, arg;
     ss >> command >> arg;
-    
-    std::shared_ptr<Action> action;
-    if (command == "edit" || command == "subtask" ||
-        command == "delete" || command == "complete" ||
-        command == "label") {
-        action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATEID);
-    } else if (command == "show" || command == "save" ||
-               command == "load" || command.empty()) {
-        action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
-    } else {
-        action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATENOARG);
-    }
-    action->setActionData(Action::Data{arg});
-    ActionResult result = action->make(c);
+    command_ = command;
 
-    if (result)
-        c.setID(result.id);
-    else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
+    factory()->controller()->setData(Controller::Data{arg});
+    ActionResult result;
+    std::shared_ptr<Controller> action;
+    if (command_ == "edit" || command_ == "subtask" ||
+        command_ == "delete" || command_ == "complete" ||
+        command_ == "label") {
+        result = factory()->controller()->ValidateID(c);
+    } else if (command_ == "show") {
+        result = factory()->controller()->ValidateLabelOrID(c);
+    } else if (command_ == "save" || command_ == "load" || command_.empty()) {
+        result = factory()->controller()->ValidateAlpha(c);
+    } else {
+        result = factory()->controller()->ValidateNoArg(c);
     }
-    return factory()->createStep(command);
+
+    return processResult(*this, result, factory(), "");
 }
 
 std::shared_ptr<Step> HelpStep::execute(Context &c) {
@@ -54,16 +71,8 @@ std::shared_ptr<Step> AddStep::execute(Context &c) {
     Context input_context = wizard.run();
     c.setTask(input_context.task());
 
-    auto action = factory()->lazyInitAction(Factory::ActionLabel::ADDTASK);
-    ActionResult result = action->make(c);
-
-    if (result) {
-            factory()->printer()->print("Added Task with ID " + std::to_string(result.id->num()) + ".\n");
-    } else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
-    }
-    return StepSwitcher::nextStep(*this, factory());
+    ActionResult result = factory()->controller()->AddTask(c);
+    return processResult(*this, result, factory(), "Added Task");
 }
 
 bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title) {
@@ -154,18 +163,8 @@ std::shared_ptr<Step> EditStep::execute(Context &c) {
     Context input_context = wizard.run();
     c.setTask(input_context.task());
 
-    auto action = factory()->lazyInitAction(Factory::ActionLabel::EDIT);
-    ActionResult result = action->make(c);
-
-
-    if (result) {
-        factory()->printer()->print("Edited Task with ID " + std::to_string(result.id->num()) + ".\n");
-    } else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
-    }
-
-    return StepSwitcher::nextStep(*this, factory());
+    ActionResult result = factory()->controller()->EditTask(c);
+    return processResult(*this, result, factory(), "Edited Task");
 }
 
 std::shared_ptr<Step> SubtaskStep::execute(Context &c) {
@@ -173,17 +172,9 @@ std::shared_ptr<Step> SubtaskStep::execute(Context &c) {
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
-    auto action = factory()->lazyInitAction(Factory::ActionLabel::ADDSUBTASK);
-    ActionResult result = action->make(c);
 
-    if (result) {
-        factory()->printer()->print("Added Subtask with ID " + std::to_string(result.id->num()) + ".\n");
-    } else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
-    }
-
-    return StepSwitcher::nextStep(*this, factory());
+    ActionResult result = factory()->controller()->AddSubtask(c);
+    return processResult(*this, result, factory(), "Added Subtask");
 }
 
 std::shared_ptr<Step> QuitStep::execute(Context &c) {
@@ -191,10 +182,8 @@ std::shared_ptr<Step> QuitStep::execute(Context &c) {
 }
 
 std::shared_ptr<Step> ShowStep::execute(Context &c) {
-    std::shared_ptr<Action> action = factory()->lazyInitAction(Factory::ActionLabel::SHOW);
-    std::shared_ptr<Action> labelAction = factory()->lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
-    action->setActionData(labelAction->data());
-    ActionResult result = action->make(c);
+//    factory()->controller()->setData(Controller::Data{}); //TODO
+    ActionResult result = factory()->controller()->ShowTasks(c);
 
     auto tasks = c.tasks();
     for (const auto &kv : tasks) {
@@ -219,38 +208,17 @@ void ShowStep::recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<Proto
 }
 
 std::shared_ptr<Step> CompleteStep::execute(Context &c) {
-    auto action = factory()->lazyInitAction(Factory::ActionLabel::COMPLETE);
-    ActionResult result = action->make(c);
-
-    if (result) {
-        factory()->printer()->print("Marked Task with ID " +
-                                    std::to_string(result.id->num()) + " as completed.\n");
-    } else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
-    }
-
-    return StepSwitcher::nextStep(*this, factory());
+    ActionResult result = factory()->controller()->CompleteTask(c);
+    return processResult(*this, result, factory(), "Completed Task");
 }
 
 std::shared_ptr<Step> DeleteStep::execute(Context &c) {
-    auto action = factory()->lazyInitAction(Factory::ActionLabel::DELETE);
-    ActionResult result = action->make(c);
-
-    if (result) {
-        factory()->printer()->print("Deleted Task with ID " +
-                                     std::to_string(result.id->num()) + ".\n");
-    } else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
-    }
-
-    return StepSwitcher::nextStep(*this, factory());
+    ActionResult result = factory()->controller()->DeleteTask(c);
+    return processResult(*this, result, factory(), "Deleted Task");
 }
 
 std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c) {
-    auto action = factory()->lazyInitAction(Factory::ActionLabel::CONFIRMDELETE);
-    ActionResult result = action->make(c);
+    ActionResult result = factory()->controller()->ConfirmDeleteTask(c);
 
     if (result) {
         auto ch = c.tasks().at(*result.id).second.children();
@@ -278,51 +246,22 @@ std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c) {
 }
 
 std::shared_ptr<Step> LabelStep::execute(Context &c) {
-    std::shared_ptr<Action> action = factory()->lazyInitAction(Factory::ActionLabel::LABEL);
     std::string label;
     while (label.empty())
         label = factory()->reader()->read("[Add Label]\n    >> ");
-    action->setActionData(Action::Data{label});
-    ActionResult result = action->make(c);
-
-    if (result) {
-        factory()->printer()->print("Added label to Task with ID " + std::to_string(result.id->num()) + ".\n");
-    } else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
-    }
-
-    return StepSwitcher::nextStep(*this, factory());
+    factory()->controller()->setData(Controller::Data{label});
+    ActionResult result = factory()->controller()->LabelTask(c);
+    return processResult(*this, result, factory(), "Added label to Task");
 }
 
 std::shared_ptr<Step> SaveStep::execute(Context &c) {
-    std::shared_ptr<Action> action = factory()->lazyInitAction(Factory::ActionLabel::SAVE);
-    std::shared_ptr<Action> labelAction = factory()->lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
-    action->setActionData(labelAction->data());
-    ActionResult result = action->make(c);
-
-    if (result) {
-        factory()->printer()->print("Saved to file successfully.\n");
-    } else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
-    }
-
-    return StepSwitcher::nextStep(*this, factory());
+    // factory()->controller()->setData(Controller::Data{label}); //TODO
+    ActionResult result = factory()->controller()->SaveTasks(c);
+    return processResult(*this, result, factory(), "Saved to file successfully.\n");
 }
 
 std::shared_ptr<Step> LoadStep::execute(Context &c) {
-    std::shared_ptr<Action> action = factory()->lazyInitAction(Factory::ActionLabel::LOAD);
-    std::shared_ptr<Action> labelAction = factory()->lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
-    action->setActionData(labelAction->data());
-    ActionResult result = action->make(c);
-
-    if (result) {
-        factory()->printer()->print("Loaded from file successfully.\n");
-    } else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
-    }
-
-    return StepSwitcher::nextStep(*this, factory());
+    // factory()->controller()->setData(Controller::Data{label}); //TODO
+    ActionResult result = factory()->controller()->LoadTasks(c);
+    return processResult(*this, result, factory(), "Loaded from file successfully.\n");
 }
