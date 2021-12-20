@@ -10,7 +10,7 @@ TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator))
 TaskManager::TaskManager(const std::shared_ptr<IDGenerator> &generator) : gen_(generator) {
 }
 TaskManager::TaskManager(const std::shared_ptr<IDGenerator> &generator,
-                         const std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &tasks) :
+                         const Container &tasks) :
                          gen_(generator), tasks_(tasks) {
 }
 
@@ -35,11 +35,11 @@ ActionResult TaskManager::AddSubtask(const ProtoTask::Task &t, const ProtoTask::
     return {ActionResult::Status::SUCCESS, id};
 }
 
-std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> TaskManager::getTasks() const {
+Container TaskManager::getTasks() const {
     return tasks_;
 }
 
-std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> TaskManager::getTasks(const std::string &label) const {
+Container TaskManager::getTasks(const std::string &label) const {
     decltype(tasks_) tasks;
     for (const auto &kv : tasks_) {
         if (kv.second.first.label() == label) {
@@ -51,8 +51,8 @@ std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> TaskManager::getTa
     return tasks;
 }
 
-std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> TaskManager::getTasks(const ProtoTask::TaskID &id) {
-    decltype(tasks_) tasks;
+Container TaskManager::getTasks(const ProtoTask::TaskID &id) {
+    Container tasks;
     tasks.insert(std::make_pair(id, tasks_.at(id)));
     tasks.at(id).second.RemoveParent();
     for (const auto &ch : tasks.at(id).second.children()) {
@@ -66,15 +66,19 @@ std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> TaskManager::getTa
 }
 
 ActionResult TaskManager::Delete(const ProtoTask::TaskID &id, bool deleteChildren) {
-    if (!tasks_.at(id).second.children().empty() && !deleteChildren)
-        return {ActionResult::Status::HAS_CHILDREN, id};
-    std::optional<ProtoTask::TaskID> ancestor = tasks_.at(id).second.parent();
-    if (ancestor && Validate(ancestor.value()))
-        tasks_.at(ancestor.value()).second.RemoveChild(id);
-    for (auto const &ch : tasks_.at(id).second.children())
-        Delete(ch, true);
-    tasks_.erase(id);
-    return {ActionResult::Status::SUCCESS, id};
+    try {
+        if (!tasks_.at(id).second.children().empty() && !deleteChildren)
+            return {ActionResult::Status::HAS_CHILDREN, id};
+        std::optional<ProtoTask::TaskID> ancestor = tasks_.at(id).second.parent();
+        if (ancestor && Validate(ancestor.value()))
+            tasks_.at(ancestor.value()).second.RemoveChild(id);
+        for (auto const &ch: tasks_.at(id).second.children())
+            Delete(ch, true);
+        tasks_.erase(id);
+        return {ActionResult::Status::SUCCESS, id};
+    } catch (const std::out_of_range &) {
+        return {ActionResult::Status::ID_NOT_FOUND, id};
+    }
 }
 
 ActionResult TaskManager::Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) {

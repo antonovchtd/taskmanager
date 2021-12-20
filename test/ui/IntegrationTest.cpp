@@ -336,7 +336,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksAndShowByID)
     EXPECT_EQ(out[12], "2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021");
     EXPECT_EQ(out[14], "    3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
     EXPECT_EQ(out[16], "3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
-    EXPECT_EQ(out[18], "Invalid ID. Try again.\n");
+    EXPECT_EQ(out[18], "ID 4 was not found.\n");
 
 }
 

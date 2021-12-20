@@ -12,7 +12,7 @@ std::optional<ProtoTask::TaskID> Context::id() const {
     return id_;
 }
 
-std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Context::tasks() const {
+Container Context::tasks() const {
     return tasks_;
 }
 
@@ -37,6 +37,6 @@ void Context::setID(const std::optional<ProtoTask::TaskID> &id) {
     id_ = id;
 }
 
-void Context::setTasks(const std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &tasks) {
+void Context::setTasks(const Container &tasks) {
     tasks_ = tasks;
 }

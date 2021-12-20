@@ -17,7 +17,7 @@ class Context{
 public:
     ProtoTask::Task task() const;
     std::optional<ProtoTask::TaskID> id() const;
-    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> tasks() const;
+    Container tasks() const;
 
 public:
     void setTitle(const std::string &);
@@ -25,12 +25,12 @@ public:
     void setPriority(const ProtoTask::Task::Priority &);
     void setTask(const ProtoTask::Task &);
     void setID(const std::optional<ProtoTask::TaskID> &);
-    void setTasks(const std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &);
+    void setTasks(const Container &);
 
 private:
     ProtoTask::Task task_;
     std::optional<ProtoTask::TaskID> id_;
-    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> tasks_;
+    Container tasks_;
 };
 
 #endif //TASKMANAGER_SRC_UI_CONTEXT_H_

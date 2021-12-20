@@ -33,14 +33,14 @@ ActionResult GetIDAction::make(Context &context) {
         return {ActionResult::Status::TAKES_ARG, std::nullopt};
     try {
         id.set_num(std::stoi(data().arg));
+        return model()->Validate(id);
     } catch (const std::invalid_argument &) {
         return {ActionResult::Status::NOT_AN_ID, std::nullopt};
     }
-    return {ActionResult::Status::SUCCESS, id};
 }
 
 ActionResult ValidateNoArgAction::make(Context &context) {
-    if (!data().arg.empty())
+    if (data().arg.empty())
         return {ActionResult::Status::SUCCESS, std::nullopt};
     else
         return {ActionResult::Status::TAKES_NO_ARG, std::nullopt};
@@ -51,7 +51,7 @@ ActionResult ValidateLabelOrIDArgAction::make(Context &context) {
     ProtoTask::TaskID id;
     try {
         id.set_num(std::stoi(data().arg));
-        return {ActionResult::Status::SUCCESS, id};
+        return model()->Validate(id);
     } catch (const std::invalid_argument &) {
         return {ActionResult::Status::SUCCESS, std::nullopt};
     }
@@ -61,45 +61,60 @@ ActionResult AddTaskAction::make(Context &context) {
     return model()->Add(context.task());
 }
 
-void AddSubtaskAction::make(Context &context) {
-    context.setID(model()->AddSubtask(context.task(), *context.id()).id);
+ActionResult EditTaskAction::make(Context &context) {
+    return model()->Edit(*context.id(), context.task());
 }
 
-void EditTaskAction::make(Context &context) {
-    model()->Edit(*context.id(), context.task());
+ActionResult AddSubtaskAction::make(Context &context) {
+    return model()->AddSubtask(context.task(), *context.id());
 }
 
-void ShowAction::make(Context &context) {
+ActionResult ShowAction::make(Context &context) {
     if (data().arg.empty())
         context.setTasks(model()->getTasks());
-    else if (context.id().has_value() && context.id()->has_num())
+    else if (context.id().has_value() && context.id()->has_num()) {
         context.setTasks(model()->getTasks(*context.id()));
+        return {ActionResult::Status::SUCCESS, *context.id()};
+    }
     else
         context.setTasks(model()->getTasks(data().arg));
+
+    return {ActionResult::Status::SUCCESS, std::nullopt};
 }
 
-void CompleteTaskAction::make(Context &context) {
-    model()->Complete(*context.id());
+ActionResult CompleteTaskAction::make(Context &context) {
+    return model()->Complete(*context.id());
 }
 
-void DeleteAction::make(Context &context) {
-    model()->Delete(*context.id(), true);
+ActionResult DeleteAction::make(Context &context) {
+    return model()->Delete(*context.id(), true);
 }
 
-void ConfirmDeleteAction::make(Context &context) {
-    context.setTasks(model()->getTasks(*context.id()));
+ActionResult ConfirmDeleteAction::make(Context &context) {
+    try {
+        context.setTasks(model()->getTasks(*context.id()));
+        return {ActionResult::Status::SUCCESS, *context.id()};
+    } catch (const std::out_of_range &) {
+        return {ActionResult::Status::ID_NOT_FOUND, *context.id()};
+    }
 }
 
-void LabelAction::make(Context &context) {
-    model()->SetLabel(*context.id(), data().arg);
+ActionResult LabelAction::make(Context &context) {
+    return model()->SetLabel(*context.id(), data().arg);
 }
 
-void SaveAction::make(Context &context) {
+ActionResult SaveAction::make(Context &context) {
     std::string filename = data().arg.empty() ? "data.bin" : data().arg;
-    Persistor::save(filename, model());
+    if (Persistor::save(filename, model()))
+        return {ActionResult::Status::SUCCESS, std::nullopt};
+    else
+        return {ActionResult::Status::FAILED_TO_OPEN_FILE, std::nullopt};
 }
 
-void LoadAction::make(Context &context) {
+ActionResult LoadAction::make(Context &context) {
     std::string filename = data().arg.empty() ? "data.bin" : data().arg;
-    Persistor::load(filename, model());
+    if (Persistor::load(filename, model()))
+        return {ActionResult::Status::SUCCESS, std::nullopt};
+    else
+        return {ActionResult::Status::FILE_NOT_FOUND, std::nullopt};
 }

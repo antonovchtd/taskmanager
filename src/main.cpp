@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
  * Task:
  * - add <title> [priority] [due date]

@@ -40,11 +40,10 @@ public:
     };
 
     enum class ActionLabel{
-        DONOTHING,
         ADDTASK,
         ADDSUBTASK,
         VALIDATEID,
-        VALIDATENOID,
+        VALIDATENOARG,
         VALIDATELABEL,
         EDIT,
         SHOW,

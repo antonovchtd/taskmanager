@@ -124,15 +124,13 @@ std::shared_ptr<Action> Factory::lazyInitAction(const Factory::ActionLabel &labe
 
 std::shared_ptr<Action> Factory::getNewAction(const Factory::ActionLabel &label) {
     switch (label){
-        case Factory::ActionLabel::DONOTHING:
-            return std::make_shared<DoNothingAction>(model_);
         case Factory::ActionLabel::ADDTASK:
             return std::make_shared<AddTaskAction>(model_);
         case Factory::ActionLabel::ADDSUBTASK:
             return std::make_shared<AddSubtaskAction>(model_);
         case Factory::ActionLabel::VALIDATEID:
             return std::make_shared<GetIDAction>(model_);
-        case Factory::ActionLabel::VALIDATENOID:
+        case Factory::ActionLabel::VALIDATENOARG:
             return std::make_shared<ValidateNoArgAction>(model_);
         case Factory::ActionLabel::VALIDATELABEL:
             return std::make_shared<ValidateLabelOrIDArgAction>(model_);

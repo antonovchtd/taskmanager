@@ -19,18 +19,20 @@
 #include "ActionResult.h"
 #include "../persistence/Persistor.h"
 
+typedef std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Container;
+
 class TaskManager {
 public:
     TaskManager();
     explicit TaskManager(const std::shared_ptr<IDGenerator> &generator);
     TaskManager(const std::shared_ptr<IDGenerator> &generator,
-                const std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &tasks);
+                const Container &tasks);
 
 public:
     std::pair<ProtoTask::Task, Node>& operator[](ProtoTask::TaskID);
-    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> getTasks() const;
-    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> getTasks(const std::string &label) const;
-    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> getTasks(const ProtoTask::TaskID &id);
+    Container getTasks() const;
+    Container getTasks(const std::string &label) const;
+    Container getTasks(const ProtoTask::TaskID &id);
     std::shared_ptr<IDGenerator> gen() const;
     size_t size() const;
 
@@ -48,7 +50,7 @@ public:
     void Replace(const std::vector<ProtoTask::TaskEntity> &);
 
 private:
-    std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> tasks_;
+    Container tasks_;
     std::shared_ptr<IDGenerator> gen_;
 };
 
