@@ -37,7 +37,7 @@ std::shared_ptr<Step> HomeStep::execute(Context &c) {
         c.setID(result.id);
     else {
         factory()->printer()->print(result.message());
-        command = "";
+        return factory()->lazyInitStep(Factory::State::HOME);
     }
     return factory()->createStep(command);
 }
