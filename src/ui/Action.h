@@ -13,12 +13,14 @@ class Action {
 public:
     struct Data {
         std::string arg;
+        ProtoTask::TaskID id;
+        ProtoTask::Task task;
     };
 
 public:
     explicit Action(const std::shared_ptr<TaskManager> &);
     Action(const std::shared_ptr<TaskManager> &, const Data &);
-    virtual void make(Context &) = 0;
+    virtual ActionResult make(Context &) = 0;
     
 public:
     std::shared_ptr<TaskManager> model() const;
@@ -30,88 +32,82 @@ private:
     Action::Data data_;
 };
 
-class DoNothingAction : public Action {
-public:
-    using Action::Action;
-    void make(Context &) override;
-};
-
 class AddTaskAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
-class ValidateIDAction : public Action {
+class GetIDAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class ValidateNoArgAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
-class ValidateLabelArgAction : public Action {
+class ValidateLabelOrIDArgAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class EditTaskAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class AddSubtaskAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class ShowAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class CompleteTaskAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class DeleteAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class ConfirmDeleteAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class LabelAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class SaveAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 class LoadAction : public Action {
 public:
     using Action::Action;
-    void make(Context &) override;
+    ActionResult make(Context &) override;
 };
 
 

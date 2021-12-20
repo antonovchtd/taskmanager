@@ -16,6 +16,7 @@
 #include "Node.h"
 #include "Task.pb.h"
 #include "utils.h"
+#include "ActionResult.h"
 #include "../persistence/Persistor.h"
 
 class TaskManager {
@@ -34,13 +35,13 @@ public:
     size_t size() const;
 
 public:
-    ProtoTask::TaskID Add(const ProtoTask::Task &);
-    ProtoTask::TaskID AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &);
-    void Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t);
-    void Complete(const ProtoTask::TaskID &);
-    void Delete(const ProtoTask::TaskID &id, bool deleteChildren = false);
-    bool Validate(const ProtoTask::TaskID &id) const;
-    void SetLabel(const ProtoTask::TaskID &, const std::string &);
+    ActionResult Add(const ProtoTask::Task &);
+    ActionResult AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &);
+    ActionResult Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t);
+    ActionResult Complete(const ProtoTask::TaskID &);
+    ActionResult Delete(const ProtoTask::TaskID &id, bool deleteChildren = false);
+    ActionResult Validate(const ProtoTask::TaskID &id) const;
+    ActionResult SetLabel(const ProtoTask::TaskID &, const std::string &);
 
 public:
     std::vector<ProtoTask::TaskEntity> Export();

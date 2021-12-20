@@ -30,8 +30,7 @@ public:
     Step(const std::shared_ptr<Factory> &factory);
 
 public:
-    virtual std::shared_ptr<Action> execute(Context &c) = 0;
-    virtual void process(Context &c) = 0;
+    virtual std::shared_ptr<Step> execute(Context &c) = 0;
     virtual ~Step() = default;
 
 public:
@@ -44,34 +43,28 @@ private:
 class HomeStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
-
-public:
-    std::shared_ptr<Action> getValidateArgAction(const std::string &arg);
-
-private:
-    std::string command_;
 };
 
 class HelpStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class AddStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class ReadTaskDataStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 
 public:
@@ -83,28 +76,28 @@ public:
 class EditStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class SubtaskStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class QuitStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class ShowStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
     void recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &kv,
                         const Context &c,
@@ -114,42 +107,42 @@ public:
 class CompleteStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class DeleteStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class ConfirmDeleteStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class LabelStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class SaveStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 
 class LoadStep : public Step {
 public:
     using Step::Step;
-    std::shared_ptr<Action> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c) override;
     void process(Context &c) override;
 };
 

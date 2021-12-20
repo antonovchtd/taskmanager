@@ -13,62 +13,66 @@ std::shared_ptr<Factory> Step::factory() const {
     return factory_;
 }
 
-std::shared_ptr<Action> HomeStep::execute(Context &c) {
+std::shared_ptr<Step> HomeStep::execute(Context &c) {
     std::stringstream ss{factory()->reader()->read(" > ")};
-    std::string arg;
-    ss >> command_ >> arg;
-    return getValidateArgAction(arg);
-}
-
-void HomeStep::process(Context &c) {
-    if (c.id().has_value()) {
-        if (c.id()->has_is_invalid() && c.id()->is_invalid()) {
-            factory()->printer()->print("Invalid ID. Try again.\n");
-            command_ = "";
-        }
-    } else {
-        factory()->printer()->print("This function takes no argument.\n");
-        command_ = "";
-    }
-    c.setStep(factory()->createStep(command_));
-}
-
-std::shared_ptr<Action> HomeStep::getValidateArgAction(const std::string &arg) {
+    std::string command, arg;
+    ss >> command >> arg;
+    
     std::shared_ptr<Action> action;
-    if (command_ == "edit" || command_ == "subtask" ||
-        command_ == "delete" || command_ == "complete" ||
-        command_ == "label") {
+    if (command == "edit" || command == "subtask" ||
+        command == "delete" || command == "complete" ||
+        command == "label") {
         action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATEID);
-    } else if (command_ == "show" || command_ == "save" || command_ == "load") {
+    } else if (command == "show" || command == "save" || command == "load") {
         action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATELABEL);
     } else {
         action = factory()->lazyInitAction(Factory::ActionLabel::VALIDATENOID);
     }
     action->setActionData(Action::Data{arg});
-    return action;
+    ActionResult result = action->make(c);
+
+    switch (result.status) {
+        case ActionResult::Status::NOT_AN_ID:
+        case ActionResult::Status::TAKES_ARG:
+            factory()->printer()->print("This function expects in ID argument.\n");
+            command = "";
+            break;
+        case ActionResult::Status::TAKES_NO_ARG:
+            factory()->printer()->print("This function takes no argument.\n");
+            command = "";
+            break;
+        default:
+            c.setID(result.id);
+            break;
+    }
+    return factory()->createStep(command);
 }
 
-std::shared_ptr<Action> HelpStep::execute(Context &c) {
+std::shared_ptr<Step> HelpStep::execute(Context &c) {
     FileReader fr("../src/model/help.txt");
     factory()->printer()->print(fr.read(""));
-    return ActionGetter::getAction(*this, factory());
+    return StepSwitcher::nextStep(*this, factory());
 }
 
-void HelpStep::process(Context &c) {
-    c.setStep(StepSwitcher::nextStep(*this, factory()));
-}
-
-std::shared_ptr<Action> AddStep::execute(Context &c) {
+std::shared_ptr<Step> AddStep::execute(Context &c) {
     factory()->printer()->print("[Add Task]\n");
     Machine wizard(factory(), Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
-    return ActionGetter::getAction(*this, factory());
-}
 
-void AddStep::process(Context &c) {
-    factory()->printer()->print("Added Task with ID " + std::to_string(c.id()->num()) + ".\n");
-    c.setStep(StepSwitcher::nextStep(*this, factory()));
+    auto action = factory()->lazyInitAction(Factory::ActionLabel::ADDTASK);
+    ActionResult result = action->make(c);
+
+    switch (result.status) {
+        case ActionResult::Status::DUPLICATE_ID:
+            factory()->printer()->print("Failed to add task with ID " + std::to_string(result.id->num()) +
+                                        ". Duplicate ID.\n");
+            return factory()->lazyInitStep(Factory::State::HOME);
+        default:
+            factory()->printer()->print("Added Task with ID " + std::to_string(result.id->num()) + ".\n");
+            c.setID(result.id);
+    }
+    return StepSwitcher::nextStep(*this, factory());
 }
 
 bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title) {

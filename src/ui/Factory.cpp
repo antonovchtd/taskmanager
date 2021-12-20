@@ -78,7 +78,7 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
 }
 
 std::shared_ptr<Step> Factory::getNewStep(const State &s) {
-    switch (s){
+    switch (s) {
         case State::HOME:
             return std::shared_ptr<HomeStep>{new HomeStep(shared_from_this())};
         case State::HELP:
@@ -131,11 +131,11 @@ std::shared_ptr<Action> Factory::getNewAction(const Factory::ActionLabel &label)
         case Factory::ActionLabel::ADDSUBTASK:
             return std::make_shared<AddSubtaskAction>(model_);
         case Factory::ActionLabel::VALIDATEID:
-            return std::make_shared<ValidateIDAction>(model_);
+            return std::make_shared<GetIDAction>(model_);
         case Factory::ActionLabel::VALIDATENOID:
             return std::make_shared<ValidateNoArgAction>(model_);
         case Factory::ActionLabel::VALIDATELABEL:
-            return std::make_shared<ValidateLabelArgAction>(model_);
+            return std::make_shared<ValidateLabelOrIDArgAction>(model_);
         case Factory::ActionLabel::EDIT:
             return std::make_shared<EditTaskAction>(model_);
         case Factory::ActionLabel::SHOW:

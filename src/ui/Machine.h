@@ -12,7 +12,6 @@
 class Machine {
 public:
     Machine();
-    explicit Machine(const Factory::State &s);
     Machine(const std::shared_ptr<Factory> &f, const Factory::State &s);
 
 public:
@@ -24,6 +23,7 @@ public:
 private:
     Context context_;
     std::shared_ptr<Factory> factory_;
+    Factory::State initial_step_;
 };
 
 

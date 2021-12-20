@@ -27,55 +27,42 @@ void Action::setActionData(const Action::Data &data) {
     data_ = data;
 }
 
-void AddTaskAction::make(Context &context) {
-    context.setID(model()->Add(context.task()));
+ActionResult GetIDAction::make(Context &context) {
+    ProtoTask::TaskID id;
+    if (data().arg.empty())
+        return {ActionResult::Status::TAKES_ARG, std::nullopt};
+    try {
+        id.set_num(std::stoi(data().arg));
+    } catch (const std::invalid_argument &) {
+        return {ActionResult::Status::NOT_AN_ID, std::nullopt};
+    }
+    return {ActionResult::Status::SUCCESS, id};
 }
 
-void DoNothingAction::make(Context &context) {
-    // do nothing
+ActionResult ValidateNoArgAction::make(Context &context) {
+    if (!data().arg.empty())
+        return {ActionResult::Status::SUCCESS, std::nullopt};
+    else
+        return {ActionResult::Status::TAKES_NO_ARG, std::nullopt};
+}
+
+ActionResult ValidateLabelOrIDArgAction::make(Context &context) {
+    // empty is OK
+    ProtoTask::TaskID id;
+    try {
+        id.set_num(std::stoi(data().arg));
+        return {ActionResult::Status::SUCCESS, id};
+    } catch (const std::invalid_argument &) {
+        return {ActionResult::Status::SUCCESS, std::nullopt};
+    }
+}
+
+ActionResult AddTaskAction::make(Context &context) {
+    return model()->Add(context.task());
 }
 
 void AddSubtaskAction::make(Context &context) {
-    context.setID(model()->AddSubtask(context.task(), *context.id()));
-}
-
-void ValidateIDAction::make(Context &context) {
-    ProtoTask::TaskID id;
-    try {
-        id.set_num(std::stoi(data().arg));
-    } catch (const std::invalid_argument &) {
-        id.set_is_invalid(true);
-    }
-    if (!model()->Validate(id)) {
-        id.set_is_invalid(true);
-    }
-    context.setID(id);
-}
-
-void ValidateNoArgAction::make(Context &context) {
-    if (!data().arg.empty()){
-        context.setID(std::nullopt);
-    }
-    else {
-        ProtoTask::TaskID id;
-        id.set_is_invalid(false);
-        context.setID(id);
-    }
-}
-
-void ValidateLabelArgAction::make(Context &context) {
-    // arg can be empty, can be something, no check for ID though
-    ProtoTask::TaskID id;
-    try {
-        id.set_num(std::stoi(data().arg));
-    } catch (const std::invalid_argument &) {
-        id.set_is_invalid(false);
-    }
-    if (id.has_num())
-        if (!model()->Validate(id))
-            id.set_is_invalid(true);
-
-    context.setID(id);
+    context.setID(model()->AddSubtask(context.task(), *context.id()).id);
 }
 
 void EditTaskAction::make(Context &context) {

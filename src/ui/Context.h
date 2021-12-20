@@ -15,13 +15,11 @@
 
 class Context{
 public:
-    std::shared_ptr<Step> step() const;
     ProtoTask::Task task() const;
     std::optional<ProtoTask::TaskID> id() const;
     std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> tasks() const;
 
 public:
-    void setStep(const std::shared_ptr<Step> &);
     void setTitle(const std::string &);
     void setDueDate(const time_t &);
     void setPriority(const ProtoTask::Task::Priority &);
@@ -32,7 +30,6 @@ public:
 private:
     ProtoTask::Task task_;
     std::optional<ProtoTask::TaskID> id_;
-    std::shared_ptr<Step> step_;
     std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> tasks_;
 };
 

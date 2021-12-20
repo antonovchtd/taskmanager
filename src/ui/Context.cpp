@@ -4,10 +4,6 @@
 
 #include "Context.h"
 
-std::shared_ptr<Step> Context::step() const {
-    return step_;
-}
-
 ProtoTask::Task Context::task() const {
     return task_;
 }
@@ -18,10 +14,6 @@ std::optional<ProtoTask::TaskID> Context::id() const {
 
 std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Context::tasks() const {
     return tasks_;
-}
-
-void Context::setStep(const std::shared_ptr<Step> &s) {
-    step_ = s;
 }
 
 void Context::setTitle(const std::string &title) {

@@ -14,25 +14,25 @@ TaskManager::TaskManager(const std::shared_ptr<IDGenerator> &generator,
                          gen_(generator), tasks_(tasks) {
 }
 
-ProtoTask::TaskID TaskManager::Add(const ProtoTask::Task &t) {
+ActionResult TaskManager::Add(const ProtoTask::Task &t) {
     ProtoTask::TaskID id = gen_->genID();
     if (Validate(id))
-        throw std::runtime_error("TaskManager::Add attempts to overwrite ProtoTask::Task");
+        return {ActionResult::Status::DUPLICATE_ID, id};
 
     tasks_.insert(std::make_pair(id, std::make_pair(t, Node())));
-    return id;
+    return {ActionResult::Status::SUCCESS, id};
 }
 
-ProtoTask::TaskID TaskManager::AddSubtask(const ProtoTask::Task &t, const ProtoTask::TaskID &parent) {
+ActionResult TaskManager::AddSubtask(const ProtoTask::Task &t, const ProtoTask::TaskID &parent) {
     ProtoTask::TaskID id = gen_->genID();
     if (Validate(id))
-        throw std::runtime_error("TaskManager::AddSubtask attempts to overwrite ProtoTask::Task");
+        return {ActionResult::Status::DUPLICATE_ID, id};
     if (!Validate(parent))
-        throw std::runtime_error("TaskManager::AddSubtask invalid parent ID");
+        return {ActionResult::Status::PARENT_ID_NOT_FOUND, parent};
 
     tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
     tasks_.at(parent).second.AddChild(id);
-    return id;
+    return {ActionResult::Status::SUCCESS, id};
 }
 
 std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> TaskManager::getTasks() const {
@@ -65,45 +65,61 @@ std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> TaskManager::getTa
     return tasks;
 }
 
-void TaskManager::Delete(const ProtoTask::TaskID &id, bool deleteChildren) {
+ActionResult TaskManager::Delete(const ProtoTask::TaskID &id, bool deleteChildren) {
     if (!tasks_.at(id).second.children().empty() && !deleteChildren)
-        throw std::runtime_error("TaskManager::Delete attempts to delete ProtoTask::Task with subtasks");
+        return {ActionResult::Status::HAS_CHILDREN, id};
     std::optional<ProtoTask::TaskID> ancestor = tasks_.at(id).second.parent();
     if (ancestor && Validate(ancestor.value()))
         tasks_.at(ancestor.value()).second.RemoveChild(id);
     for (auto const &ch : tasks_.at(id).second.children())
         Delete(ch, true);
     tasks_.erase(id);
+    return {ActionResult::Status::SUCCESS, id};
 }
 
-void TaskManager::Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) {
-    tasks_.at(id).first = t;
+ActionResult TaskManager::Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) {
+    try {
+        tasks_.at(id).first = t;
+    } catch (const std::out_of_range &) {
+        return {ActionResult::Status::ID_NOT_FOUND, id};
+    }
+    return {ActionResult::Status::SUCCESS, id};
 }
 
-void TaskManager::Complete(const ProtoTask::TaskID &id) {
-    ProtoTask::Task t = tasks_.at(id).first;
-    t.set_is_complete(true);
-    Edit(id, t);
+ActionResult TaskManager::Complete(const ProtoTask::TaskID &id) {
+    try {
+        tasks_.at(id).first.set_is_complete(true);
+    } catch (const std::out_of_range &) {
+        return {ActionResult::Status::ID_NOT_FOUND, id};
+    }
     for (auto const &ch : tasks_.at(id).second.children())
         Complete(ch);
+    return {ActionResult::Status::SUCCESS, id};
 }
 
 std::pair<ProtoTask::Task, Node>& TaskManager::operator[](ProtoTask::TaskID id) {
     return tasks_.at(id);
 }
 
-bool TaskManager::Validate(const ProtoTask::TaskID &id) const{
-    return tasks_.find(id) != tasks_.end();
+ActionResult TaskManager::Validate(const ProtoTask::TaskID &id) const{
+    if (tasks_.find(id) != tasks_.end())
+        return {ActionResult::Status::SUCCESS, id};
+    else
+        return {ActionResult::Status::ID_NOT_FOUND, id};
 }
 
 size_t TaskManager::size() const {
     return tasks_.size();
 }
 
-void TaskManager::SetLabel(const ProtoTask::TaskID &id, const std::string &label) {
-    ProtoTask::Task t = tasks_.at(id).first;
-    t.set_label(label);
-    Edit(id, t);
+ActionResult TaskManager::SetLabel(const ProtoTask::TaskID &id, const std::string &label) {
+    ProtoTask::Task t;
+    try {
+        tasks_.at(id).first.set_label(label);
+    } catch (const std::out_of_range &) {
+        return {ActionResult::Status::ID_NOT_FOUND, id};
+    }
+    return {ActionResult::Status::SUCCESS, id};
 }
 
 std::vector<ProtoTask::TaskEntity> TaskManager::Export() {

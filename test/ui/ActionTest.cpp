@@ -63,7 +63,7 @@ TEST_F(ActionTest, makeValidateIDActionValidID)
     t.set_label("label");
     t.set_is_complete(false);
     ProtoTask::TaskID id = ptr->Add(t);
-    ValidateIDAction via(ptr, Action::Data{std::to_string(id.num())});
+    GetIDAction via(ptr, Action::Data{std::to_string(id.num())});
     via.make(c);
     EXPECT_EQ(id, *c.id());
 }
@@ -79,7 +79,7 @@ TEST_F(ActionTest, makeValidateIDActionInvalidID)
     t.set_label("label");
     t.set_is_complete(false);
     ProtoTask::TaskID id = ptr->Add(t);
-    ValidateIDAction via(ptr, Action::Data{std::to_string(id.num()) + "0"});
+    GetIDAction via(ptr, Action::Data{std::to_string(id.num()) + "0"});
     via.make(c);
     EXPECT_TRUE(c.id()->has_is_invalid() && c.id()->is_invalid());
 }
@@ -88,7 +88,7 @@ TEST_F(ActionTest, makeValidateIDActionNoID)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    ValidateIDAction via(ptr, Action::Data{""});
+    GetIDAction via(ptr, Action::Data{""});
     via.make(c);
     EXPECT_TRUE(c.id()->has_is_invalid() && c.id()->is_invalid());
 }
@@ -97,7 +97,7 @@ TEST_F(ActionTest, makeValidateIDActionString)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    ValidateIDAction via(ptr, Action::Data{"bad"});
+    GetIDAction via(ptr, Action::Data{"bad"});
     via.make(c);
     EXPECT_TRUE(c.id()->has_is_invalid() && c.id()->is_invalid());
 }
@@ -124,7 +124,7 @@ TEST_F(ActionTest, makeValidateLabelArgActionEmptyStr)
 {
     auto ptr = std::make_shared<TaskManager>(TaskManager{});
     Context c;
-    ValidateLabelArgAction vlaa(ptr, Action::Data{""});
+    ValidateLabelOrIDArgAction vlaa(ptr, Action::Data{""});
     vlaa.make(c);
     EXPECT_TRUE(c.id()->has_is_invalid() && !c.id()->is_invalid());
 }
@@ -140,7 +140,7 @@ TEST_F(ActionTest, makeValidateLabelArgActionValidID)
     t.set_label("label");
     t.set_is_complete(false);
     ProtoTask::TaskID id = ptr->Add(t);
-    ValidateLabelArgAction vlaa(ptr, Action::Data{std::to_string(id.num())});
+    ValidateLabelOrIDArgAction vlaa(ptr, Action::Data{std::to_string(id.num())});
     vlaa.make(c);
     EXPECT_EQ(id, *c.id());
 }
@@ -156,7 +156,7 @@ TEST_F(ActionTest, makeValidateLabelArgActionInvalidID)
     t.set_label("label");
     t.set_is_complete(false);
     ProtoTask::TaskID id = ptr->Add(t);
-    ValidateLabelArgAction vlaa(ptr, Action::Data{std::to_string(id.num()) + "0"});
+    ValidateLabelOrIDArgAction vlaa(ptr, Action::Data{std::to_string(id.num()) + "0"});
     vlaa.make(c);
     EXPECT_TRUE(c.id()->has_is_invalid() && c.id()->is_invalid());
 }
