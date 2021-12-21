@@ -12,7 +12,7 @@ using ::testing::Return;
 using ::testing::_;
 using testing::SaveArg;
 
-class PersistorTest : public ::testing::Test
+class PersisterTest : public ::testing::Test
 {
 
 };
@@ -27,7 +27,7 @@ public:
     MOCK_METHOD(void, print, (const std::string &message), (override));
 };
 
-TEST_F(PersistorTest, shouldSaveAndLoadTasksMapWithGeneratorState)
+TEST_F(PersisterTest, shouldSaveAndLoadTasksMapWithGeneratorState)
 {
     auto tm = std::make_shared<TaskManager>();
     ProtoTask::Task t = ProtoTask::create("task 1", ProtoTask::Task_Priority_HIGH,
@@ -36,11 +36,11 @@ TEST_F(PersistorTest, shouldSaveAndLoadTasksMapWithGeneratorState)
                                           time(nullptr), "b", false);
     ProtoTask::Task subsub = ProtoTask::create("subsubtask 3", ProtoTask::Task_Priority_LOW,
                                           time(nullptr), "c", false);
-    auto id1 = tm->Add(t);
-    auto id2 = tm->AddSubtask(sub, id1);
-    auto id3 = tm->AddSubtask(subsub, id2);
+    auto id1 = *tm->Add(t).id;
+    auto id2 = *tm->AddSubtask(sub, id1).id;
+    auto id3 = *tm->AddSubtask(subsub, id2).id;
 
-    std::string filename = "PersistorTest.bin";
+    std::string filename = "PersisterTest.bin";
     Persistor::save(filename, tm);
     auto tm_loaded = std::make_shared<TaskManager>();
     Persistor::load(filename, tm_loaded);
