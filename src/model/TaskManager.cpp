@@ -101,7 +101,7 @@ ActionResult TaskManager::Complete(const ProtoTask::TaskID &id) {
     return {ActionResult::Status::SUCCESS, id};
 }
 
-std::pair<ProtoTask::Task, Node>& TaskManager::operator[](ProtoTask::TaskID id) {
+std::pair<ProtoTask::Task, Node>& TaskManager::operator[](const ProtoTask::TaskID &id) {
     return tasks_.at(id);
 }
 
@@ -143,7 +143,7 @@ std::vector<ProtoTask::TaskEntity> TaskManager::Export() {
 void TaskManager::Replace(const std::vector<ProtoTask::TaskEntity> &vec) {
     tasks_.clear();
     ProtoTask::TaskID max_id;
-    max_id.set_num(0);
+    max_id.set_value(0);
     for (const auto &te : vec) {
         Node n;
         if (te.has_parent())
@@ -159,7 +159,7 @@ void TaskManager::Replace(const std::vector<ProtoTask::TaskEntity> &vec) {
             tasks_[*kv.second.second.parent()].second.AddChild(kv.first);
 
     // set IDGenerator state
-    gen_->setState(max_id.num()+1);
+    gen_->setState(max_id.value()+1);
 }
 
 std::shared_ptr<IDGenerator> TaskManager::gen() const {

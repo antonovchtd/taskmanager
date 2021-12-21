@@ -12,7 +12,7 @@ IDGenerator::IDGenerator(int last) : last_(last) {
 
 ProtoTask::TaskID IDGenerator::genID() {
     ProtoTask::TaskID id;
-    id.set_num(last_++);
+    id.set_value(last_++);
     return id;
 }
 

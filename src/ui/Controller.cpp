@@ -35,7 +35,7 @@ ActionResult Controller::ValidateID(Context &context) {
     if (data().arg.empty())
         return {ActionResult::Status::TAKES_ARG, std::nullopt};
     try {
-        id.set_num(std::stoi(data().arg));
+        id.set_value(std::stoi(data().arg));
         context.setID(id);
         return model()->Validate(id);
     } catch (const std::invalid_argument &) {
@@ -54,7 +54,7 @@ ActionResult Controller::ValidateLabelOrID(Context &context) {
     // empty is OK
     ProtoTask::TaskID id;
     try {
-        id.set_num(std::stoi(data().arg));
+        id.set_value(std::stoi(data().arg));
         context.setID(id);
         return model()->Validate(id);
     } catch (const std::invalid_argument &) {
@@ -66,7 +66,7 @@ ActionResult Controller::ValidateAlpha(Context &context) {
     // empty is OK
     ProtoTask::TaskID id;
     try {
-        id.set_num(std::stoi(data().arg));
+        id.set_value(std::stoi(data().arg));
         return {ActionResult::Status::TAKES_ALPHA, id};
     } catch (const std::invalid_argument &) {
         return {ActionResult::Status::SUCCESS, std::nullopt};
@@ -88,7 +88,7 @@ ActionResult Controller::AddSubtask(Context &context) {
 ActionResult Controller::ShowTasks(Context &context) {
     if (data().arg.empty())
         context.setTasks(model()->getTasks());
-    else if (context.id().has_value() && context.id()->has_num()) {
+    else if (context.id()) {
         context.setTasks(model()->getTasks(*context.id()));
         return {ActionResult::Status::SUCCESS, *context.id()};
     }

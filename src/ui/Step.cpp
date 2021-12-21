@@ -26,7 +26,7 @@ std::shared_ptr<Step> processResult(const T &step,
         if (!message.empty()) {
             step.factory()->printer()->print(message);
             if (result.id)
-                step.factory()->printer()->print(" (ID: " + std::to_string(result.id->num()) + ")\n");
+                step.factory()->printer()->print(" (ID: " + std::to_string(result.id->value()) + ")\n");
         }
     }
     else {
@@ -198,7 +198,7 @@ std::shared_ptr<Step> ShowStep::execute(Context &c) {
 void ShowStep::recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &kv,
                               const Context &c,
                               const std::string &prefix) {
-    factory()->printer()->print(prefix + std::to_string(kv.first.num()) +
+    factory()->printer()->print(prefix + std::to_string(kv.first.value()) +
                      " – " + to_string(kv.second.first));
 
     factory()->printer()->print("\n");
@@ -225,7 +225,7 @@ std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c) {
         auto ch = c.tasks().at(*result.id).second.children();
         if (!ch.empty()) {
             while (true) {
-                std::string reply = factory()->reader()->read("Task " + std::to_string(c.id()->num()) +
+                std::string reply = factory()->reader()->read("Task " + std::to_string(c.id()->value()) +
                                                               " has " + std::to_string(ch.size()) +
                                                               " subtask(s). Confirm to delete all. [Y]/N > ");
                 if (reply.empty() || reply == "Y" || reply == "y") {

@@ -13,13 +13,13 @@ std::string ActionResult::message() const {
         case Status::SUCCESS:
             return "Success!";
         case Status::ID_NOT_FOUND:
-            return "ID " + std::to_string(id->num()) + " was not found.\n";
+            return "ID " + std::to_string(id->value()) + " was not found.\n";
         case Status::PARENT_ID_NOT_FOUND:
-            return "Parent ID " + std::to_string(id->num()) + " was not found.\n";
+            return "Parent ID " + std::to_string(id->value()) + " was not found.\n";
         case Status::HAS_CHILDREN:
-            return "Cannot proceed: Task " + std::to_string(id->num()) + " has children.\n";
+            return "Cannot proceed: Task " + std::to_string(id->value()) + " has children.\n";
         case Status::DUPLICATE_ID:
-            return "Error: Duplicate ID " + std::to_string(id->num()) + ".\n";
+            return "Error: Duplicate ID " + std::to_string(id->value()) + ".\n";
         case Status::FILE_NOT_FOUND:
             return "File could not be found.\n";
         case Status::FAILED_TO_OPEN_FILE:

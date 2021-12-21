@@ -91,15 +91,15 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
     ASSERT_EQ(2, tm.size());
 
     ProtoTask::TaskID id;
-    id.set_num(1);
+    id.set_value(1);
     ASSERT_TRUE(tm.Validate(id));
     EXPECT_TRUE(tm[id].first.is_complete());
 
-    id.set_num(2);
+    id.set_value(2);
     ASSERT_TRUE(tm.Validate(id));
     EXPECT_FALSE(tm[id].first.is_complete());
 
-    id.set_num(3);
+    id.set_value(3);
     EXPECT_FALSE(tm.Validate(id));
 
     EXPECT_EQ(4, tm.gen()->state());
@@ -138,17 +138,17 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
 
     // check completeness
     ProtoTask::TaskID id;
-    id.set_num(1);
+    id.set_value(1);
     ASSERT_TRUE(tm.Validate(id));
     EXPECT_TRUE(tm[id].first.is_complete());
 
     ProtoTask::TaskID id2;
-    id2.set_num(2);
+    id2.set_value(2);
     ASSERT_TRUE(tm.Validate(id2));
     EXPECT_TRUE(tm[id2].first.is_complete());
 
     ProtoTask::TaskID id3;
-    id3.set_num(3);
+    id3.set_value(3);
     ASSERT_TRUE(tm.Validate(id3));
     EXPECT_TRUE(tm[id3].first.is_complete());
 
@@ -208,17 +208,17 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
 
     // check labels
     ProtoTask::TaskID id;
-    id.set_num(1);
+    id.set_value(1);
     ASSERT_TRUE(tm.Validate(id));
     EXPECT_EQ("", tm[id].first.label());
 
     ProtoTask::TaskID id2;
-    id2.set_num(2);
+    id2.set_value(2);
     ASSERT_TRUE(tm.Validate(id2));
     EXPECT_EQ("l2", tm[id2].first.label());
 
     ProtoTask::TaskID id3;
-    id3.set_num(3);
+    id3.set_value(3);
     ASSERT_TRUE(tm.Validate(id3));
     EXPECT_EQ("l3", tm[id3].first.label());
 
@@ -273,11 +273,11 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
     ASSERT_EQ(1, tm.size());
 
     ProtoTask::TaskID id;
-    id.set_num(1);
+    id.set_value(1);
     EXPECT_FALSE(tm.Validate(id));
-    id.set_num(2);
+    id.set_value(2);
     EXPECT_TRUE(tm.Validate(id));
-    id.set_num(3);
+    id.set_value(3);
     EXPECT_FALSE(tm.Validate(id));
 
     for (int i = 0; i <  prompts.size(); ++i) {
@@ -325,7 +325,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
     ASSERT_EQ(1, tm.size());
 
     ProtoTask::TaskID id;
-    id.set_num(1);
+    id.set_value(1);
     EXPECT_TRUE(tm.Validate(id));
 
     for (int i = 0; i <  prompts.size(); ++i) {
@@ -406,9 +406,9 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
     ASSERT_EQ(3, tm.size());
 
     ProtoTask::TaskID id1, id2, id3;
-    id1.set_num(1);
-    id2.set_num(2);
-    id3.set_num(3);
+    id1.set_value(1);
+    id2.set_value(2);
+    id3.set_value(3);
 
     ASSERT_TRUE(tm.Validate(id1));
     EXPECT_TRUE(tm[id1].first.is_complete());

@@ -4,10 +4,7 @@ syntax = "proto3";
 package ProtoTask;
 
 message TaskID {
-  oneof value {
-    int32 num = 1;
-    bool is_invalid = 2;
-  }
+  int32 value = 1;
 }
 
 message Task {

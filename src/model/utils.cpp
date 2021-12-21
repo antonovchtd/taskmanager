@@ -13,9 +13,7 @@ bool ProtoTask::operator==(const ProtoTask::Task &lhs, const ProtoTask::Task &rh
            rhs.due_date() == lhs.due_date();
 }
 bool ProtoTask::operator==(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
-    if (rhs.has_num() && lhs.has_num())
-        return rhs.num() == lhs.num();
-    return false;
+    return rhs.value() == lhs.value();
 }
 
 bool ProtoTask::operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
@@ -23,14 +21,10 @@ bool ProtoTask::operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID
 }
 
 bool ProtoTask::operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
-    if (lhs.has_num() && rhs.has_num())
-        return lhs.num() < rhs.num();
-    return false;
+    return lhs.value() < rhs.value();
 }
 bool ProtoTask::operator>(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
-    if (lhs.has_num() && rhs.has_num())
-        return lhs.num() > rhs.num();
-    return false;
+    return lhs.value() > rhs.value();
 }
 
 std::string to_string(const ProtoTask::Task &t) {

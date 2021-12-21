@@ -29,7 +29,7 @@ public:
                 const Container &tasks);
 
 public:
-    std::pair<ProtoTask::Task, Node>& operator[](ProtoTask::TaskID);
+    std::pair<ProtoTask::Task, Node>& operator[](const ProtoTask::TaskID &);
     Container getTasks() const;
     Container getTasks(const std::string &label) const;
     Container getTasks(const ProtoTask::TaskID &id);
