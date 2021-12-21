@@ -10,20 +10,20 @@
 
 class StepSwitcher {
 public:
-    static std::shared_ptr<Step> nextStep(const HomeStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const HelpStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const AddStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const ReadTaskDataStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const SubtaskStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const EditStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const QuitStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const ShowStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const CompleteStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const DeleteStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const ConfirmDeleteStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const LabelStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const SaveStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const LoadStep &, const std::shared_ptr<Factory> &);
+    static std::shared_ptr<Step> nextStep(const HomeStep &);
+    static std::shared_ptr<Step> nextStep(const HelpStep &);
+    static std::shared_ptr<Step> nextStep(const AddStep &);
+    static std::shared_ptr<Step> nextStep(const ReadTaskDataStep &);
+    static std::shared_ptr<Step> nextStep(const SubtaskStep &);
+    static std::shared_ptr<Step> nextStep(const EditStep &);
+    static std::shared_ptr<Step> nextStep(const QuitStep &);
+    static std::shared_ptr<Step> nextStep(const ShowStep &);
+    static std::shared_ptr<Step> nextStep(const CompleteStep &);
+    static std::shared_ptr<Step> nextStep(const DeleteStep &);
+    static std::shared_ptr<Step> nextStep(const ConfirmDeleteStep &);
+    static std::shared_ptr<Step> nextStep(const LabelStep &);
+    static std::shared_ptr<Step> nextStep(const SaveStep &);
+    static std::shared_ptr<Step> nextStep(const LoadStep &);
 };
 
 #endif //TASKMANAGER_SRC_UI_STEPSWITCHER_H_

@@ -19,20 +19,19 @@ std::string HomeStep::command() const {
 }
 
 template <typename T>
-std::shared_ptr<Step> processResult (const T &step,
-                                     const ActionResult &result,
-                                     const std::shared_ptr<Factory> &factory,
-                                     const std::string &message) {
+std::shared_ptr<Step> processResult(const T &step,
+                                    const ActionResult &result,
+                                    const std::string &message) {
     if (result) {
-        factory->printer()->print(message);
+        step.factory()->printer()->print(message);
         if (result.id)
-            factory->printer()->print(" (ID: " + std::to_string(result.id->num()) + ")\n");
+            step.factory()->printer()->print(" (ID: " + std::to_string(result.id->num()) + ")\n");
     }
     else {
-        factory->printer()->print(result.message());
-        return factory->lazyInitStep(Factory::State::HOME);
+        step.factory()->printer()->print(result.message());
+        return step.factory()->lazyInitStep(Factory::State::HOME);
     }
-    return StepSwitcher::nextStep(step, factory);
+    return StepSwitcher::nextStep(step);
 }
 
 std::shared_ptr<Step> HomeStep::execute(Context &c) {
@@ -56,13 +55,13 @@ std::shared_ptr<Step> HomeStep::execute(Context &c) {
         result = factory()->controller()->ValidateNoArg(c);
     }
 
-    return processResult(*this, result, factory(), "");
+    return processResult(*this, result, "");
 }
 
 std::shared_ptr<Step> HelpStep::execute(Context &c) {
     FileReader fr("../src/model/help.txt");
     factory()->printer()->print(fr.read(""));
-    return StepSwitcher::nextStep(*this, factory());
+    return StepSwitcher::nextStep(*this);
 }
 
 std::shared_ptr<Step> AddStep::execute(Context &c) {
@@ -72,7 +71,7 @@ std::shared_ptr<Step> AddStep::execute(Context &c) {
     c.setTask(input_context.task());
 
     ActionResult result = factory()->controller()->AddTask(c);
-    return processResult(*this, result, factory(), "Added Task");
+    return processResult(*this, result, "Added Task");
 }
 
 bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title) {
@@ -154,7 +153,7 @@ std::shared_ptr<Step> ReadTaskDataStep::execute(Context &c) {
     }
     c.setDueDate(*due_date);
 
-    return StepSwitcher::nextStep(*this, factory());
+    return StepSwitcher::nextStep(*this);
 }
 
 std::shared_ptr<Step> EditStep::execute(Context &c) {
@@ -164,7 +163,7 @@ std::shared_ptr<Step> EditStep::execute(Context &c) {
     c.setTask(input_context.task());
 
     ActionResult result = factory()->controller()->EditTask(c);
-    return processResult(*this, result, factory(), "Edited Task");
+    return processResult(*this, result, "Edited Task");
 }
 
 std::shared_ptr<Step> SubtaskStep::execute(Context &c) {
@@ -174,11 +173,11 @@ std::shared_ptr<Step> SubtaskStep::execute(Context &c) {
     c.setTask(input_context.task());
 
     ActionResult result = factory()->controller()->AddSubtask(c);
-    return processResult(*this, result, factory(), "Added Subtask");
+    return processResult(*this, result, "Added Subtask");
 }
 
 std::shared_ptr<Step> QuitStep::execute(Context &c) {
-    return StepSwitcher::nextStep(*this, factory());
+    return StepSwitcher::nextStep(*this);
 }
 
 std::shared_ptr<Step> ShowStep::execute(Context &c) {
@@ -191,7 +190,7 @@ std::shared_ptr<Step> ShowStep::execute(Context &c) {
             ShowStep::recursivePrint(kv, c, "");
     }
 
-    return StepSwitcher::nextStep(*this, factory());
+    return StepSwitcher::nextStep(*this);
 }
 
 void ShowStep::recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &kv,
@@ -209,12 +208,12 @@ void ShowStep::recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<Proto
 
 std::shared_ptr<Step> CompleteStep::execute(Context &c) {
     ActionResult result = factory()->controller()->CompleteTask(c);
-    return processResult(*this, result, factory(), "Completed Task");
+    return processResult(*this, result, "Completed Task");
 }
 
 std::shared_ptr<Step> DeleteStep::execute(Context &c) {
     ActionResult result = factory()->controller()->DeleteTask(c);
-    return processResult(*this, result, factory(), "Deleted Task");
+    return processResult(*this, result, "Deleted Task");
 }
 
 std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c) {
@@ -242,7 +241,7 @@ std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c) {
         return factory()->lazyInitStep(Factory::State::HOME);
     }
 
-    return StepSwitcher::nextStep(*this, factory());
+    return StepSwitcher::nextStep(*this);
 }
 
 std::shared_ptr<Step> LabelStep::execute(Context &c) {
@@ -251,17 +250,17 @@ std::shared_ptr<Step> LabelStep::execute(Context &c) {
         label = factory()->reader()->read("[Add Label]\n    >> ");
     factory()->controller()->setData(Controller::Data{label});
     ActionResult result = factory()->controller()->LabelTask(c);
-    return processResult(*this, result, factory(), "Added label to Task");
+    return processResult(*this, result, "Added label to Task");
 }
 
 std::shared_ptr<Step> SaveStep::execute(Context &c) {
     // factory()->controller()->setData(Controller::Data{label}); //TODO
     ActionResult result = factory()->controller()->SaveTasks(c);
-    return processResult(*this, result, factory(), "Saved to file successfully.\n");
+    return processResult(*this, result, "Saved to file successfully.\n");
 }
 
 std::shared_ptr<Step> LoadStep::execute(Context &c) {
     // factory()->controller()->setData(Controller::Data{label}); //TODO
     ActionResult result = factory()->controller()->LoadTasks(c);
-    return processResult(*this, result, factory(), "Loaded from file successfully.\n");
+    return processResult(*this, result, "Loaded from file successfully.\n");
 }
