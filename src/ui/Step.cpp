@@ -256,13 +256,11 @@ std::shared_ptr<Step> LabelStep::execute(Context &c) {
 }
 
 std::shared_ptr<Step> SaveStep::execute(Context &c) {
-    // factory()->controller()->setData(Controller::Data{label}); //TODO
     ActionResult result = factory()->controller()->SaveTasks(c);
     return processResult(*this, result, "Saved to file successfully.\n");
 }
 
 std::shared_ptr<Step> LoadStep::execute(Context &c) {
-    // factory()->controller()->setData(Controller::Data{label}); //TODO
     ActionResult result = factory()->controller()->LoadTasks(c);
     return processResult(*this, result, "Loaded from file successfully.\n");
 }
