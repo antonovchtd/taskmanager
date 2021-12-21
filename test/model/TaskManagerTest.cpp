@@ -31,7 +31,7 @@ TEST_F(TaskManagerTest, shouldAddTask)
     t.set_due_date(time(nullptr) + 10);
     t.set_label("label");
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     ASSERT_EQ(1, tm.size());
     EXPECT_TRUE(tm.Validate(id));
 }
@@ -45,9 +45,9 @@ TEST_F(TaskManagerTest, shouldAddSubtask)
     t.set_due_date(time(nullptr) + 10);
     t.set_label("label");
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     t.set_title("SubTask");
-    ProtoTask::TaskID id_ch = tm.AddSubtask(t, id);
+    ProtoTask::TaskID id_ch = *tm.AddSubtask(t, id).id;
     ASSERT_EQ(2, tm.size());
     EXPECT_TRUE(tm.Validate(id));
     EXPECT_TRUE(tm.Validate(id_ch));
@@ -66,11 +66,11 @@ TEST_F(TaskManagerTest, shouldChangeParent)
     t.set_due_date(time(nullptr) + 10);
     t.set_label("label");
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     t.set_title("TestTitle 2");
-    ProtoTask::TaskID id2 = tm.Add(t);
+    ProtoTask::TaskID id2 = *tm.Add(t).id;
     t.set_title("SubTask");
-    ProtoTask::TaskID id_ch = tm.AddSubtask(t, id);
+    ProtoTask::TaskID id_ch = *tm.AddSubtask(t, id).id;
     ASSERT_EQ(3, tm.size());
     tm[id_ch].second.SetParent(id2);
     tm[id].second.RemoveChild(id_ch);
@@ -93,7 +93,7 @@ TEST_F(TaskManagerTest, shouldRemoveAllChildren)
     t.set_due_date(time(nullptr) + 10);
     t.set_label("label");
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     t.set_title("Subtask");
     tm.AddSubtask(t, id);
     t.set_title("SubTask 2");
@@ -113,7 +113,7 @@ TEST_F(TaskManagerTest, shouldEdit)
     t.set_due_date(time(nullptr) + 10);
     t.set_label("label");
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     t.set_title("Edited");
     tm.Edit(id, t);
     EXPECT_EQ(t, tm[id].first);
@@ -128,7 +128,7 @@ TEST_F(TaskManagerTest, shouldDeleteTask)
     t.set_due_date(time(nullptr) + 10);
     t.set_label("label");
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     tm.Delete(id, false);
     EXPECT_FALSE(tm.Validate(id));
 }
@@ -142,7 +142,7 @@ TEST_F(TaskManagerTest, shouldCompleteTask)
     t.set_due_date(time(nullptr) + 10);
     t.set_label("label");
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     tm.Complete(id);
     EXPECT_TRUE(tm[id].first.is_complete());
 }
@@ -150,7 +150,7 @@ TEST_F(TaskManagerTest, shouldCompleteTask)
 TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtAddingTasksSameID)
 {
     ProtoTask::TaskID id;
-    id.set_num(1);
+    id.set_value(1);
     std::shared_ptr<MockIDGenerator> generator = std::shared_ptr<MockIDGenerator>(new MockIDGenerator);
     EXPECT_CALL(*generator, genID())
         .Times(2)
@@ -164,8 +164,8 @@ TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtAddingTasksSameID)
     t.set_due_date(time(nullptr));
     t.set_label("label");
     t.set_is_complete(false);
-    tm.Add(t);
-    EXPECT_THROW(tm.Add(t), std::runtime_error);
+    *tm.Add(t).id;
+    EXPECT_THROW(*tm.Add(t).id, std::runtime_error);
 }
 
 TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtDeletingTaskWithChildren)
@@ -178,7 +178,7 @@ TEST_F(TaskManagerTest, shouldThrowRuntimeErrorAtDeletingTaskWithChildren)
     t.set_due_date(time(nullptr));
     t.set_label("");
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     t.set_title("Subtask");
     tm.AddSubtask(t, id);
     ASSERT_EQ(2, tm.size());
@@ -196,9 +196,9 @@ TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
     t.set_due_date(time(nullptr));
     t.set_label("");
     t.set_is_complete(false);
-    ProtoTask::TaskID id1 = tm.Add(t);
+    ProtoTask::TaskID id1 = *tm.Add(t).id;
     t.set_title("Subtask");
-    ProtoTask::TaskID id2 = tm.AddSubtask(t, id1);
+    ProtoTask::TaskID id2 = *tm.AddSubtask(t, id1).id;
     ASSERT_EQ(2, tm.size());
     tm.Delete(id2, false);
     ASSERT_EQ(1, tm.size());
@@ -214,7 +214,7 @@ TEST_F(TaskManagerTest, shouldAddLabel){
     t.set_due_date(time(nullptr));
     t.set_label("");
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     std::string label = "testing";
     tm.SetLabel(id, label);
     EXPECT_EQ(label, tm[id].first.label());
@@ -229,15 +229,15 @@ TEST_F(TaskManagerTest, shouldReturnTasks){
     t.set_due_date(time(nullptr));
     t.set_label("");
     t.set_is_complete(false);
-    ProtoTask::TaskID id1 = tm.Add(t);
+    ProtoTask::TaskID id1 = *tm.Add(t).id;
 
     t.set_title("TestTitle");
     t.set_due_date(time(nullptr) + 10);
-    ProtoTask::TaskID id2 = tm.AddSubtask(t, id1);
+    ProtoTask::TaskID id2 = *tm.AddSubtask(t, id1).id;
 
     t.set_title("SubTask 2");
     t.set_due_date(time(nullptr) + 5);
-    ProtoTask::TaskID id3 = tm.AddSubtask(t, id1);
+    ProtoTask::TaskID id3 = *tm.AddSubtask(t, id1).id;
 
     auto tasks = tm.getTasks();
     ASSERT_EQ(3, tasks.size());
@@ -255,15 +255,15 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
     t.set_due_date(time(nullptr));
     t.set_label("");
     t.set_is_complete(false);
-    ProtoTask::TaskID id1 = tm.Add(t);
+    ProtoTask::TaskID id1 = *tm.Add(t).id;
 
     t.set_title("TestTitle");
     t.set_due_date(time(nullptr) + 10);
-    ProtoTask::TaskID id2 = tm.AddSubtask(t, id1);
+    ProtoTask::TaskID id2 = *tm.AddSubtask(t, id1).id;
 
     t.set_title("SubTask 2");
     t.set_due_date(time(nullptr) + 5);
-    ProtoTask::TaskID id3 = tm.AddSubtask(t, id1);
+    ProtoTask::TaskID id3 = *tm.AddSubtask(t, id1).id;
 
     std::string label = "testing";
     tm.SetLabel(id2, label);

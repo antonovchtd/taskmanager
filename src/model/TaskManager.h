@@ -17,7 +17,7 @@
 #include "Task.pb.h"
 #include "utils.h"
 #include "ActionResult.h"
-#include "../persistence/Persistor.h"
+#include "../persistence/Persister.h"
 
 typedef std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Container;
 

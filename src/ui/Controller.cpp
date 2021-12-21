@@ -121,7 +121,7 @@ ActionResult Controller::LabelTask(Context &context) {
 
 ActionResult Controller::SaveTasks(Context &context) {
     std::string filename = data().arg.empty() ? filename_ : data().arg;
-    if (Persistor::save(filename, model()))
+    if (Persister::save(filename, model()))
         return {ActionResult::Status::SUCCESS, std::nullopt};
     else
         return {ActionResult::Status::FAILED_TO_OPEN_FILE, std::nullopt};
@@ -129,7 +129,7 @@ ActionResult Controller::SaveTasks(Context &context) {
 
 ActionResult Controller::LoadTasks(Context &context) {
     std::string filename = data().arg.empty() ? filename_ : data().arg;
-    if (Persistor::load(filename, model()))
+    if (Persister::load(filename, model()))
         return {ActionResult::Status::SUCCESS, std::nullopt};
     else
         return {ActionResult::Status::FILE_NOT_FOUND, std::nullopt};

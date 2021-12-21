@@ -4,10 +4,10 @@
 
 #include <google/protobuf/util/delimited_message_util.h>
 
-#include "Persistor.h"
+#include "Persister.h"
 #include "../model/TaskManager.h"
 
-bool Persistor::save(const std::string &filename, const std::shared_ptr<TaskManager> &model) {
+bool Persister::save(const std::string &filename, const std::shared_ptr<TaskManager> &model) {
     std::ofstream file(filename, std::ios::trunc | std::ios::binary);
     if (file.is_open()) {
         std::vector<ProtoTask::TaskEntity> vec = model->Export();
@@ -21,7 +21,7 @@ bool Persistor::save(const std::string &filename, const std::shared_ptr<TaskMana
     return true;
 }
 
-bool Persistor::load(const std::string &filename, const std::shared_ptr<TaskManager> &model) {
+bool Persister::load(const std::string &filename, const std::shared_ptr<TaskManager> &model) {
     std::ifstream file(filename, std::ios::binary);
     google::protobuf::io::IstreamInputStream iis{&file};
     if (file.is_open()) {

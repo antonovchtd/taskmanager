@@ -10,7 +10,7 @@
 #include "../model/Task.pb.h"
 class TaskManager;
 
-class Persistor {
+class Persister {
 public:
     static bool save(const std::string &filename, const std::shared_ptr<TaskManager> &model);
     static bool load(const std::string &filename, const std::shared_ptr<TaskManager> &model);

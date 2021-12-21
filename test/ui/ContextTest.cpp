@@ -11,19 +11,11 @@ class ContextTest : public ::testing::Test
 
 };
 
-TEST_F(ContextTest, shouldSetAndGetStep)
-{
-    Context c;
-    auto f = Factory::create();
-    c.setStep(f->lazyInitStep(Factory::State::HOME));
-    EXPECT_EQ(c.step(), f->lazyInitStep(Factory::State::HOME));
-}
-
 TEST_F(ContextTest, shouldSetID)
 {
     Context c;
     ProtoTask::TaskID id;
-    id.set_num(42);
+    id.set_value(42);
     c.setID(id);
     EXPECT_EQ(id, *c.id());
 }
@@ -37,7 +29,7 @@ TEST_F(ContextTest, shouldSetTasks)
     t.set_label("label");
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
-    ProtoTask::TaskID id = tm.Add(t);
+    ProtoTask::TaskID id = *tm.Add(t).id;
     Context c;
     c.setTasks(tm.getTasks());
     auto tasks = c.tasks();
