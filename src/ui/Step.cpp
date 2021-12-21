@@ -23,9 +23,11 @@ std::shared_ptr<Step> processResult(const T &step,
                                     const ActionResult &result,
                                     const std::string &message) {
     if (result) {
-        step.factory()->printer()->print(message);
-        if (result.id)
-            step.factory()->printer()->print(" (ID: " + std::to_string(result.id->num()) + ")\n");
+        if (!message.empty()) {
+            step.factory()->printer()->print(message);
+            if (result.id)
+                step.factory()->printer()->print(" (ID: " + std::to_string(result.id->num()) + ")\n");
+        }
     }
     else {
         step.factory()->printer()->print(result.message());
