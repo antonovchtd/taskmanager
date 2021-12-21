@@ -68,7 +68,7 @@ std::shared_ptr<Step> HelpStep::execute(Context &c) {
 
 std::shared_ptr<Step> AddStep::execute(Context &c) {
     factory()->printer()->print("[Add Task]\n");
-    Machine wizard(factory(), Factory::State::READTASK);
+    Machine wizard = factory()->createMachine(Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
 
@@ -160,7 +160,7 @@ std::shared_ptr<Step> ReadTaskDataStep::execute(Context &c) {
 
 std::shared_ptr<Step> EditStep::execute(Context &c) {
     factory()->printer()->print("[Edit Task]\n");
-    Machine wizard(factory(), Factory::State::READTASK);
+    Machine wizard = factory()->createMachine(Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
 
@@ -170,7 +170,7 @@ std::shared_ptr<Step> EditStep::execute(Context &c) {
 
 std::shared_ptr<Step> SubtaskStep::execute(Context &c) {
     factory()->printer()->print("[Add Subtask]\n");
-    Machine wizard(factory(), Factory::State::READTASK);
+    Machine wizard = factory()->createMachine(Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
 

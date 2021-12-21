@@ -19,6 +19,7 @@
 #include "../io/FilePrinter.h"
 
 class Step;
+class Machine;
 
 class Factory : public std::enable_shared_from_this<Factory> {
 public:
@@ -53,6 +54,8 @@ public:
 
     std::shared_ptr<Step> getNewStep(const State &s);
     std::shared_ptr<Step> lazyInitStep(const State &state);
+
+    Machine createMachine(const State &state);
 
 public:
     std::shared_ptr<AbstractReader> reader() const;

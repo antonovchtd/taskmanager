@@ -4,6 +4,7 @@
 
 #include "Factory.h"
 #include "Step.h"
+#include "Machine.h"
 
 Factory::Factory() :
         reader_(std::shared_ptr<AbstractReader>(new ConsoleReader)),
@@ -68,6 +69,10 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
             printer()->print("Wrong command. Try again. Type `help` for help.\n");
         return lazyInitStep(Factory::State::HOME);
     }
+}
+
+Machine Factory::createMachine(const State &state) {
+    return {shared_from_this(), state};
 }
 
 std::shared_ptr<Step> Factory::getNewStep(const State &s) {
