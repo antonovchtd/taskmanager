@@ -379,9 +379,9 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksAndShowByID)
     ASSERT_EQ(3, tm.size());
 
     EXPECT_EQ(out[9], "1 – test, Priority: Low, Due: Tue Dec 21 00:00:00 2021 [overdue]");
-    EXPECT_EQ(out[11], "    2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021");
+    EXPECT_EQ(out[11], "    2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021 [overdue]");
     EXPECT_EQ(out[13], "        3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
-    EXPECT_EQ(out[15], "2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021");
+    EXPECT_EQ(out[15], "2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021 [overdue]");
     EXPECT_EQ(out[17], "    3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
     EXPECT_EQ(out[19], "3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
     EXPECT_EQ(out[21], "ID 4 was not found.\n");
