@@ -5,16 +5,18 @@
 #include "Controller.h"
 #include "Context.h"
 
-Controller::Controller() : model_{std::make_shared<TaskManager>()}{
+Controller::Controller() : model_{std::make_shared<TaskManager>()},
+                           persister_{std::make_shared<Persister>()} {
 };
 
-Controller::Controller(const std::shared_ptr<TaskManager> &model, const Data &data) :
-                model_(model), data_(data) {
-    
+Controller::Controller(const std::shared_ptr<TaskManager> &model,
+                       const std::shared_ptr<Persister> &persister) :
+                model_{model}, persister_{persister} {
+
 }
 
 Controller::Controller(const std::shared_ptr<TaskManager> &model) :
-                model_(model) {
+                model_(model), persister_{std::make_shared<Persister>()} {
 
 }
 
@@ -120,16 +122,16 @@ ActionResult Controller::LabelTask(Context &context) {
 }
 
 ActionResult Controller::SaveTasks(Context &context) {
-    std::string filename = data().arg.empty() ? filename_ : data().arg;
-    if (Persister::save(filename, model()))
+    std::string filename = data().arg.empty() ? persister_->defaultFilename() : data().arg;
+    if (persister_->save(filename, model()))
         return {ActionResult::Status::SUCCESS, std::nullopt};
     else
         return {ActionResult::Status::FAILED_TO_OPEN_FILE, std::nullopt};
 }
 
 ActionResult Controller::LoadTasks(Context &context) {
-    std::string filename = data().arg.empty() ? filename_ : data().arg;
-    if (Persister::load(filename, model()))
+    std::string filename = data().arg.empty() ? persister_->defaultFilename() : data().arg;
+    if (persister_->load(filename, model()))
         return {ActionResult::Status::SUCCESS, std::nullopt};
     else
         return {ActionResult::Status::FILE_NOT_FOUND, std::nullopt};

@@ -12,8 +12,14 @@ class TaskManager;
 
 class Persister {
 public:
-    static bool save(const std::string &filename, const std::shared_ptr<TaskManager> &model);
-    static bool load(const std::string &filename, const std::shared_ptr<TaskManager> &model);
+    virtual bool save(const std::string &filename, const std::shared_ptr<TaskManager> &model);
+    virtual bool load(const std::string &filename, const std::shared_ptr<TaskManager> &model);
+
+public:
+    std::string defaultFilename() const;
+
+private:
+    std::string default_filename_ = "data.bin";
 };
 
 

@@ -18,7 +18,7 @@ public:
 public:
     Controller();
     explicit Controller(const std::shared_ptr<TaskManager> &);
-    Controller(const std::shared_ptr<TaskManager> &, const Data &);
+    Controller(const std::shared_ptr<TaskManager> &, const std::shared_ptr<Persister> &);
 
 public:
     ActionResult ValidateID(Context &);
@@ -44,7 +44,7 @@ public:
 private:
     std::shared_ptr<TaskManager> model_;
     Controller::Data data_;
-    std::string filename_ = "data.bin";
+    std::shared_ptr<Persister> persister_;
 };
 
 

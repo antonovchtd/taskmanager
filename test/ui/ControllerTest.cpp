@@ -6,6 +6,13 @@
 #include "../../src/ui/Context.h"
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+using ::testing::AtLeast;
+using ::testing::Return;
+using ::testing::_;
+using testing::SaveArg;
+using ::testing::DoAll;
 
 class ControllerTest : public ::testing::Test
 {
@@ -328,4 +335,102 @@ TEST_F(ControllerTest, shouldNotLabelTaskWithInvalidID)
     EXPECT_EQ(result_label.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_EQ(new_id, result_label.id);
     EXPECT_EQ("label", (*tm_)[*result.id].first.label());
+}
+
+class MockPersister : public Persister {
+public:
+    MOCK_METHOD(bool, save, (const std::string &filename, const std::shared_ptr<TaskManager> &model), (override));
+    MOCK_METHOD(bool, load, (const std::string &filename, const std::shared_ptr<TaskManager> &model), (override));
+};
+
+TEST_F(ControllerTest, shouldReturnSuccesOnCorrectSaveWithCustomFilename)
+{
+    std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
+    ctr_ = Controller{tm_, mp};
+    std::string expected_filename = "custom.txt";
+
+    EXPECT_CALL(*mp, save(expected_filename, tm_))
+            .Times(1)
+            .WillOnce(Return(true));
+
+    ctr_.setData(Controller::Data{expected_filename});
+    ActionResult result = ctr_.SaveTasks(context_);
+    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
+    EXPECT_EQ(result.id, std::nullopt);
+}
+
+TEST_F(ControllerTest, shouldReturnSuccesOnCorrectSaveWithDefaultFilename)
+{
+    std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
+    ctr_ = Controller{tm_, mp};
+
+    EXPECT_CALL(*mp, save(mp->defaultFilename(), tm_))
+            .Times(1)
+            .WillOnce(Return(true));
+
+    ctr_.setData(Controller::Data{""});
+    ActionResult result = ctr_.SaveTasks(context_);
+    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
+    EXPECT_EQ(result.id, std::nullopt);
+}
+
+TEST_F(ControllerTest, shouldReturnFailOnIncorrectSaveWithDefaultFilename)
+{
+    std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
+    ctr_ = Controller{tm_, mp};
+
+    EXPECT_CALL(*mp, save(mp->defaultFilename(), tm_))
+            .Times(1)
+            .WillOnce(Return(false));
+
+    ctr_.setData(Controller::Data{""});
+    ActionResult result = ctr_.SaveTasks(context_);
+    EXPECT_EQ(result.status, ActionResult::Status::FAILED_TO_OPEN_FILE);
+    EXPECT_EQ(result.id, std::nullopt);
+}
+
+TEST_F(ControllerTest, shouldReturnSuccesOnCorrectLoadWithCustomFilename)
+{
+    std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
+    ctr_ = Controller{tm_, mp};
+    std::string expected_filename = "custom.txt";
+
+    EXPECT_CALL(*mp, load(expected_filename, tm_))
+            .Times(1)
+            .WillOnce(Return(true));
+
+    ctr_.setData(Controller::Data{expected_filename});
+    ActionResult result = ctr_.LoadTasks(context_);
+    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
+    EXPECT_EQ(result.id, std::nullopt);
+}
+
+TEST_F(ControllerTest, shouldReturnSuccesOnCorrectLoadWithDefaultFilename)
+{
+    std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
+    ctr_ = Controller{tm_, mp};
+
+    EXPECT_CALL(*mp, load(mp->defaultFilename(), tm_))
+            .Times(1)
+            .WillOnce(Return(true));
+
+    ctr_.setData(Controller::Data{""});
+    ActionResult result = ctr_.LoadTasks(context_);
+    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
+    EXPECT_EQ(result.id, std::nullopt);
+}
+
+TEST_F(ControllerTest, shouldReturnFailOnIncorrectLoadWithDefaultFilename)
+{
+    std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
+    ctr_ = Controller{tm_, mp};
+
+    EXPECT_CALL(*mp, load(mp->defaultFilename(), tm_))
+            .Times(1)
+            .WillOnce(Return(false));
+
+    ctr_.setData(Controller::Data{""});
+    ActionResult result = ctr_.LoadTasks(context_);
+    EXPECT_EQ(result.status, ActionResult::Status::FILE_NOT_FOUND);
+    EXPECT_EQ(result.id, std::nullopt);
 }

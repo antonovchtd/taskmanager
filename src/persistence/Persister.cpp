@@ -7,6 +7,10 @@
 #include "Persister.h"
 #include "../model/TaskManager.h"
 
+std::string Persister::defaultFilename() const {
+    return default_filename_;
+}
+
 bool Persister::save(const std::string &filename, const std::shared_ptr<TaskManager> &model) {
     std::ofstream file(filename, std::ios::trunc | std::ios::binary);
     if (file.is_open()) {
