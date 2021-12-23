@@ -78,8 +78,10 @@ file(GLOB_RECURSE Utils src/utilities/*)
 file(GLOB_RECURSE IO src/io/*)
 file(GLOB_RECURSE PER src/persistence/*)
 file(GLOB_RECURSE TEST test/*)
-add_executable(taskmanager src/main.cpp ${Model} ${Utils} ${UI} ${IO} ${PER})
-add_executable(test_taskmanager ${Model} ${Utils} ${UI} ${IO} ${PER} ${TEST})
+add_executable(taskmanager src/main.cpp ${Model} ${Utils} ${UI} ${IO} ${PER}
+        ${CMAKE_CURRENT_BINARY_DIR}/Task.pb.h ${CMAKE_CURRENT_BINARY_DIR}/Task.pb.cc)
+add_executable(test_taskmanager ${Model} ${Utils} ${UI} ${IO} ${PER} ${TEST}
+        ${CMAKE_CURRENT_BINARY_DIR}/Task.pb.h ${CMAKE_CURRENT_BINARY_DIR}/Task.pb.cc)
 target_link_libraries(test_taskmanager GTest::GTest GTest::Main GTest::gmock GTest::gmock_main)
 target_link_libraries(test_taskmanager ${Boost_LIBRARIES})
 target_link_libraries(taskmanager protobuf::libprotobuf gRPC::grpc++ gRPC::grpc++_reflection)
