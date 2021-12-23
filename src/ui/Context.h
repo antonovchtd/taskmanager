@@ -11,7 +11,7 @@
 
 #include "Step.h"
 #include "Factory.h"
-#include "../model/TaskManager.h"
+#include "model/TaskManager.h"
 
 class Context{
 public:

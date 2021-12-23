@@ -3,7 +3,7 @@
 //
 
 #include "NodeUtils.h"
-#include "../model/Node.h"
+#include "model/Node.h"
 #include "TaskIDUtils.h"
 
 bool operator==(const Node &lhs, const Node &rhs) {

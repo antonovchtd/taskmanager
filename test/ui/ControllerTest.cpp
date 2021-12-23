@@ -2,8 +2,8 @@
 // Created by Anton O. on 12/5/21.
 //
 
-#include "../../src/ui/Controller.h"
-#include "../../src/ui/Context.h"
+#include "ui/Controller.h"
+#include "ui/Context.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>

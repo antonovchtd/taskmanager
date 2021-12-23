@@ -5,7 +5,7 @@
 #ifndef TASKMANAGER_SRC_UI_MACHINE_H_
 #define TASKMANAGER_SRC_UI_MACHINE_H_
 
-#include "../model/TaskManager.h"
+#include "model/TaskManager.h"
 #include "Context.h"
 #include "Factory.h"
 

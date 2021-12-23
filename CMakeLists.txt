@@ -71,6 +71,7 @@ set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
+include_directories(src/)
 file(GLOB_RECURSE UI src/ui/*)
 file(GLOB_RECURSE Model src/model/*)
 file(GLOB_RECURSE Utils src/utilities/*)

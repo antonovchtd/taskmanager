@@ -2,7 +2,7 @@
 // Created by Anton O. on 12/16/21.
 //
 
-#include "../../src/ui/Machine.h"
+#include "ui/Machine.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>

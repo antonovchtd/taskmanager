@@ -2,8 +2,8 @@
 //// Created by Anton O. on 12/4/21.
 ////
 //
-//#include "../../src/ui/Step.h"
-//#include "../../src/ui/Context.h"
+//#include "ui/Step.h"
+//#include "ui/Context.h"
 //
 //#include <gtest/gtest.h>
 //#include <gmock/gmock.h>

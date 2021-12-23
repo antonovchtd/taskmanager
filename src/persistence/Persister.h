@@ -7,7 +7,7 @@
 
 #include <memory>
 #include <vector>
-#include "../model/Task.pb.h"
+#include "model/Task.pb.h"
 class TaskManager;
 
 class Persister {

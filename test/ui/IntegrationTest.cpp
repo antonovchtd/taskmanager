@@ -4,7 +4,7 @@
 
 #include <numeric>
 
-#include "../../src/ui/Machine.h"
+#include "ui/Machine.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>

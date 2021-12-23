@@ -10,13 +10,13 @@
 #include <map>
 
 #include "Controller.h"
-#include "../model/TaskManager.h"
-#include "../io/AbstractReader.h"
-#include "../io/ConsoleReader.h"
-#include "../io/FileReader.h"
-#include "../io/AbstractPrinter.h"
-#include "../io/ConsolePrinter.h"
-#include "../io/FilePrinter.h"
+#include "model/TaskManager.h"
+#include "io/AbstractReader.h"
+#include "io/ConsoleReader.h"
+#include "io/FileReader.h"
+#include "io/AbstractPrinter.h"
+#include "io/ConsolePrinter.h"
+#include "io/FilePrinter.h"
 
 class Step;
 class Machine;

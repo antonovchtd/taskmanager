@@ -15,11 +15,11 @@
 #include "IDGenerator.h"
 #include "Node.h"
 #include "Task.pb.h"
-#include "../utilities/TaskIDUtils.h"
-#include "../utilities/TaskUtils.h"
-#include "../utilities/NodeUtils.h"
+#include "utilities/TaskIDUtils.h"
+#include "utilities/TaskUtils.h"
+#include "utilities/NodeUtils.h"
 #include "ActionResult.h"
-#include "../persistence/Persister.h"
+#include "persistence/Persister.h"
 
 typedef std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Container;
 

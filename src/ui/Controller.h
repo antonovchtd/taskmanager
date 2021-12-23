@@ -5,7 +5,7 @@
 #ifndef TASKMANAGER_SRC_UI_ACTION_H_
 #define TASKMANAGER_SRC_UI_ACTION_H_
 
-#include "../model/TaskManager.h"
+#include "model/TaskManager.h"
 
 class Context;
 

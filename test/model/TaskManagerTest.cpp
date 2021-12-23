@@ -2,7 +2,7 @@
 // Created by Anton Ovcharenko on 17.11.2021.
 //
 
-#include "../../src/model/TaskManager.h"
+#include "model/TaskManager.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>

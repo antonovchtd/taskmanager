@@ -5,7 +5,7 @@
 #include <google/protobuf/util/delimited_message_util.h>
 
 #include "Persister.h"
-#include "../model/TaskManager.h"
+#include "model/TaskManager.h"
 
 std::string Persister::defaultFilename() const {
     return default_filename_;

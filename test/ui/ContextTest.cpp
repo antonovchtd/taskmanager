@@ -2,7 +2,7 @@
 // Created by Anton O. on 12/3/21.
 //
 
-#include "../../src/ui/Context.h"
+#include "ui/Context.h"
 
 #include <gtest/gtest.h>
 

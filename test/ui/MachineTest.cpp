@@ -6,9 +6,9 @@
 // Created by Anton O. on 12/6/21.
 //
 
-#include "../../src/ui/Machine.h"
-#include "../../src/ui/Step.h"
-#include "../../src/ui/Controller.h"
+#include "ui/Machine.h"
+#include "ui/Step.h"
+#include "ui/Controller.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
