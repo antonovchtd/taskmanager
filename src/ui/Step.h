@@ -104,6 +104,12 @@ public:
     std::shared_ptr<Step> execute(Context &c) override;
 };
 
+class UncompleteStep : public Step {
+public:
+    using Step::Step;
+    std::shared_ptr<Step> execute(Context &c) override;
+};
+
 class DeleteStep : public Step {
 public:
     using Step::Step;

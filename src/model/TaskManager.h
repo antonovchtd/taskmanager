@@ -43,6 +43,7 @@ public:
     ActionResult AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &);
     ActionResult Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t);
     ActionResult Complete(const ProtoTask::TaskID &);
+    ActionResult Uncomplete(const ProtoTask::TaskID &);
     ActionResult Delete(const ProtoTask::TaskID &id, bool deleteChildren = false);
     ActionResult Validate(const ProtoTask::TaskID &id) const;
     ActionResult SetLabel(const ProtoTask::TaskID &, const std::string &);
@@ -50,6 +51,9 @@ public:
 public:
     std::vector<ProtoTask::TaskEntity> Export();
     void Replace(const std::vector<ProtoTask::TaskEntity> &);
+
+private:
+    ActionResult SetComplete(const ProtoTask::TaskID &, bool);
 
 private:
     Container tasks_;

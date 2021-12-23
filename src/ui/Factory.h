@@ -33,6 +33,7 @@ public:
         QUIT,
         SHOW,
         COMPLETE,
+        UNCOMPLETE,
         DELETE,
         CONFIRMDELETE,
         LABEL,

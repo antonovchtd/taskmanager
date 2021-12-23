@@ -19,6 +19,7 @@ public:
     static std::shared_ptr<Step> nextStep(const QuitStep &);
     static std::shared_ptr<Step> nextStep(const ShowStep &);
     static std::shared_ptr<Step> nextStep(const CompleteStep &);
+    static std::shared_ptr<Step> nextStep(const UncompleteStep &);
     static std::shared_ptr<Step> nextStep(const DeleteStep &);
     static std::shared_ptr<Step> nextStep(const ConfirmDeleteStep &);
     static std::shared_ptr<Step> nextStep(const LabelStep &);

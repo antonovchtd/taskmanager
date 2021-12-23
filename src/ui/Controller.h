@@ -30,6 +30,7 @@ public:
     ActionResult AddSubtask(Context &);
     ActionResult ShowTasks(Context &);
     ActionResult CompleteTask(Context &);
+    ActionResult UncompleteTask(Context &);
     ActionResult DeleteTask(Context &);
     ActionResult ConfirmDeleteTask(Context &);
     ActionResult LabelTask(Context &);

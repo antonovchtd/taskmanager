@@ -104,6 +104,10 @@ ActionResult Controller::CompleteTask(Context &context) {
     return model()->Complete(*context.id());
 }
 
+ActionResult Controller::UncompleteTask(Context &context) {
+    return model()->Uncomplete(*context.id());
+}
+
 ActionResult Controller::DeleteTask(Context &context) {
     return model()->Delete(*context.id(), true);
 }

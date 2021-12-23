@@ -47,7 +47,7 @@ std::shared_ptr<Step> HomeStep::execute(Context &c) {
     std::shared_ptr<Controller> action;
     if (command_ == "edit" || command_ == "subtask" ||
         command_ == "delete" || command_ == "complete" ||
-        command_ == "label") {
+        command_ == "uncomplete" ||command_ == "label") {
         result = factory()->controller()->ValidateID(c);
     } else if (command_ == "show") {
         result = factory()->controller()->ValidateLabelOrID(c);
@@ -210,6 +210,11 @@ void ShowStep::recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<Proto
 std::shared_ptr<Step> CompleteStep::execute(Context &c) {
     ActionResult result = factory()->controller()->CompleteTask(c);
     return processResult(*this, result, "Completed Task");
+}
+
+std::shared_ptr<Step> UncompleteStep::execute(Context &c) {
+    ActionResult result = factory()->controller()->UncompleteTask(c);
+    return processResult(*this, result, "Uncompleted Task");
 }
 
 std::shared_ptr<Step> DeleteStep::execute(Context &c) {

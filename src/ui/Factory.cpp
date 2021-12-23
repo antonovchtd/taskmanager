@@ -56,6 +56,8 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
         return lazyInitStep(Factory::State::SUBTASK);
     } else if (command == "complete") {
         return lazyInitStep(Factory::State::COMPLETE);
+    } else if (command == "uncomplete") {
+        return lazyInitStep(Factory::State::UNCOMPLETE);
     } else if (command == "delete") {
         return lazyInitStep(Factory::State::CONFIRMDELETE);
     } else if (command == "label") {
@@ -95,6 +97,8 @@ std::shared_ptr<Step> Factory::getNewStep(const State &s) {
             return std::shared_ptr<ShowStep>{new ShowStep(shared_from_this())};
         case State::COMPLETE:
             return std::shared_ptr<CompleteStep>{new CompleteStep(shared_from_this())};
+        case State::UNCOMPLETE:
+            return std::shared_ptr<UncompleteStep>{new UncompleteStep(shared_from_this())};
         case State::DELETE:
             return std::shared_ptr<DeleteStep>{new DeleteStep(shared_from_this())};
         case State::CONFIRMDELETE:

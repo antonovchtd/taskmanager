@@ -250,6 +250,18 @@ TEST_F(ControllerTest, shouldNotCompleteTaskWithInvalidID)
     EXPECT_FALSE((*tm_)[*result.id].first.is_complete());
 }
 
+TEST_F(ControllerTest, shouldUncompleteTaskWithValidID)
+{
+    ActionResult result = ctr_.AddTask(context_);
+    context_.setID(result.id);
+    ActionResult result_complete = ctr_.CompleteTask(context_);
+    ASSERT_TRUE((*tm_)[*result_complete.id].first.is_complete());
+    ActionResult result_uncomplete = ctr_.UncompleteTask(context_);
+    ASSERT_EQ(1, tm_->size());
+    EXPECT_EQ(result_uncomplete.status, ActionResult::Status::SUCCESS);
+    ASSERT_FALSE((*tm_)[*result_uncomplete.id].first.is_complete());
+}
+
 TEST_F(ControllerTest, shouldDeleteTaskValidIDNoSubtasks)
 {
     ActionResult result = ctr_.AddTask(context_);

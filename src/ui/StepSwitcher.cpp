@@ -40,6 +40,10 @@ std::shared_ptr<Step> StepSwitcher::nextStep(const CompleteStep &step) {
     return step.factory()->lazyInitStep(Factory::State::HOME);
 }
 
+std::shared_ptr<Step> StepSwitcher::nextStep(const UncompleteStep &step) {
+    return step.factory()->lazyInitStep(Factory::State::HOME);
+}
+
 std::shared_ptr<Step> StepSwitcher::nextStep(const DeleteStep &step) {
     return step.factory()->lazyInitStep(Factory::State::HOME);
 }

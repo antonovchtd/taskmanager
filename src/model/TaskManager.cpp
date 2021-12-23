@@ -91,13 +91,21 @@ ActionResult TaskManager::Edit(const ProtoTask::TaskID &id, const ProtoTask::Tas
 }
 
 ActionResult TaskManager::Complete(const ProtoTask::TaskID &id) {
+    return SetComplete(id, true);
+}
+
+ActionResult TaskManager::Uncomplete(const ProtoTask::TaskID &id) {
+    return SetComplete(id, false);
+}
+
+ActionResult TaskManager::SetComplete(const ProtoTask::TaskID &id, bool flag) {
     try {
-        tasks_.at(id).first.set_is_complete(true);
+        tasks_.at(id).first.set_is_complete(flag);
     } catch (const std::out_of_range &) {
         return {ActionResult::Status::ID_NOT_FOUND, id};
     }
     for (auto const &ch : tasks_.at(id).second.children())
-        Complete(ch);
+        SetComplete(ch, flag);
     return {ActionResult::Status::SUCCESS, id};
 }
 
