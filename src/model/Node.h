@@ -7,7 +7,8 @@
 
 #include <vector>
 #include "Task.pb.h"
-#include "utils.h"
+#include "../utilities/TaskIDUtils.h"
+#include "../utilities/NodeUtils.h"
 
 class Node{
 public:

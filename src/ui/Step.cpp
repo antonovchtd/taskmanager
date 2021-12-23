@@ -183,7 +183,6 @@ std::shared_ptr<Step> QuitStep::execute(Context &c) {
 }
 
 std::shared_ptr<Step> ShowStep::execute(Context &c) {
-//    factory()->controller()->setData(Controller::Data{}); //TODO
     ActionResult result = factory()->controller()->ShowTasks(c);
 
     auto tasks = c.tasks();

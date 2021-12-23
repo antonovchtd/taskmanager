@@ -363,8 +363,8 @@ TEST_F(IntegrationTest, shouldCreateNothingWithBadInput)
 
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksAndShowByID)
 {
-    std::vector<std::string> scenario {"add", "test", "1", "21/12", "subtask 1", "sub", "2",
-                                       "22/12", "subtask 2", "subsub", "3", "23/12", "show 1",
+    std::vector<std::string> scenario {"add", "test", "1", "21/12/21", "subtask 1", "sub", "2",
+                                       "22/12/21", "subtask 2", "subsub", "3", "23/12/21", "show 1",
                                        "show 2", "show 3", "show 4", "quit"};
     MockReaderToVector mr{scenario};
     MockPrinterToVector mp;
@@ -380,10 +380,10 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksAndShowByID)
 
     EXPECT_EQ(out[9], "1 – test, Priority: Low, Due: Tue Dec 21 00:00:00 2021 [overdue]");
     EXPECT_EQ(out[11], "    2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021 [overdue]");
-    EXPECT_EQ(out[13], "        3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
+    EXPECT_EQ(out[13], "        3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021 [overdue]");
     EXPECT_EQ(out[15], "2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021 [overdue]");
-    EXPECT_EQ(out[17], "    3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
-    EXPECT_EQ(out[19], "3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021");
+    EXPECT_EQ(out[17], "    3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021 [overdue]");
+    EXPECT_EQ(out[19], "3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021 [overdue]");
     EXPECT_EQ(out[21], "ID 4 was not found.\n");
 
 }

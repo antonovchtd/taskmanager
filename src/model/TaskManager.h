@@ -15,7 +15,9 @@
 #include "IDGenerator.h"
 #include "Node.h"
 #include "Task.pb.h"
-#include "utils.h"
+#include "../utilities/TaskIDUtils.h"
+#include "../utilities/TaskUtils.h"
+#include "../utilities/NodeUtils.h"
 #include "ActionResult.h"
 #include "../persistence/Persister.h"
 
