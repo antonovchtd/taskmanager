@@ -56,6 +56,44 @@ TEST_F(TaskManagerTest, shouldAddTask)
     EXPECT_TRUE(tm.Validate(id));
 }
 
+TEST_F(TaskManagerTest, shouldFailToAddTaskWithDuplicateID)
+{
+    auto gen = std::make_shared<MockIDGenerator>();
+    ProtoTask::TaskID id;
+    id.set_value(1);
+    EXPECT_CALL(*gen, genID).WillRepeatedly(Return(id));
+    TaskManager tm{gen};
+    tm.Add(ProtoTask::Task());
+    ActionResult result = tm.Add(ProtoTask::Task());
+    EXPECT_EQ(result.status, ActionResult::Status::DUPLICATE_ID);
+    EXPECT_EQ(*result.id, id);
+}
+
+TEST_F(TaskManagerTest, shouldFailToAddSubtaskWithDuplicateID)
+{
+    auto gen = std::make_shared<MockIDGenerator>();
+    ProtoTask::TaskID id;
+    id.set_value(1);
+    EXPECT_CALL(*gen, genID).WillRepeatedly(Return(id));
+    TaskManager tm{gen};
+    tm.Add(ProtoTask::Task());
+    ActionResult result = tm.AddSubtask(ProtoTask::Task(), id);
+    EXPECT_EQ(result.status, ActionResult::Status::DUPLICATE_ID);
+    EXPECT_EQ(*result.id, id);
+}
+
+TEST_F(TaskManagerTest, shouldFailToAddSubtaskWithMissingParent)
+{
+    auto gen = std::make_shared<MockIDGenerator>();
+    ProtoTask::TaskID id;
+    id.set_value(1);
+    EXPECT_CALL(*gen, genID).WillRepeatedly(Return(id));
+    TaskManager tm{gen};
+    ActionResult result = tm.AddSubtask(ProtoTask::Task(), id);
+    EXPECT_EQ(result.status, ActionResult::Status::PARENT_ID_NOT_FOUND);
+    EXPECT_EQ(*result.id, id);
+}
+
 TEST_F(TaskManagerTest, shouldAddSubtask)
 {
     TaskManager tm;
@@ -186,18 +224,43 @@ TEST_F(TaskManagerTest, shouldFailToDeleteTaskWithWrongID)
     EXPECT_EQ(*result.id, id);
 }
 
-TEST_F(TaskManagerTest, shouldCompleteTask)
+TEST_F(TaskManagerTest, shouldFailToDeleteTaskWithChildren)
 {
     TaskManager tm;
     ProtoTask::Task t;
     t.set_title("TestTitle");
-    t.set_priority(ProtoTask::Task::Priority::Task_Priority_NONE);
-    t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
+    ProtoTask::TaskID id = *tm.Add(t).id;
+    tm.AddSubtask(t, id);
+    ActionResult result = tm.Delete(id, false);
+    EXPECT_EQ(result.status, ActionResult::Status::HAS_CHILDREN);
+    EXPECT_EQ(*result.id, id);
+}
+
+TEST_F(TaskManagerTest, shouldDeleteTaskWithChildren)
+{
+    TaskManager tm;
+    ProtoTask::Task t;
+    t.set_title("TestTitle");
+    ProtoTask::TaskID id = *tm.Add(t).id;
+    tm.AddSubtask(t, id);
+    ActionResult result = tm.Delete(id, true);
+    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
+    EXPECT_EQ(*result.id, id);
+    EXPECT_EQ(0, tm.size());
+}
+
+TEST_F(TaskManagerTest, shouldCompleteTaskWithSubtasks)
+{
+    TaskManager tm;
+    ProtoTask::Task t;
+    t.set_title("TestTitle");
     t.set_is_complete(false);
     ProtoTask::TaskID id = *tm.Add(t).id;
+    tm.AddSubtask(t, id);
     tm.Complete(id);
     EXPECT_TRUE(tm[id].first.is_complete());
+    auto ch_id = tm[id].second.children()[0];
+    EXPECT_TRUE(tm[ch_id].first.is_complete());
 }
 
 TEST_F(TaskManagerTest, shouldFailToCompleteTaskWithWrongID)
