@@ -20,6 +20,13 @@ Factory::Factory(const std::shared_ptr<AbstractReader> &reader,
 
 }
 
+Factory::Factory(const std::shared_ptr<AbstractReader> &reader,
+        const std::shared_ptr<AbstractPrinter> &printer,
+        const std::shared_ptr<Controller> &controller) :
+        reader_(reader), printer_(printer), controller_(controller) {
+
+}
+
 std::shared_ptr<Factory> Factory::create() {
     return std::shared_ptr<Factory>(new Factory);
 }
@@ -27,6 +34,12 @@ std::shared_ptr<Factory> Factory::create() {
 std::shared_ptr<Factory> Factory::create(const std::shared_ptr<AbstractReader> &reader,
                                          const std::shared_ptr<AbstractPrinter> &printer) {
     return std::shared_ptr<Factory>(new Factory(reader, printer));
+}
+
+std::shared_ptr<Factory> Factory::create(const std::shared_ptr<AbstractReader> &reader,
+                                         const std::shared_ptr<AbstractPrinter> &printer,
+                                         const std::shared_ptr<Controller> &controller) {
+    return std::shared_ptr<Factory>(new Factory(reader, printer, controller));
 }
 
 std::shared_ptr<AbstractPrinter> Factory::printer() const {

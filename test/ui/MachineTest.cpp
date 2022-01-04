@@ -33,7 +33,25 @@ public:
     MOCK_METHOD(void, print, (const std::string &message), (override));
 };
 
-TEST_F(MachineTest, test1)
+TEST_F(MachineTest, shouldReturnModel)
 {
+    auto tm = std::make_shared<TaskManager>();
+    auto con = std::make_shared<Controller>(tm);
+    auto mr = std::make_shared<MockReader>();
+    auto mp = std::make_shared<MockPrinter>();
+    auto f = Factory::create(mr, mp, con);
+    Machine m{f, Factory::State::HOME};
+    EXPECT_EQ(tm, m.model());
+}
 
+TEST_F(MachineTest, shouldExecuteRun)
+{
+    MockReader mr;
+    MockPrinter mp;
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
+                             std::shared_ptr<AbstractPrinter>(&mp));
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read)
+        .WillOnce(Return("quit"));
+    Machine m{f, Factory::State::HOME};
+    m.run();
 }

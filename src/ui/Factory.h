@@ -43,12 +43,19 @@ public:
 
 public:
     static std::shared_ptr<Factory> create();
-    static std::shared_ptr<Factory> create(const std::shared_ptr<AbstractReader> &, const std::shared_ptr<AbstractPrinter> &);
+    static std::shared_ptr<Factory> create(const std::shared_ptr<AbstractReader> &,
+                                           const std::shared_ptr<AbstractPrinter> &);
+    static std::shared_ptr<Factory> create(const std::shared_ptr<AbstractReader> &,
+                                           const std::shared_ptr<AbstractPrinter> &,
+                                           const std::shared_ptr<Controller> &);
 
 private:
     Factory();
     Factory(const std::shared_ptr<AbstractReader> &,
             const std::shared_ptr<AbstractPrinter> &);
+    Factory(const std::shared_ptr<AbstractReader> &,
+            const std::shared_ptr<AbstractPrinter> &,
+            const std::shared_ptr<Controller> &);
 
 public:
     std::shared_ptr<Step> createStep(const std::string &command);
