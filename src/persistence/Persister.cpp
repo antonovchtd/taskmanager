@@ -19,10 +19,10 @@ bool Persister::save(const std::string &filename, const std::shared_ptr<TaskMana
             google::protobuf::util::SerializeDelimitedToOstream(te, &file);
         }
         file.close();
+        return true;
     }
     else
         return false;
-    return true;
 }
 
 bool Persister::load(const std::string &filename, const std::shared_ptr<TaskManager> &model) {
