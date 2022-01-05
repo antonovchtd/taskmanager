@@ -41,7 +41,7 @@ public:
 private:
     std::shared_ptr<TaskManager> model_;
     Controller::Data data_;
-    std::shared_ptr<Persister> persister_;
+    std::shared_ptr<PersisterInterface> persister_;
 };
 
 
