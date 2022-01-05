@@ -16,7 +16,7 @@ public:
     virtual bool load(const std::string &filename, const std::shared_ptr<TaskManager> &model);
 
 public:
-    ~Persister() = default;
+    virtual ~Persister() = default;
 
 public:
     std::string defaultFilename() const;

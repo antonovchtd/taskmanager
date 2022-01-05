@@ -39,8 +39,9 @@ ActionResult Controller::ValidateID(Context &context) {
     try {
         id.set_value(std::stoi(data().arg));
         context.setID(id);
-        return model()->Validate(id);
+        return model_->Validate(id);
     } catch (const std::invalid_argument &) {
+        context.setID(std::nullopt);
         return {ActionResult::Status::TAKES_ID, std::nullopt};
     }
 }
@@ -58,8 +59,9 @@ ActionResult Controller::ValidateLabelOrID(Context &context) {
     try {
         id.set_value(std::stoi(data().arg));
         context.setID(id);
-        return model()->Validate(id);
+        return model_->Validate(id);
     } catch (const std::invalid_argument &) {
+        context.setID(std::nullopt);
         return {ActionResult::Status::SUCCESS, std::nullopt};
     }
 }

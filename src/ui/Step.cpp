@@ -76,7 +76,7 @@ std::shared_ptr<Step> AddStep::execute(Context &c) {
     return processResult(*this, result, "Added Task");
 }
 
-bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title) {
+bool ReadTaskDataStep::validateTitle(const std::string &title) const {
     if (title.empty()) {
         factory()->printer()->print("    Title cannot be empty!\n");
         return false;
@@ -84,7 +84,7 @@ bool ReadTaskDataStep::validateTitle(const Context &c, const std::string &title)
     return true;
 }
 
-std::optional<ProtoTask::Task::Priority> ReadTaskDataStep::stringToPriority(const Context &c, const std::string &priority) {
+std::optional<ProtoTask::Task::Priority> ReadTaskDataStep::stringToPriority(const std::string &priority) const {
     int pint;
     try {
         pint = priority.empty() ? 0 : std::stoi(priority);
@@ -99,7 +99,7 @@ std::optional<ProtoTask::Task::Priority> ReadTaskDataStep::stringToPriority(cons
     }
 }
 
-std::optional<time_t> ReadTaskDataStep::stringToTime(const Context &c, const std::string &datestring) {
+std::optional<time_t> ReadTaskDataStep::stringToTime(const std::string &datestring) const {
     std::smatch matches;
     if (std::regex_search(datestring, matches,
                           std::regex(R"(in (\d+:)?(\d+):(\d+))"))) {
@@ -140,18 +140,18 @@ std::shared_ptr<Step> ReadTaskDataStep::execute(Context &c) {
     std::string title;
     do {
         title = factory()->reader()->read("    Title > ");
-    } while (!validateTitle(c, title));
+    } while (!validateTitle(title));
     c.setTitle(title);
 
     std::optional<ProtoTask::Task::Priority> priority{std::nullopt};
     while (!priority) {
-        priority = stringToPriority(c, factory()->reader()->read("    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > "));
+        priority = stringToPriority(factory()->reader()->read("    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > "));
     }
     c.setPriority(*priority);
 
     std::optional<time_t> due_date;
     while (!due_date) {
-        due_date = ReadTaskDataStep::stringToTime(c, factory()->reader()->read("    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} > "));
+        due_date = stringToTime(factory()->reader()->read("    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} > "));
     }
     c.setDueDate(*due_date);
 
@@ -251,12 +251,17 @@ std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c) {
 }
 
 std::shared_ptr<Step> LabelStep::execute(Context &c) {
-    std::string label;
-    while (label.empty())
-        label = factory()->reader()->read("[Add Label]\n    >> ");
+    std::string label = readLabel();
     factory()->controller()->setData(Controller::Data{label});
     ActionResult result = factory()->controller()->LabelTask(c);
     return processResult(*this, result, "Added label to Task");
+}
+
+std::string LabelStep::readLabel() const {
+    std::string label = factory()->reader()->read("[Add Label]\n    >> ");
+    while (label.empty())
+        label = factory()->reader()->read("Label cannot be empty. Try again.\n    >> ");
+    return label;
 }
 
 std::shared_ptr<Step> SaveStep::execute(Context &c) {

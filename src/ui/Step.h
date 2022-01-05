@@ -66,9 +66,9 @@ public:
     std::shared_ptr<Step> execute(Context &c) override;
 
 public:
-    std::optional<time_t> stringToTime(const Context &c, const std::string &datestring);
-    bool validateTitle(const Context &c, const std::string &title);
-    std::optional<ProtoTask::Task::Priority> stringToPriority(const Context &c, const std::string &priority);
+    std::optional<time_t> stringToTime(const std::string &datestring) const;
+    bool validateTitle(const std::string &title) const;
+    std::optional<ProtoTask::Task::Priority> stringToPriority(const std::string &priority) const;
 };
 
 class EditStep : public Step {
@@ -126,6 +126,7 @@ class LabelStep : public Step {
 public:
     using Step::Step;
     std::shared_ptr<Step> execute(Context &c) override;
+    std::string readLabel() const;
 };
 
 class SaveStep : public Step {

@@ -16,7 +16,7 @@ std::string FileReader::read(const std::string &message) {
             os << line << "\n";
         file.close();
     } else {
-        throw std::runtime_error("FileReader::read failed to open file " + filename_);
+        os << "FileReader::read failed to open file " + filename_ << std::endl;
     }
     return os.str();
 }
