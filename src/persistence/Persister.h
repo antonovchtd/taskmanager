@@ -11,8 +11,8 @@
 
 class Persister : public PersisterInterface {
 public:
-    bool save(const std::string &filename, const std::shared_ptr<TaskManager> &model) override;
-    bool load(const std::string &filename, const std::shared_ptr<TaskManager> &model) override;
+    bool save(const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model) override;
+    bool load(const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model) override;
 
 public:
     std::string defaultFilename() const override;

@@ -76,7 +76,7 @@ public:
     MOCK_METHOD(ActionResult, SaveTasks, (Context &), (override));
     MOCK_METHOD(ActionResult, LoadTasks, (Context &), (override));
     MOCK_METHOD(void, setData, (const ControllerInterface::Data &), (override));
-    MOCK_METHOD(std::shared_ptr<TaskManager>, model, (), (const, override));
+    MOCK_METHOD(std::shared_ptr<TaskManagerInterface>, model, (), (const, override));
     MOCK_METHOD(ControllerInterface::Data, data, (), (const, override));
 };
 

@@ -7,7 +7,7 @@
 
 class Context;
 class ActionResult;
-class TaskManager;
+class TaskManagerInterface;
 
 class ControllerInterface {
 public:
@@ -36,7 +36,7 @@ public:
     virtual void setData(const ControllerInterface::Data &data) = 0;
 
 public:
-    virtual std::shared_ptr<TaskManager> model() const = 0;
+    virtual std::shared_ptr<TaskManagerInterface> model() const = 0;
     virtual ControllerInterface::Data data() const = 0;
 
 public:

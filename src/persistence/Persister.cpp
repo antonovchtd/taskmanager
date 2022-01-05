@@ -11,7 +11,7 @@ std::string Persister::defaultFilename() const {
     return default_filename_;
 }
 
-bool Persister::save(const std::string &filename, const std::shared_ptr<TaskManager> &model) {
+bool Persister::save(const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model) {
     std::ofstream file(filename, std::ios::trunc | std::ios::binary);
     if (file.is_open()) {
         std::vector<ProtoTask::TaskEntity> vec = model->Export();
@@ -25,7 +25,7 @@ bool Persister::save(const std::string &filename, const std::shared_ptr<TaskMana
         return false;
 }
 
-bool Persister::load(const std::string &filename, const std::shared_ptr<TaskManager> &model) {
+bool Persister::load(const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model) {
     std::ifstream file(filename, std::ios::binary);
     google::protobuf::io::IstreamInputStream iis{&file};
     if (file.is_open()) {

@@ -5,22 +5,22 @@
 #include "Controller.h"
 #include "Context.h"
 
-Controller::Controller() : model_{std::make_shared<TaskManager>()},
-                           persister_{std::make_shared<Persister>()} {
+Controller::Controller() : model_{std::shared_ptr<TaskManagerInterface>(new TaskManager)},
+                           persister_{std::shared_ptr<PersisterInterface>(new Persister)} {
 };
 
-Controller::Controller(const std::shared_ptr<TaskManager> &model,
-                       const std::shared_ptr<Persister> &persister) :
+Controller::Controller(const std::shared_ptr<TaskManagerInterface> &model,
+                       const std::shared_ptr<PersisterInterface> &persister) :
                 model_{model}, persister_{persister} {
 
 }
 
-Controller::Controller(const std::shared_ptr<TaskManager> &model) :
-                model_(model), persister_{std::make_shared<Persister>()} {
+Controller::Controller(const std::shared_ptr<TaskManagerInterface> &model) :
+                model_(model), persister_{std::shared_ptr<PersisterInterface>(new Persister)} {
 
 }
 
-std::shared_ptr<TaskManager> Controller::model() const {
+std::shared_ptr<TaskManagerInterface> Controller::model() const {
     return model_;
 }
 

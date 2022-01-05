@@ -87,22 +87,22 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 
     Machine m(f, Factory::State::HOME);
     m.run();
-    TaskManager tm = *m.model();
-    ASSERT_EQ(2, tm.size());
+    auto tm = m.model();
+    ASSERT_EQ(2, tm->size());
 
     ProtoTask::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(tm.Validate(id));
-    EXPECT_TRUE(tm[id].first.is_complete());
+    ASSERT_TRUE(tm->Validate(id));
+    EXPECT_TRUE(tm->getTasks()[id].first.is_complete());
 
     id.set_value(2);
-    ASSERT_TRUE(tm.Validate(id));
-    EXPECT_FALSE(tm[id].first.is_complete());
+    ASSERT_TRUE(tm->Validate(id));
+    EXPECT_FALSE(tm->getTasks()[id].first.is_complete());
 
     id.set_value(3);
-    EXPECT_FALSE(tm.Validate(id));
+    EXPECT_FALSE(tm->Validate(id));
 
-    EXPECT_EQ(4, tm.gen()->state());
+    EXPECT_EQ(4, tm->gen()->state());
 }
 
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
@@ -133,43 +133,43 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
 
     Machine m(f, Factory::State::HOME);
     m.run();
-    TaskManager tm = *m.model();
-    ASSERT_EQ(3, tm.size());
+    auto tm = m.model();
+    ASSERT_EQ(3, tm->size());
 
     // check completeness
     ProtoTask::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(tm.Validate(id));
-    EXPECT_TRUE(tm[id].first.is_complete());
+    ASSERT_TRUE(tm->Validate(id));
+    EXPECT_TRUE(tm->getTasks()[id].first.is_complete());
 
     ProtoTask::TaskID id2;
     id2.set_value(2);
-    ASSERT_TRUE(tm.Validate(id2));
-    EXPECT_TRUE(tm[id2].first.is_complete());
+    ASSERT_TRUE(tm->Validate(id2));
+    EXPECT_TRUE(tm->getTasks()[id2].first.is_complete());
 
     ProtoTask::TaskID id3;
     id3.set_value(3);
-    ASSERT_TRUE(tm.Validate(id3));
-    EXPECT_TRUE(tm[id3].first.is_complete());
+    ASSERT_TRUE(tm->Validate(id3));
+    EXPECT_TRUE(tm->getTasks()[id3].first.is_complete());
 
     // check parents
-    EXPECT_EQ(tm[id].second.parent(), std::nullopt);
-    EXPECT_EQ(tm[id2].second.parent(), id);
-    EXPECT_EQ(tm[id3].second.parent(), id2);
+    EXPECT_EQ(tm->getTasks()[id].second.parent(), std::nullopt);
+    EXPECT_EQ(tm->getTasks()[id2].second.parent(), id);
+    EXPECT_EQ(tm->getTasks()[id3].second.parent(), id2);
 
     // check children
-    auto ch1 = tm[id].second.children();
+    auto ch1 = tm->getTasks()[id].second.children();
     ASSERT_EQ(1, ch1.size());
     EXPECT_EQ(ch1[0], id2);
 
-    auto ch2 = tm[id2].second.children();
+    auto ch2 = tm->getTasks()[id2].second.children();
     ASSERT_EQ(1, ch2.size());
     EXPECT_EQ(ch2[0], id3);
 
-    auto ch3 = tm[id3].second.children();
+    auto ch3 = tm->getTasks()[id3].second.children();
     ASSERT_EQ(0, ch3.size());
 
-    EXPECT_EQ(4, tm.gen()->state());
+    EXPECT_EQ(4, tm->gen()->state());
 }
 
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
@@ -203,42 +203,42 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
 
     Machine m(f, Factory::State::HOME);
     m.run();
-    TaskManager tm = *m.model();
-    ASSERT_EQ(3, tm.size());
+    auto tm = m.model();
+    ASSERT_EQ(3, tm->size());
 
     // check labels
     ProtoTask::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(tm.Validate(id));
-    EXPECT_EQ("", tm[id].first.label());
+    ASSERT_TRUE(tm->Validate(id));
+    EXPECT_EQ("", tm->getTasks()[id].first.label());
 
     ProtoTask::TaskID id2;
     id2.set_value(2);
-    ASSERT_TRUE(tm.Validate(id2));
-    EXPECT_EQ("l2", tm[id2].first.label());
+    ASSERT_TRUE(tm->Validate(id2));
+    EXPECT_EQ("l2", tm->getTasks()[id2].first.label());
 
     ProtoTask::TaskID id3;
     id3.set_value(3);
-    ASSERT_TRUE(tm.Validate(id3));
-    EXPECT_EQ("l3", tm[id3].first.label());
+    ASSERT_TRUE(tm->Validate(id3));
+    EXPECT_EQ("l3", tm->getTasks()[id3].first.label());
 
     // check parents
-    EXPECT_EQ(tm[id].second.parent(), std::nullopt);
-    EXPECT_EQ(tm[id2].second.parent(), id);
-    EXPECT_EQ(tm[id3].second.parent(), std::nullopt);
+    EXPECT_EQ(tm->getTasks()[id].second.parent(), std::nullopt);
+    EXPECT_EQ(tm->getTasks()[id2].second.parent(), id);
+    EXPECT_EQ(tm->getTasks()[id3].second.parent(), std::nullopt);
 
     // check children
-    auto ch1 = tm[id].second.children();
+    auto ch1 = tm->getTasks()[id].second.children();
     ASSERT_EQ(1, ch1.size());
     EXPECT_EQ(ch1[0], id2);
 
-    auto ch2 = tm[id2].second.children();
+    auto ch2 = tm->getTasks()[id2].second.children();
     ASSERT_EQ(0, ch2.size());
 
-    auto ch3 = tm[id3].second.children();
+    auto ch3 = tm->getTasks()[id3].second.children();
     ASSERT_EQ(0, ch3.size());
 
-    EXPECT_EQ(4, tm.gen()->state());
+    EXPECT_EQ(4, tm->gen()->state());
 }
 
 TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
@@ -267,18 +267,18 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
 
     Machine m(f, Factory::State::HOME);
     m.run();
-    TaskManager tm = *m.model();
+    auto tm = m.model();
     auto out = mp.messages();
     auto prompts = mr.prompts();
-    ASSERT_EQ(1, tm.size());
+    ASSERT_EQ(1, tm->size());
 
     ProtoTask::TaskID id;
     id.set_value(1);
-    EXPECT_FALSE(tm.Validate(id));
+    EXPECT_FALSE(tm->Validate(id));
     id.set_value(2);
-    EXPECT_TRUE(tm.Validate(id));
+    EXPECT_TRUE(tm->Validate(id));
     id.set_value(3);
-    EXPECT_FALSE(tm.Validate(id));
+    EXPECT_FALSE(tm->Validate(id));
 
     for (int i = 0; i <  prompts.size(); ++i) {
         EXPECT_EQ(prompts[i], prompts_expected[i]);
@@ -319,14 +319,14 @@ TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
 
     Machine m(f, Factory::State::HOME);
     m.run();
-    TaskManager tm = *m.model();
+    auto tm = m.model();
     auto out = mp.messages();
     auto prompts = mr.prompts();
-    ASSERT_EQ(1, tm.size());
+    ASSERT_EQ(1, tm->size());
 
     ProtoTask::TaskID id;
     id.set_value(1);
-    EXPECT_TRUE(tm.Validate(id));
+    EXPECT_TRUE(tm->Validate(id));
 
     for (int i = 0; i <  prompts.size(); ++i) {
         EXPECT_EQ(prompts[i], prompts_expected[i]);
@@ -357,8 +357,8 @@ TEST_F(IntegrationTest, shouldCreateNothingWithBadInput)
 
     Machine m(f, Factory::State::HOME);
     m.run();
-    TaskManager tm = *m.model();
-    ASSERT_EQ(0, tm.size());
+    auto tm = m.model();
+    ASSERT_EQ(0, tm->size());
 }
 
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksAndShowByID)
@@ -373,10 +373,10 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksAndShowByID)
 
     Machine m(f, Factory::State::HOME);
     m.run();
-    TaskManager tm = *m.model();
+    auto tm = m.model();
 
     auto out = mp.messages();
-    ASSERT_EQ(3, tm.size());
+    ASSERT_EQ(3, tm->size());
 
     EXPECT_EQ(out[9], "1 – test, Priority: Low, Due: Tue Dec 21 00:00:00 2021 [overdue]");
     EXPECT_EQ(out[11], "    2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021 [overdue]");
@@ -402,35 +402,35 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
     m.run();
     Machine m2(f, Factory::State::HOME);
     m2.run();
-    TaskManager tm = *m2.model();
-    ASSERT_EQ(3, tm.size());
+    auto tm = m2.model();
+    ASSERT_EQ(3, tm->size());
 
     ProtoTask::TaskID id1, id2, id3;
     id1.set_value(1);
     id2.set_value(2);
     id3.set_value(3);
 
-    ASSERT_TRUE(tm.Validate(id1));
-    EXPECT_TRUE(tm[id1].first.is_complete());
-    EXPECT_EQ(tm[id1].first.title(), "Task 1");
-    EXPECT_EQ(std::nullopt, tm[id1].second.parent());
-    auto ch = tm[id1].second.children();
+    ASSERT_TRUE(tm->Validate(id1));
+    EXPECT_TRUE(tm->getTasks()[id1].first.is_complete());
+    EXPECT_EQ(tm->getTasks()[id1].first.title(), "Task 1");
+    EXPECT_EQ(std::nullopt, tm->getTasks()[id1].second.parent());
+    auto ch = tm->getTasks()[id1].second.children();
     ASSERT_EQ(1, ch.size());
     auto it = std::find(ch.cbegin(), ch.cend(), id2);
     EXPECT_NE(it, ch.cend());
 
-    ASSERT_TRUE(tm.Validate(id2));
-    EXPECT_TRUE(tm[id2].first.is_complete());
-    EXPECT_EQ(tm[id2].first.title(), "Subtask 2");
-    EXPECT_EQ(id1, *tm[id2].second.parent());
-    ch = tm[id2].second.children();
+    ASSERT_TRUE(tm->Validate(id2));
+    EXPECT_TRUE(tm->getTasks()[id2].first.is_complete());
+    EXPECT_EQ(tm->getTasks()[id2].first.title(), "Subtask 2");
+    EXPECT_EQ(id1, *tm->getTasks()[id2].second.parent());
+    ch = tm->getTasks()[id2].second.children();
     EXPECT_EQ(1, ch.size());
     it = std::find(ch.cbegin(), ch.cend(), id3);
     EXPECT_NE(it, ch.cend());
 
-    ASSERT_TRUE(tm.Validate(id3));
-    EXPECT_TRUE(tm[id3].first.is_complete());
-    EXPECT_EQ(tm[id3].first.title(), "Subtask 3");
-    EXPECT_EQ(0, tm[id3].second.children().size());
-    EXPECT_EQ(id2, *tm[id3].second.parent());
+    ASSERT_TRUE(tm->Validate(id3));
+    EXPECT_TRUE(tm->getTasks()[id3].first.is_complete());
+    EXPECT_EQ(tm->getTasks()[id3].first.title(), "Subtask 3");
+    EXPECT_EQ(0, tm->getTasks()[id3].second.children().size());
+    EXPECT_EQ(id2, *tm->getTasks()[id3].second.parent());
 }

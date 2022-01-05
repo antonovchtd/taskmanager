@@ -5,25 +5,9 @@
 #ifndef TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 #define TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 
-#include <iostream>
-#include <cstdlib>
-#include <map>
-#include <vector>
-#include <utility>
-#include <fstream>
+#include "TaskManagerInterface.h"
 
-#include "IDGenerator.h"
-#include "Node.h"
-#include "Task.pb.h"
-#include "utilities/TaskIDUtils.h"
-#include "utilities/TaskUtils.h"
-#include "utilities/NodeUtils.h"
-#include "ActionResult.h"
-#include "persistence/Persister.h"
-
-typedef std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Container;
-
-class TaskManager {
+class TaskManager : public TaskManagerInterface {
 public:
     TaskManager();
     explicit TaskManager(const std::shared_ptr<IDGenerator> &generator);
@@ -31,26 +15,26 @@ public:
                 const Container &tasks);
 
 public:
-    std::pair<ProtoTask::Task, Node>& operator[](const ProtoTask::TaskID &);
-    Container getTasks() const;
-    Container getTasks(const std::string &label) const;
-    Container getTasks(const ProtoTask::TaskID &id);
-    std::shared_ptr<IDGenerator> gen() const;
-    size_t size() const;
+    std::pair<ProtoTask::Task, Node>& operator[](const ProtoTask::TaskID &) override;
+    Container getTasks() const override;
+    Container getTasks(const std::string &label) const override;
+    Container getTasks(const ProtoTask::TaskID &id) override;
+    std::shared_ptr<IDGenerator> gen() const override;
+    size_t size() const override;
 
 public:
-    ActionResult Add(const ProtoTask::Task &);
-    ActionResult AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &);
-    ActionResult Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t);
-    ActionResult Complete(const ProtoTask::TaskID &);
-    ActionResult Uncomplete(const ProtoTask::TaskID &);
-    ActionResult Delete(const ProtoTask::TaskID &id, bool deleteChildren = false);
-    ActionResult Validate(const ProtoTask::TaskID &id) const;
-    ActionResult SetLabel(const ProtoTask::TaskID &, const std::string &);
+    ActionResult Add(const ProtoTask::Task &) override;
+    ActionResult AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &) override;
+    ActionResult Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) override;
+    ActionResult Complete(const ProtoTask::TaskID &) override;
+    ActionResult Uncomplete(const ProtoTask::TaskID &) override;
+    ActionResult Delete(const ProtoTask::TaskID &id, bool deleteChildren = false) override;
+    ActionResult Validate(const ProtoTask::TaskID &id) const override;
+    ActionResult SetLabel(const ProtoTask::TaskID &, const std::string &) override;
 
 public:
-    std::vector<ProtoTask::TaskEntity> Export();
-    void Replace(const std::vector<ProtoTask::TaskEntity> &);
+    std::vector<ProtoTask::TaskEntity> Export() override;
+    void Replace(const std::vector<ProtoTask::TaskEntity> &) override;
 
 private:
     ActionResult SetComplete(const ProtoTask::TaskID &, bool);

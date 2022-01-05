@@ -17,12 +17,12 @@ using ::testing::DoAll;
 class ControllerTest : public ::testing::Test
 {
 public:
-    std::shared_ptr<TaskManager> tm_;
+    std::shared_ptr<TaskManagerInterface> tm_;
     Context context_;
     Controller ctr_;
 
     void SetUp() override {
-        tm_ = std::make_shared<TaskManager>();
+        tm_ = std::shared_ptr<TaskManagerInterface>(new TaskManager);
         ctr_ = Controller{tm_};
         ProtoTask::Task t;
         t.set_title("test");
@@ -351,8 +351,8 @@ TEST_F(ControllerTest, shouldNotLabelTaskWithInvalidID)
 
 class MockPersister : public Persister {
 public:
-    MOCK_METHOD(bool, save, (const std::string &filename, const std::shared_ptr<TaskManager> &model), (override));
-    MOCK_METHOD(bool, load, (const std::string &filename, const std::shared_ptr<TaskManager> &model), (override));
+    MOCK_METHOD(bool, save, (const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model), (override));
+    MOCK_METHOD(bool, load, (const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model), (override));
 };
 
 TEST_F(ControllerTest, shouldReturnSuccesOnCorrectSaveWithCustomFilename)
