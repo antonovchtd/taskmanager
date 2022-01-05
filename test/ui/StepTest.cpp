@@ -58,6 +58,28 @@ private:
     std::vector<std::string> messages_;
 };
 
+class MockController : public ControllerInterface {
+public:
+    MOCK_METHOD(ActionResult, ValidateID, (Context &), (override));
+    MOCK_METHOD(ActionResult, ValidateNoArg, (Context &), (override));
+    MOCK_METHOD(ActionResult, ValidateLabelOrID, (Context &), (override));
+    MOCK_METHOD(ActionResult, ValidateAlpha, (Context &), (override));
+    MOCK_METHOD(ActionResult, AddTask, (Context &), (override));
+    MOCK_METHOD(ActionResult, EditTask, (Context &), (override));
+    MOCK_METHOD(ActionResult, AddSubtask, (Context &), (override));
+    MOCK_METHOD(ActionResult, ShowTasks, (Context &), (override));
+    MOCK_METHOD(ActionResult, CompleteTask, (Context &), (override));
+    MOCK_METHOD(ActionResult, UncompleteTask, (Context &), (override));
+    MOCK_METHOD(ActionResult, DeleteTask, (Context &), (override));
+    MOCK_METHOD(ActionResult, ConfirmDeleteTask, (Context &), (override));
+    MOCK_METHOD(ActionResult, LabelTask, (Context &), (override));
+    MOCK_METHOD(ActionResult, SaveTasks, (Context &), (override));
+    MOCK_METHOD(ActionResult, LoadTasks, (Context &), (override));
+    MOCK_METHOD(void, setData, (const ControllerInterface::Data &), (override));
+    MOCK_METHOD(std::shared_ptr<TaskManager>, model, (), (const, override));
+    MOCK_METHOD(ControllerInterface::Data, data, (), (const, override));
+};
+
 std::vector<std::string> homeStepExecuteCall(const std::string &command, Factory::State expected_step) {
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
@@ -646,4 +668,70 @@ TEST_F(StepTest, executeLabelStep)
     ASSERT_EQ(2, messages.size());
     EXPECT_EQ(messages[0], "Added label to Task");
     EXPECT_EQ(messages[1], " (ID: 1)\n");
+}
+
+std::vector<std::string> executeLoadStep(ActionResult::Status s) {
+    ActionResult success_result{s, std::nullopt};
+
+    auto con = std::make_shared<MockController>();
+    EXPECT_CALL(*con, LoadTasks)
+            .WillOnce(Return(success_result));
+
+    auto mr = std::make_shared<MockReaderToVector>();
+    auto mp = std::make_shared<MockPrinterToVector>();
+    auto f = Factory::create(mr, mp, con);
+
+    auto step = f->lazyInitStep(Factory::State::LOAD);
+    Context c;
+    auto next_step = step->execute(c);
+    EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
+
+    return mp->messages();
+}
+
+TEST_F(StepTest, shouldExecuteLoadStepSuccessfully)
+{
+    auto messages = executeLoadStep(ActionResult::Status::SUCCESS);
+    ASSERT_EQ(1, messages.size());
+    EXPECT_EQ("Loaded from file successfully.\n", messages[0]);
+}
+
+TEST_F(StepTest, shouldExecuteLoadStepFileNotFound)
+{
+    auto messages = executeLoadStep(ActionResult::Status::FILE_NOT_FOUND);
+    ASSERT_EQ(1, messages.size());
+    EXPECT_EQ("File could not be found.\n", messages[0]);
+}
+
+std::vector<std::string> executeSaveStep(ActionResult::Status s) {
+    ActionResult success_result{s, std::nullopt};
+
+    auto con = std::make_shared<MockController>();
+    EXPECT_CALL(*con, SaveTasks)
+            .WillOnce(Return(success_result));
+
+    auto mr = std::make_shared<MockReaderToVector>();
+    auto mp = std::make_shared<MockPrinterToVector>();
+    auto f = Factory::create(mr, mp, con);
+
+    auto step = f->lazyInitStep(Factory::State::SAVE);
+    Context c;
+    auto next_step = step->execute(c);
+    EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
+
+    return mp->messages();
+}
+
+TEST_F(StepTest, shouldExecuteSaveStepSuccessfully)
+{
+    auto messages = executeSaveStep(ActionResult::Status::SUCCESS);
+    ASSERT_EQ(1, messages.size());
+    EXPECT_EQ("Saved to file successfully.\n", messages[0]);
+}
+
+TEST_F(StepTest, shouldExecuteSaveStepFailedToOpen)
+{
+    auto messages = executeSaveStep(ActionResult::Status::FAILED_TO_OPEN_FILE);
+    ASSERT_EQ(1, messages.size());
+    EXPECT_EQ("Failed to open file.\n", messages[0]);
 }
