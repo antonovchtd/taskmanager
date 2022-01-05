@@ -86,11 +86,10 @@ std::vector<std::string> homeStepExecuteCall(const std::string &command, Factory
     tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
                                   time(nullptr), "label", false));
     auto con = std::make_shared<Controller>(tm);
-    auto mr = std::make_shared<MockReader>();
-    auto mp = std::make_shared<MockPrinterToVector>();
-
-    auto f = Factory::create(mr, mp, con);
-    EXPECT_CALL(*mr, read(_))
+    MockReader mr;
+    MockPrinterToVector mp;
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr), std::shared_ptr<AbstractPrinter>(&mp), con);
+    EXPECT_CALL(mr, read(_))
         .Times(1)
         .WillOnce(Return(command));
 
@@ -102,7 +101,7 @@ std::vector<std::string> homeStepExecuteCall(const std::string &command, Factory
     std::string function, argument;
     is >> function >> argument;
     EXPECT_EQ(f->controller()->data().arg, argument);
-    return mp->messages();
+    return mp.messages();
 }
 
 TEST_F(StepTest, executeHomeStepWithAddCommand)
@@ -328,7 +327,7 @@ TEST_F(StepTest, executeHomeStepWithBadCommand)
 }
 
 std::vector<std::string> executeWithWizardCall(Factory::State current_step, Factory::State expected_next_step) {
-    std::vector<std::string> scenario = {"", "test", "10", "low", "2", "31-12-22", "31/12/2022 15:00"};
+    std::vector<std::string> scenario = {"", "test", "10", "low", "", "31-12-22", "31/12/2022 15:00"};
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
     tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
@@ -363,7 +362,7 @@ std::vector<std::string> executeWithWizardCall(Factory::State current_step, Fact
     timeinfo->tm_mon = 11;
     timeinfo->tm_mday = 31;
     timeinfo->tm_year = 122;
-    ProtoTask::Task t = ProtoTask::createTask("test", ProtoTask::Task_Priority_MEDIUM, mktime(timeinfo), "", false);
+    ProtoTask::Task t = ProtoTask::createTask("test", ProtoTask::Task_Priority_NONE, mktime(timeinfo), "", false);
     EXPECT_EQ(t, c.task());
 
     auto prompts = mr->prompts();
@@ -642,6 +641,30 @@ TEST_F(StepTest, processConfirmDeleteStepWithBadStr)
     processConfirmDeleteCall(std::vector<std::string>{"bad", "n"}, Factory::State::HOME);
 }
 
+TEST_F(StepTest, processConfirmDeleteStepIDNotFound)
+{
+    ProtoTask::TaskID id;
+    id.set_value(42);
+    ActionResult result{ActionResult::Status::ID_NOT_FOUND, id};
+    MockController con;
+    EXPECT_CALL(con, ConfirmDeleteTask)
+        .WillOnce(Return(result));
+
+    auto mr = std::make_shared<MockReaderToVector>();
+    auto mp = std::make_shared<MockPrinterToVector>();
+    auto f = Factory::create(mr, mp, std::shared_ptr<ControllerInterface>(&con));
+
+    auto step = f->lazyInitStep(Factory::State::CONFIRMDELETE);
+    Context c;
+    auto next_step = step->execute(c);
+    EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
+
+    auto messages = mp->messages();
+    ASSERT_EQ(1, messages.size());
+    EXPECT_EQ(messages[0], "ID 42 was not found.\n");
+
+}
+
 TEST_F(StepTest, executeLabelStep)
 {
     auto gen = std::make_shared<IDGenerator>(1);
@@ -673,13 +696,13 @@ TEST_F(StepTest, executeLabelStep)
 std::vector<std::string> executeLoadStep(ActionResult::Status s) {
     ActionResult success_result{s, std::nullopt};
 
-    auto con = std::make_shared<MockController>();
-    EXPECT_CALL(*con, LoadTasks)
+    MockController con;
+    EXPECT_CALL(con, LoadTasks)
             .WillOnce(Return(success_result));
 
     auto mr = std::make_shared<MockReaderToVector>();
     auto mp = std::make_shared<MockPrinterToVector>();
-    auto f = Factory::create(mr, mp, con);
+    auto f = Factory::create(mr, mp, std::shared_ptr<ControllerInterface>(&con));
 
     auto step = f->lazyInitStep(Factory::State::LOAD);
     Context c;
@@ -706,13 +729,13 @@ TEST_F(StepTest, shouldExecuteLoadStepFileNotFound)
 std::vector<std::string> executeSaveStep(ActionResult::Status s) {
     ActionResult success_result{s, std::nullopt};
 
-    auto con = std::make_shared<MockController>();
-    EXPECT_CALL(*con, SaveTasks)
+    MockController con;
+    EXPECT_CALL(con, SaveTasks)
             .WillOnce(Return(success_result));
 
     auto mr = std::make_shared<MockReaderToVector>();
     auto mp = std::make_shared<MockPrinterToVector>();
-    auto f = Factory::create(mr, mp, con);
+    auto f = Factory::create(mr, mp, std::shared_ptr<ControllerInterface>(&con));
 
     auto step = f->lazyInitStep(Factory::State::SAVE);
     Context c;

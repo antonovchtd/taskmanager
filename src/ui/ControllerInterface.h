@@ -38,6 +38,9 @@ public:
 public:
     virtual std::shared_ptr<TaskManager> model() const = 0;
     virtual ControllerInterface::Data data() const = 0;
+
+public:
+    virtual ~ControllerInterface() = default;
 };
 
 #endif //TASKMANAGER_SRC_UI_CONTROLLERINTERFACE_H_
