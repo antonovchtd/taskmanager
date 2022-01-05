@@ -6,41 +6,37 @@
 #define TASKMANAGER_SRC_UI_ACTION_H_
 
 #include "model/TaskManager.h"
+#include "ui/ControllerInterface.h"
 
-class Context;
-
-class Controller {
-public:
-    struct Data {
-        std::string arg;
-    };
-
+class Controller : public ControllerInterface {
 public:
     Controller();
     explicit Controller(const std::shared_ptr<TaskManager> &);
     Controller(const std::shared_ptr<TaskManager> &, const std::shared_ptr<Persister> &);
 
 public:
-    ActionResult ValidateID(Context &);
-    ActionResult ValidateNoArg(Context &);
-    ActionResult ValidateLabelOrID(Context &);
-    ActionResult ValidateAlpha(Context &);
-    ActionResult AddTask(Context &);
-    ActionResult EditTask(Context &);
-    ActionResult AddSubtask(Context &);
-    ActionResult ShowTasks(Context &);
-    ActionResult CompleteTask(Context &);
-    ActionResult UncompleteTask(Context &);
-    ActionResult DeleteTask(Context &);
-    ActionResult ConfirmDeleteTask(Context &);
-    ActionResult LabelTask(Context &);
-    ActionResult SaveTasks(Context &);
-    ActionResult LoadTasks(Context &);
+    ActionResult ValidateID(Context &) override;
+    ActionResult ValidateNoArg(Context &) override;
+    ActionResult ValidateLabelOrID(Context &) override;
+    ActionResult ValidateAlpha(Context &) override;
+    ActionResult AddTask(Context &) override;
+    ActionResult EditTask(Context &) override;
+    ActionResult AddSubtask(Context &) override;
+    ActionResult ShowTasks(Context &) override;
+    ActionResult CompleteTask(Context &) override;
+    ActionResult UncompleteTask(Context &) override;
+    ActionResult DeleteTask(Context &) override;
+    ActionResult ConfirmDeleteTask(Context &) override;
+    ActionResult LabelTask(Context &) override;
+    ActionResult SaveTasks(Context &) override;
+    ActionResult LoadTasks(Context &) override;
 
 public:
-    std::shared_ptr<TaskManager> model() const;
-    Controller::Data data() const;
-    void setData(const Controller::Data &data);
+    void setData(const Controller::Data &data) override;
+
+public:
+    std::shared_ptr<TaskManager> model() const override;
+    Controller::Data data() const override;
 
 private:
     std::shared_ptr<TaskManager> model_;

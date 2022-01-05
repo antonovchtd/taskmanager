@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 
+#include "ControllerInterface.h"
 #include "Controller.h"
 #include "model/TaskManager.h"
 #include "io/AbstractReader.h"
@@ -47,7 +48,7 @@ public:
                                            const std::shared_ptr<AbstractPrinter> &);
     static std::shared_ptr<Factory> create(const std::shared_ptr<AbstractReader> &,
                                            const std::shared_ptr<AbstractPrinter> &,
-                                           const std::shared_ptr<Controller> &);
+                                           const std::shared_ptr<ControllerInterface> &);
 
 private:
     Factory();
@@ -55,7 +56,7 @@ private:
             const std::shared_ptr<AbstractPrinter> &);
     Factory(const std::shared_ptr<AbstractReader> &,
             const std::shared_ptr<AbstractPrinter> &,
-            const std::shared_ptr<Controller> &);
+            const std::shared_ptr<ControllerInterface> &);
 
 public:
     std::shared_ptr<Step> createStep(const std::string &command);
@@ -68,13 +69,13 @@ public:
 public:
     std::shared_ptr<AbstractReader> reader() const;
     std::shared_ptr<AbstractPrinter> printer() const;
-    std::shared_ptr<Controller> controller() const;
+    std::shared_ptr<ControllerInterface> controller() const;
 
 private:
     std::map<State, std::shared_ptr<Step>> steps_;
     std::shared_ptr<AbstractReader> reader_;
     std::shared_ptr<AbstractPrinter> printer_;
-    std::shared_ptr<Controller> controller_;
+    std::shared_ptr<ControllerInterface> controller_;
 };
 
 #endif //TASKMANAGER_SRC_UI_FACTORY_H_
