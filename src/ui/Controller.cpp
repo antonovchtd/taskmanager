@@ -103,18 +103,18 @@ ActionResult Controller::ShowTasks(Context &context) {
 }
 
 ActionResult Controller::CompleteTask(Context &context) {
-    return model()->Complete(*context.id());
+    return model()->SetComplete(*context.id(), true);
 }
 
 ActionResult Controller::UncompleteTask(Context &context) {
-    return model()->Uncomplete(*context.id());
+    return model()->SetComplete(*context.id(), false);
 }
 
 ActionResult Controller::DeleteTask(Context &context) {
     return model()->Delete(*context.id(), true);
 }
 
-ActionResult Controller::ConfirmDeleteTask(Context &context) {
+ActionResult Controller::ReadTaskWithChildren(Context &context) {
     try {
         context.setTasks(model()->getTasks(*context.id()));
         return {ActionResult::Status::SUCCESS, *context.id()};
@@ -128,7 +128,7 @@ ActionResult Controller::LabelTask(Context &context) {
 }
 
 ActionResult Controller::SaveTasks(Context &context) {
-    std::string filename = data().arg.empty() ? persister_->defaultFilename() : data().arg;
+    std::string filename = data().arg.empty() ? persister_->defaultLocation() : data().arg;
     if (persister_->save(filename, model()))
         return {ActionResult::Status::SUCCESS, std::nullopt};
     else
@@ -136,7 +136,7 @@ ActionResult Controller::SaveTasks(Context &context) {
 }
 
 ActionResult Controller::LoadTasks(Context &context) {
-    std::string filename = data().arg.empty() ? persister_->defaultFilename() : data().arg;
+    std::string filename = data().arg.empty() ? persister_->defaultLocation() : data().arg;
     if (persister_->load(filename, model()))
         return {ActionResult::Status::SUCCESS, std::nullopt};
     else

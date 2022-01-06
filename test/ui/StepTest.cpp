@@ -71,7 +71,7 @@ public:
     MOCK_METHOD(ActionResult, CompleteTask, (Context &), (override));
     MOCK_METHOD(ActionResult, UncompleteTask, (Context &), (override));
     MOCK_METHOD(ActionResult, DeleteTask, (Context &), (override));
-    MOCK_METHOD(ActionResult, ConfirmDeleteTask, (Context &), (override));
+    MOCK_METHOD(ActionResult, ReadTaskWithChildren, (Context &), (override));
     MOCK_METHOD(ActionResult, LabelTask, (Context &), (override));
     MOCK_METHOD(ActionResult, SaveTasks, (Context &), (override));
     MOCK_METHOD(ActionResult, LoadTasks, (Context &), (override));
@@ -514,7 +514,7 @@ TEST_F(StepTest, executeShowStep)
 
     auto messages = mp->messages();
     EXPECT_EQ(messages[0], "1 – title, Priority: Medium, Due: Wed Dec 31 23:59:59 2025 L: label");
-    EXPECT_EQ(messages[2], "    2 – subtitle, Priority: High, Due: Wed Dec 31 23:59:59 2025 [completed] L: sub_label");
+    EXPECT_EQ(messages[2], "    2 – subtitle, Priority: High, Due: Wed Dec 31 23:59:59 2025 L: sub_label [completed]");
 }
 
 TEST_F(StepTest, executeCompleteStep)
@@ -614,7 +614,7 @@ void processConfirmDeleteCall(const std::vector<std::string> &scenario, Factory:
     EXPECT_EQ(next_step, f->lazyInitStep(expected_step));
 
     auto prompts = mr->prompts();
-    EXPECT_EQ(prompts[0], "Task 1 has 1 subtask(s). Confirm to delete all. [Y]/N > ");
+    EXPECT_EQ(prompts[0], "Task 1 has 1 subtask(s). Confirm to delete all. Y/[N] > ");
     auto messages = mp->messages();
     if (!messages.empty()) {
         EXPECT_EQ(messages[0], "Wrong option. Type Y or N.\n");
@@ -623,7 +623,7 @@ void processConfirmDeleteCall(const std::vector<std::string> &scenario, Factory:
 
 TEST_F(StepTest, executeConfirmDeleteStepWithEmptyStr)
 {
-    processConfirmDeleteCall(std::vector<std::string>{""}, Factory::State::DELETE);
+    processConfirmDeleteCall(std::vector<std::string>{""}, Factory::State::HOME);
 }
 
 TEST_F(StepTest, processConfirmDeleteStepWithYStr)
@@ -647,7 +647,7 @@ TEST_F(StepTest, processConfirmDeleteStepIDNotFound)
     id.set_value(42);
     ActionResult result{ActionResult::Status::ID_NOT_FOUND, id};
     MockController con;
-    EXPECT_CALL(con, ConfirmDeleteTask)
+    EXPECT_CALL(con, ReadTaskWithChildren)
         .WillOnce(Return(result));
 
     auto mr = std::make_shared<MockReaderToVector>();

@@ -257,7 +257,7 @@ TEST_F(TaskManagerTest, shouldCompleteTaskWithSubtasks)
     t.set_is_complete(false);
     ProtoTask::TaskID id = *tm.Add(t).id;
     tm.AddSubtask(t, id);
-    tm.Complete(id);
+    tm.SetComplete(id, true);
     EXPECT_TRUE(tm[id].first.is_complete());
     auto ch_id = tm[id].second.children()[0];
     EXPECT_TRUE(tm[ch_id].first.is_complete());
@@ -274,7 +274,7 @@ TEST_F(TaskManagerTest, shouldFailToCompleteTaskWithWrongID)
     t.set_is_complete(false);
     ProtoTask::TaskID id = *tm.Add(t).id;
     id.set_value(id.value()+1);
-    ActionResult result = tm.Complete(id);
+    ActionResult result = tm.SetComplete(id, true);
     EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_EQ(*result.id, id);
 }
@@ -289,7 +289,7 @@ TEST_F(TaskManagerTest, shouldUncompleteTask)
     t.set_label("label");
     t.set_is_complete(true);
     ProtoTask::TaskID id = *tm.Add(t).id;
-    tm.Uncomplete(id);
+    tm.SetComplete(id, false);
     EXPECT_FALSE(tm[id].first.is_complete());
 }
 

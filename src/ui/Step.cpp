@@ -136,25 +136,34 @@ std::optional<time_t> ReadTaskDataStep::stringToTime(const std::string &datestri
     }
 }
 
-std::shared_ptr<Step> ReadTaskDataStep::execute(Context &c) {
+void ReadTaskDataStep::readTitle(Context &c) const {
     std::string title;
     do {
         title = factory()->reader()->read("    Title > ");
     } while (!validateTitle(title));
     c.setTitle(title);
+}
 
+void ReadTaskDataStep::readPriority(Context &c) const {
     std::optional<ProtoTask::Task::Priority> priority{std::nullopt};
     while (!priority) {
         priority = stringToPriority(factory()->reader()->read("    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > "));
     }
     c.setPriority(*priority);
+}
 
+void ReadTaskDataStep::readDueDate(Context &c) const {
     std::optional<time_t> due_date;
     while (!due_date) {
         due_date = stringToTime(factory()->reader()->read("    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} > "));
     }
     c.setDueDate(*due_date);
+}
 
+std::shared_ptr<Step> ReadTaskDataStep::execute(Context &c) {
+    readTitle(c);
+    readPriority(c);
+    readDueDate(c);
     return StepSwitcher::nextStep(*this);
 }
 
@@ -223,7 +232,7 @@ std::shared_ptr<Step> DeleteStep::execute(Context &c) {
 }
 
 std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c) {
-    ActionResult result = factory()->controller()->ConfirmDeleteTask(c);
+    ActionResult result = factory()->controller()->ReadTaskWithChildren(c);
 
     if (result) {
         auto ch = c.tasks().at(*result.id).second.children();
@@ -231,10 +240,10 @@ std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c) {
             while (true) {
                 std::string reply = factory()->reader()->read("Task " + std::to_string(c.id()->value()) +
                                                               " has " + std::to_string(ch.size()) +
-                                                              " subtask(s). Confirm to delete all. [Y]/N > ");
-                if (reply.empty() || reply == "Y" || reply == "y") {
+                                                              " subtask(s). Confirm to delete all. Y/[N] > ");
+                if (reply == "Y" || reply == "y") {
                     break;
-                } else if (reply == "N" || reply == "n") {
+                } else if (reply.empty() || reply == "N" || reply == "n") {
                     // disregard nextStep and go to HomeStep
                     return factory()->lazyInitStep(Factory::State::HOME);
                 } else {

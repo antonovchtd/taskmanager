@@ -256,8 +256,8 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
                                                  " > ", "    Title > ",
                                                  "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > ",
                                                  "    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} > ",
-                                                 " > ", "Task 1 has 1 subtask(s). Confirm to delete all. [Y]/N > ",
-                                                 " > ", "Task 1 has 1 subtask(s). Confirm to delete all. [Y]/N > ",
+                                                 " > ", "Task 1 has 1 subtask(s). Confirm to delete all. Y/[N] > ",
+                                                 " > ", "Task 1 has 1 subtask(s). Confirm to delete all. Y/[N] > ",
                                                  " > "};
     std::string expected_output = "[Add Task]\nAdded Task (ID: 1)\n[Add Task]\nAdded Task (ID: 2)\n[Add Subtask]\nAdded Subtask (ID: 3)\nDeleted Task (ID: 1)\n";
     MockReaderToVector mr{scenario};

@@ -84,18 +84,10 @@ ActionResult TaskManager::Delete(const ProtoTask::TaskID &id, bool deleteChildre
 ActionResult TaskManager::Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) {
     try {
         tasks_.at(id).first = t;
+        return {ActionResult::Status::SUCCESS, id};
     } catch (const std::out_of_range &) {
         return {ActionResult::Status::ID_NOT_FOUND, id};
     }
-    return {ActionResult::Status::SUCCESS, id};
-}
-
-ActionResult TaskManager::Complete(const ProtoTask::TaskID &id) {
-    return SetComplete(id, true);
-}
-
-ActionResult TaskManager::Uncomplete(const ProtoTask::TaskID &id) {
-    return SetComplete(id, false);
 }
 
 ActionResult TaskManager::SetComplete(const ProtoTask::TaskID &id, bool flag) {
@@ -166,8 +158,8 @@ void TaskManager::Replace(const std::vector<ProtoTask::TaskEntity> &vec) {
         if (kv.second.second.parent())
             tasks_[*kv.second.second.parent()].second.AddChild(kv.first);
 
-    // set IDGenerator state
-    gen_->setState(max_id.value()+1);
+    // substitute new IDGenerator with the new state
+    gen_ = std::make_shared<IDGenerator>(max_id.value()+1);
 }
 
 std::shared_ptr<IDGenerator> TaskManager::gen() const {

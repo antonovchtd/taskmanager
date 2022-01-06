@@ -28,7 +28,7 @@ public:
     ActionResult CompleteTask(Context &) override;
     ActionResult UncompleteTask(Context &) override;
     ActionResult DeleteTask(Context &) override;
-    ActionResult ConfirmDeleteTask(Context &) override;
+    ActionResult ReadTaskWithChildren(Context &) override;
     ActionResult LabelTask(Context &) override;
     ActionResult SaveTasks(Context &) override;
     ActionResult LoadTasks(Context &) override;

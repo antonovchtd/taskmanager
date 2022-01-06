@@ -15,7 +15,7 @@ public:
     bool load(const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model) override;
 
 public:
-    std::string defaultFilename() const override;
+    std::string defaultLocation() const override;
 
 private:
     std::string default_filename_ = "data.bin";

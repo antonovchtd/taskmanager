@@ -11,7 +11,7 @@
 
 class FilePrinter : public AbstractPrinter {
 public:
-    explicit FilePrinter(std::string filename);
+    explicit FilePrinter(const std::string &filename);
     void print(const std::string &message) override;
 
 private:

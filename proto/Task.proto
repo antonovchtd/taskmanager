@@ -17,7 +17,7 @@ message Task {
   }
   Priority priority = 2;
 //  google.protobuf.Timestamp due_date = 3;
-  uint64  due_date = 3;
+  int64  due_date = 3;
   string label = 4;
   bool is_complete = 5;
 }

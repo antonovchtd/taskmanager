@@ -7,7 +7,7 @@
 #include "Persister.h"
 #include "model/TaskManager.h"
 
-std::string Persister::defaultFilename() const {
+std::string Persister::defaultLocation() const {
     return default_filename_;
 }
 

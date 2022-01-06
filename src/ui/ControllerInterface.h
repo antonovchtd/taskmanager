@@ -27,7 +27,7 @@ public:
     virtual ActionResult CompleteTask(Context &) = 0;
     virtual ActionResult UncompleteTask(Context &) = 0;
     virtual ActionResult DeleteTask(Context &) = 0;
-    virtual ActionResult ConfirmDeleteTask(Context &) = 0;
+    virtual ActionResult ReadTaskWithChildren(Context &) = 0;
     virtual ActionResult LabelTask(Context &) = 0;
     virtual ActionResult SaveTasks(Context &) = 0;
     virtual ActionResult LoadTasks(Context &) = 0;

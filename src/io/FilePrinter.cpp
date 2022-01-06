@@ -4,7 +4,7 @@
 
 #include "FilePrinter.h"
 
-FilePrinter::FilePrinter(std::string filename) : filename_(std::move(filename)) {
+FilePrinter::FilePrinter(const std::string &filename) : filename_(filename) {
 }
 
 void FilePrinter::print(const std::string &message) {

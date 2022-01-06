@@ -69,6 +69,11 @@ public:
     std::optional<time_t> stringToTime(const std::string &datestring) const;
     bool validateTitle(const std::string &title) const;
     std::optional<ProtoTask::Task::Priority> stringToPriority(const std::string &priority) const;
+
+public:
+    void readTitle(Context &) const;
+    void readPriority(Context &) const;
+    void readDueDate(Context &) const;
 };
 
 class EditStep : public Step {
@@ -126,6 +131,8 @@ class LabelStep : public Step {
 public:
     using Step::Step;
     std::shared_ptr<Step> execute(Context &c) override;
+
+public:
     std::string readLabel() const;
 };
 

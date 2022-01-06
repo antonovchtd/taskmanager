@@ -14,7 +14,6 @@ public:
     IDGenerator(const IDGenerator&) = default;
 
     int state() const;
-    void setState(int last);
 
 public:
     virtual ProtoTask::TaskID genID();

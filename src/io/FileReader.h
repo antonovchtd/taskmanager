@@ -12,7 +12,7 @@
 
 class FileReader : public AbstractReader {
 public:
-    explicit FileReader(std::string filename);
+    explicit FileReader(const std::string &filename);
     std::string read(const std::string &prompt) override;
 
 private:

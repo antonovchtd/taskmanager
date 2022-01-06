@@ -278,7 +278,7 @@ TEST_F(ControllerTest, shouldGetTasksForConfirmDelete)
     context_.setID(result.id);
     ctr_.AddSubtask(context_);
 
-    ActionResult result_confirm = ctr_.ConfirmDeleteTask(context_);
+    ActionResult result_confirm = ctr_.ReadTaskWithChildren(context_);
     EXPECT_EQ(2, tm_->size());
     EXPECT_EQ(2, context_.tasks().size());
     EXPECT_EQ(result_confirm.status, ActionResult::Status::SUCCESS);
@@ -292,7 +292,7 @@ TEST_F(ControllerTest, shouldGetTasksForConfirmDeleteWithWrongID)
     new_id.set_value(result.id->value() + 1);
     context_.setID(new_id);
 
-    ActionResult result_confirm = ctr_.ConfirmDeleteTask(context_);
+    ActionResult result_confirm = ctr_.ReadTaskWithChildren(context_);
     EXPECT_EQ(1, tm_->size());
     EXPECT_EQ(0, context_.tasks().size());
     EXPECT_EQ(result_confirm.status, ActionResult::Status::ID_NOT_FOUND);
@@ -376,7 +376,7 @@ TEST_F(ControllerTest, shouldReturnSuccesOnCorrectSaveWithDefaultFilename)
     std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
     ctr_ = Controller{tm_, mp};
 
-    EXPECT_CALL(*mp, save(mp->defaultFilename(), tm_))
+    EXPECT_CALL(*mp, save(mp->defaultLocation(), tm_))
             .Times(1)
             .WillOnce(Return(true));
 
@@ -391,7 +391,7 @@ TEST_F(ControllerTest, shouldReturnFailOnIncorrectSaveWithDefaultFilename)
     std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
     ctr_ = Controller{tm_, mp};
 
-    EXPECT_CALL(*mp, save(mp->defaultFilename(), tm_))
+    EXPECT_CALL(*mp, save(mp->defaultLocation(), tm_))
             .Times(1)
             .WillOnce(Return(false));
 
@@ -422,7 +422,7 @@ TEST_F(ControllerTest, shouldReturnSuccesOnCorrectLoadWithDefaultFilename)
     std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
     ctr_ = Controller{tm_, mp};
 
-    EXPECT_CALL(*mp, load(mp->defaultFilename(), tm_))
+    EXPECT_CALL(*mp, load(mp->defaultLocation(), tm_))
             .Times(1)
             .WillOnce(Return(true));
 
@@ -437,7 +437,7 @@ TEST_F(ControllerTest, shouldReturnFailOnIncorrectLoadWithDefaultFilename)
     std::shared_ptr<MockPersister> mp = std::make_shared<MockPersister>();
     ctr_ = Controller{tm_, mp};
 
-    EXPECT_CALL(*mp, load(mp->defaultFilename(), tm_))
+    EXPECT_CALL(*mp, load(mp->defaultLocation(), tm_))
             .Times(1)
             .WillOnce(Return(false));
 

@@ -36,9 +36,8 @@ public:
     virtual ActionResult Add(const ProtoTask::Task &) = 0;
     virtual ActionResult AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &) = 0;
     virtual ActionResult Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) = 0;
-    virtual ActionResult Complete(const ProtoTask::TaskID &) = 0;
-    virtual ActionResult Uncomplete(const ProtoTask::TaskID &) = 0;
-    virtual ActionResult Delete(const ProtoTask::TaskID &id, bool deleteChildren = false) = 0;
+    virtual ActionResult SetComplete(const ProtoTask::TaskID &, bool) = 0;
+    virtual ActionResult Delete(const ProtoTask::TaskID &id, bool deleteChildren) = 0;
     virtual ActionResult Validate(const ProtoTask::TaskID &id) const = 0;
     virtual ActionResult SetLabel(const ProtoTask::TaskID &, const std::string &) = 0;
 

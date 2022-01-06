@@ -4,7 +4,7 @@
 
 #include "FileReader.h"
 
-FileReader::FileReader(std::string filename) : filename_(std::move(filename)) {
+FileReader::FileReader(const std::string &filename) : filename_(filename) {
 }
 
 std::string FileReader::read(const std::string &message) {

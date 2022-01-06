@@ -14,7 +14,7 @@ public:
     virtual bool load(const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model) = 0;
 
 public:
-    virtual std::string defaultFilename() const = 0;
+    virtual std::string defaultLocation() const = 0;
 
 public:
     virtual ~PersisterInterface() = default;

@@ -19,7 +19,3 @@ ProtoTask::TaskID IDGenerator::genID() {
 int IDGenerator::state() const {
     return last_;
 }
-
-void IDGenerator::setState(int last) {
-    last_ = last;
-}

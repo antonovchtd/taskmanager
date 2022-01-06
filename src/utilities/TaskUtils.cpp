@@ -22,15 +22,17 @@ std::string to_string(const ProtoTask::Task &t) {
     std::string str_time = std::string(asctime(localtime(&dd)));
     str_time.pop_back();
     os << ", Due: " << str_time;
-    if (dd < time(nullptr))
-        os << " [overdue]";
-
-    if (t.is_complete()) {
-        os << " [completed]";
-    }
 
     if (!t.label().empty()) {
         os << " L: " << t.label();
+    }
+
+    if (dd < time(nullptr)) {
+        os << " [overdue]";
+    }
+
+    if (t.is_complete()) {
+        os << " [completed]";
     }
 
     return os.str();
