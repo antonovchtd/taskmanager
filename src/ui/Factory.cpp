@@ -90,6 +90,10 @@ Machine Factory::createMachine(const State &state) {
     return {shared_from_this(), state};
 }
 
+Machine Factory::createMachine(const State &state, const Context &context) {
+    return {shared_from_this(), state, context};
+}
+
 std::shared_ptr<Step> Factory::getNewStep(const State &s) {
     switch (s) {
         case State::HOME:

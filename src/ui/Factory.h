@@ -65,6 +65,7 @@ public:
     std::shared_ptr<Step> lazyInitStep(const State &state);
 
     Machine createMachine(const State &state);
+    Machine createMachine(const State &state, const Context &context);
 
 public:
     std::shared_ptr<AbstractReader> reader() const;

@@ -13,6 +13,7 @@ class Machine {
 public:
     Machine();
     Machine(const std::shared_ptr<Factory> &f, const Factory::State &s);
+    Machine(const std::shared_ptr<Factory> &f, const Factory::State &s, const Context &c);
 
 public:
     Context run();

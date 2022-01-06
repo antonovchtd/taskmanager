@@ -99,6 +99,21 @@ std::optional<ProtoTask::Task::Priority> ReadTaskDataStep::stringToPriority(cons
     }
 }
 
+std::string ReadTaskDataStep::priorityToString(const ProtoTask::Task::Priority &priority) const {
+    switch (priority) {
+        case ProtoTask::Task_Priority_NONE:
+            return "None";
+        case ProtoTask::Task_Priority_LOW:
+            return "Low";
+        case ProtoTask::Task_Priority_MEDIUM:
+            return "Medium";
+        case ProtoTask::Task_Priority_HIGH:
+            return "High";
+        default:
+            return "";
+    }
+}
+
 std::optional<time_t> ReadTaskDataStep::stringToTime(const std::string &datestring) const {
     std::smatch matches;
     if (std::regex_search(datestring, matches,
@@ -136,26 +151,48 @@ std::optional<time_t> ReadTaskDataStep::stringToTime(const std::string &datestri
     }
 }
 
+std::string ReadTaskDataStep::timeToString(const time_t &date) const {
+    std::string str{asctime(localtime(&date))};
+    str.pop_back(); // remove trailing \n from asctime
+    return str;
+}
+
 void ReadTaskDataStep::readTitle(Context &c) const {
     std::string title;
+    std::string prompt{"    Title"};
+    if (!c.task().title().empty())
+        prompt += (" [" + c.task().title() + "]");
     do {
-        title = factory()->reader()->read("    Title > ");
+        title = factory()->reader()->read(prompt + " > ");
+        title = title.empty() ? c.task().title() : title;
     } while (!validateTitle(title));
-    c.setTitle(title);
+    if (!title.empty())
+        c.setTitle(title);
 }
 
 void ReadTaskDataStep::readPriority(Context &c) const {
     std::optional<ProtoTask::Task::Priority> priority{std::nullopt};
+    std::string prompt = "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH)";
+    if (c.task().priority() != ProtoTask::Task_Priority_NONE)
+        prompt += (" [" + priorityToString(c.task().priority()) + "]");
     while (!priority) {
-        priority = stringToPriority(factory()->reader()->read("    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > "));
+        std::string str = factory()->reader()->read(prompt + " > ");
+        priority = str.empty() ? c.task().priority() : stringToPriority(str);
     }
     c.setPriority(*priority);
 }
 
 void ReadTaskDataStep::readDueDate(Context &c) const {
     std::optional<time_t> due_date;
+    std::string prompt = "    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)}";
+    if (c.task().due_date())
+        prompt += (" [" + timeToString(c.task().due_date()) + "]");
     while (!due_date) {
-        due_date = stringToTime(factory()->reader()->read("    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} > "));
+        std::string str = factory()->reader()->read(prompt + " > ");
+        if (str.empty() && c.task().due_date())
+            due_date = std::make_optional(c.task().due_date());
+        else
+            due_date = stringToTime(str);
     }
     c.setDueDate(*due_date);
 }
@@ -169,7 +206,10 @@ std::shared_ptr<Step> ReadTaskDataStep::execute(Context &c) {
 
 std::shared_ptr<Step> EditStep::execute(Context &c) {
     factory()->printer()->print("[Edit Task]\n");
-    Machine wizard = factory()->createMachine(Factory::State::READTASK);
+    ActionResult result_get_task = factory()->controller()->ReadTaskWithChildren(c);
+    if (result_get_task)
+        c.setTask(c.tasks()[*c.id()].first);
+    Machine wizard = factory()->createMachine(Factory::State::READTASK, c);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
 

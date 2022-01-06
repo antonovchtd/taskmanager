@@ -11,6 +11,10 @@ Machine::Machine() : initial_step_{Factory::State::HOME} {
 Machine::Machine(const std::shared_ptr<Factory> &f, const Factory::State &s) : factory_{f}, initial_step_{s} {
 }
 
+Machine::Machine(const std::shared_ptr<Factory> &f, const Factory::State &s, const Context &c) :
+                 factory_{f}, initial_step_{s}, context_{c} {
+}
+
 Context Machine::run() {
 
     auto step = factory_->lazyInitStep(initial_step_);

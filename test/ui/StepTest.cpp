@@ -387,20 +387,106 @@ TEST_F(StepTest, executeAddStep)
     EXPECT_EQ(messages[6], " (ID: 2)\n");
 }
 
-TEST_F(StepTest, executeEditStep)
-{
-    auto messages = executeWithWizardCall(Factory::State::EDIT, Factory::State::HOME);
-    EXPECT_EQ(messages[0], "[Edit Task]\n");
-    EXPECT_EQ(messages[5], "Edited Task");
-    EXPECT_EQ(messages[6], " (ID: 1)\n");
-}
-
 TEST_F(StepTest, executeSubtaskStep)
 {
     auto messages = executeWithWizardCall(Factory::State::SUBTASK, Factory::State::HOME);
     EXPECT_EQ(messages[0], "[Add Subtask]\n");
     EXPECT_EQ(messages[5], "Added Subtask");
     EXPECT_EQ(messages[6], " (ID: 2)\n");
+}
+
+TEST_F(StepTest, executeEditStepAllDefault)
+{
+    std::vector<std::string> scenario = {"", "", ""};
+    auto gen = std::make_shared<IDGenerator>(1);
+    auto tm = std::make_shared<TaskManager>(gen);
+    auto t = ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
+                                   1767218399, "label", false);
+    tm->Add(t);
+    auto con = std::make_shared<Controller>(tm);
+    auto mr = std::make_shared<MockReaderToVector>(scenario);
+    auto mp = std::make_shared<MockPrinterToVector>();
+    auto f = Factory::create(mr, mp, con);
+
+    std::vector<std::string> expected_prompts = {"    Title [title] > ",
+                                                 "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) [Medium] > ",
+                                                 "    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} [Wed Dec 31 23:59:59 2025] > "
+    };
+
+    auto step = f->lazyInitStep(Factory::State::EDIT);
+    Context c;
+    ProtoTask::TaskID id;
+    id.set_value(1);
+    c.setID(id);
+    auto next_step = step->execute(c);
+    EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
+
+    EXPECT_EQ(t, c.task());
+
+    auto prompts = mr->prompts();
+    EXPECT_EQ(prompts.size(), expected_prompts.size());
+    for (int i = 0; i < prompts.size(); ++i)
+        EXPECT_EQ(prompts[i], expected_prompts[i]);
+
+    auto messages = mp->messages();
+    EXPECT_EQ(messages[0], "[Edit Task]\n");
+    EXPECT_EQ(messages[1], "Edited Task");
+    EXPECT_EQ(messages[2], " (ID: 1)\n");
+}
+
+TEST_F(StepTest, executeEditStepAllNew)
+{
+    std::vector<std::string> scenario = {"edited", "10", "low", "3", "31-12-22", "31/12/2022 15:00"};
+    auto gen = std::make_shared<IDGenerator>(1);
+    auto tm = std::make_shared<TaskManager>(gen);
+    tm->Add(ProtoTask::createTask("original", ProtoTask::Task_Priority_MEDIUM,
+                                  1767218399, "label", false));
+    auto con = std::make_shared<Controller>(tm);
+    auto mr = std::make_shared<MockReaderToVector>(scenario);
+    auto mp = std::make_shared<MockPrinterToVector>();
+    auto f = Factory::create(mr, mp, con);
+
+    std::vector<std::string> expected_prompts = {"    Title [original] > ",
+                                                 "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) [Medium] > ",
+                                                 "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) [Medium] > ",
+                                                 "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) [Medium] > ",
+                                                 "    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} [Wed Dec 31 23:59:59 2025] > ",
+                                                 "    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} [Wed Dec 31 23:59:59 2025] > "
+    };
+
+    auto step = f->lazyInitStep(Factory::State::EDIT);
+    Context c;
+    ProtoTask::TaskID id;
+    id.set_value(1);
+    c.setID(id);
+    auto next_step = step->execute(c);
+    EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
+
+    time_t rawtime;
+    time(&rawtime);
+    struct tm * timeinfo = localtime(&rawtime);
+    timeinfo->tm_hour = 15;
+    timeinfo->tm_min = 0;
+    timeinfo->tm_sec = 0;
+    timeinfo->tm_mon = 11;
+    timeinfo->tm_mday = 31;
+    timeinfo->tm_year = 122;
+    ProtoTask::Task t = ProtoTask::createTask("edited", ProtoTask::Task_Priority_HIGH,
+                                              mktime(timeinfo), "label", false);
+    EXPECT_EQ(t, c.task());
+
+    auto prompts = mr->prompts();
+    EXPECT_EQ(prompts.size(), expected_prompts.size());
+    for (int i = 0; i < prompts.size(); ++i)
+        EXPECT_EQ(prompts[i], expected_prompts[i]);
+
+    auto messages = mp->messages();
+    EXPECT_EQ(messages[0], "[Edit Task]\n");
+    EXPECT_EQ(messages[1], "    Wrong priority option. Try again.\n");
+    EXPECT_EQ(messages[2], "    Wrong priority option. Try again.\n");
+    EXPECT_EQ(messages[3], "    Wrong date format. Try again.\n");
+    EXPECT_EQ(messages[4], "Edited Task");
+    EXPECT_EQ(messages[5], " (ID: 1)\n");
 }
 
 TEST_F(StepTest, executeHelpStep)

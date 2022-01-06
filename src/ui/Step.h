@@ -67,8 +67,10 @@ public:
 
 public:
     std::optional<time_t> stringToTime(const std::string &datestring) const;
+    std::string timeToString(const time_t &date) const;
     bool validateTitle(const std::string &title) const;
     std::optional<ProtoTask::Task::Priority> stringToPriority(const std::string &priority) const;
+    std::string priorityToString(const ProtoTask::Task::Priority &priority) const;
 
 public:
     void readTitle(Context &) const;
