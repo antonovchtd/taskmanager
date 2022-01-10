@@ -53,3 +53,11 @@ TEST_F(PersisterTest, shouldSaveAndLoadTasksMapWithGeneratorState)
     }
     EXPECT_EQ(tm->gen()->state(), tm_loaded->gen()->state());
 }
+
+TEST_F(PersisterTest, shouldFailedToLoadNonExistingFile)
+{
+    auto tm = std::make_shared<TaskManager>();
+    std::string filename = "Missing.bin";
+    Persister p;
+    EXPECT_FALSE(p.load(filename, tm));
+}

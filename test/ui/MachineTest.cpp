@@ -33,6 +33,11 @@ public:
     MOCK_METHOD(void, print, (const std::string &message), (override));
 };
 
+TEST_F(MachineTest, shouldCreate)
+{
+    Machine m;
+}
+
 TEST_F(MachineTest, shouldReturnModel)
 {
     auto tm = std::make_shared<TaskManager>();

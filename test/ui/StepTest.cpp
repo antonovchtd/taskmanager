@@ -505,6 +505,15 @@ TEST_F(StepTest, executeHelpStep)
     EXPECT_EQ(expected_output, messages[0]);
 }
 
+TEST_F(StepTest, shouldConvertPriorityToString)
+{
+    ReadTaskDataStep step;
+    EXPECT_EQ("None", step.priorityToString(ProtoTask::Task_Priority_NONE));
+    EXPECT_EQ("Low", step.priorityToString(ProtoTask::Task_Priority_LOW));
+    EXPECT_EQ("Medium", step.priorityToString(ProtoTask::Task_Priority_MEDIUM));
+    EXPECT_EQ("High", step.priorityToString(ProtoTask::Task_Priority_HIGH));
+}
+
 TEST_F(StepTest, stringToTimeWithDateOnly)
 {
     ReadTaskDataStep step;
