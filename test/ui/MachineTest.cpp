@@ -46,10 +46,8 @@ TEST_F(MachineTest, shouldReturnModel)
 
 TEST_F(MachineTest, shouldExecuteRun)
 {
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
     EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read)
         .WillOnce(Return("quit"));
     Machine m{f, Factory::State::HOME};

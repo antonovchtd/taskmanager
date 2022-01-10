@@ -6,82 +6,71 @@
 #include "Machine.h"
 #include "StepSwitcher.h"
 
-Step::Step(const std::shared_ptr<Factory> &factory) : factory_(factory) {
-
-}
-
-std::shared_ptr<Factory> Step::factory() const {
-    return factory_;
-}
-
 std::string HomeStep::command() const {
     return command_;
 }
 
 template <typename T>
 std::shared_ptr<Step> processResult(const T &step,
+                                    const std::shared_ptr<Factory> &factory,
                                     const ActionResult &result,
                                     const std::string &message) {
     if (result) {
         if (!message.empty()) {
-            step.factory()->printer()->print(message);
+            factory->printer()->print(message);
             if (result.id)
-                step.factory()->printer()->print(" (ID: " + std::to_string(result.id->value()) + ")\n");
+                factory->printer()->print(" (ID: " + std::to_string(result.id->value()) + ")\n");
         }
     }
     else {
-        step.factory()->printer()->print(result.message());
-        return step.factory()->lazyInitStep(Factory::State::HOME);
+        factory->printer()->print(result.message());
+        return factory->lazyInitStep(Factory::State::HOME);
     }
-    return StepSwitcher::nextStep(step);
+    return StepSwitcher::nextStep(step, factory);
 }
 
-std::shared_ptr<Step> HomeStep::execute(Context &c) {
-    std::stringstream ss{factory()->reader()->read(" > ")};
+std::shared_ptr<Step> HomeStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    std::stringstream ss{f->reader()->read(" > ")};
     std::string command, arg;
     ss >> command >> arg;
     command_ = command;
 
-    factory()->controller()->setData(Controller::Data{arg});
+    f->controller()->setData(Controller::Data{arg});
     ActionResult result;
     std::shared_ptr<Controller> action;
     if (command_ == "edit" || command_ == "subtask" ||
         command_ == "delete" || command_ == "complete" ||
         command_ == "uncomplete" ||command_ == "label") {
-        result = factory()->controller()->ValidateID(c);
+        result = f->controller()->ValidateID(c);
     } else if (command_ == "show") {
-        result = factory()->controller()->ValidateLabelOrID(c);
+        result = f->controller()->ValidateLabelOrID(c);
     } else if (command_ == "save" || command_ == "load" || command_.empty()) {
-        result = factory()->controller()->ValidateAlpha(c);
+        result = f->controller()->ValidateAlpha(c);
     } else {
-        result = factory()->controller()->ValidateNoArg(c);
+        result = f->controller()->ValidateNoArg(c);
     }
 
-    return processResult(*this, result, "");
+    return processResult(*this, f, result, "");
 }
 
-std::shared_ptr<Step> HelpStep::execute(Context &c) {
+std::shared_ptr<Step> HelpStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
     FileReader fr("../src/model/help.txt");
-    factory()->printer()->print(fr.read(""));
-    return StepSwitcher::nextStep(*this);
+    f->printer()->print(fr.read(""));
+    return StepSwitcher::nextStep(*this, f);
 }
 
-std::shared_ptr<Step> AddStep::execute(Context &c) {
-    factory()->printer()->print("[Add Task]\n");
-    Machine wizard = factory()->createMachine(Factory::State::READTASK);
+std::shared_ptr<Step> AddStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    f->printer()->print("[Add Task]\n");
+    Machine wizard = f->createMachine(Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
 
-    ActionResult result = factory()->controller()->AddTask(c);
-    return processResult(*this, result, "Added Task");
+    ActionResult result = f->controller()->AddTask(c);
+    return processResult(*this, f, result, "Added Task");
 }
 
 bool ReadTaskDataStep::validateTitle(const std::string &title) const {
-    if (title.empty()) {
-        factory()->printer()->print("    Title cannot be empty!\n");
-        return false;
-    }
-    return true;
+    return !title.empty();
 }
 
 std::optional<ProtoTask::Task::Priority> ReadTaskDataStep::stringToPriority(const std::string &priority) const {
@@ -94,7 +83,6 @@ std::optional<ProtoTask::Task::Priority> ReadTaskDataStep::stringToPriority(cons
     if (pint >= 0 && pint <= 3)
         return static_cast<ProtoTask::Task::Priority>(pint);
     else {
-        factory()->printer()->print("    Wrong priority option. Try again.\n");
         return std::nullopt;
     }
 }
@@ -146,7 +134,6 @@ std::optional<time_t> ReadTaskDataStep::stringToTime(const std::string &datestri
         timeinfo->tm_sec = 0;
         return mktime(timeinfo);
     } else {
-        factory()->printer()->print("    Wrong date format. Try again.\n");
         return std::nullopt;
     }
 }
@@ -157,168 +144,177 @@ std::string ReadTaskDataStep::timeToString(const time_t &date) const {
     return str;
 }
 
-void ReadTaskDataStep::readTitle(Context &c) const {
+void ReadTaskDataStep::readTitle(Context &c, const std::shared_ptr<Factory> &f) const {
     std::string title;
     std::string prompt{"    Title"};
     if (!c.task().title().empty())
         prompt += (" [" + c.task().title() + "]");
-    do {
-        title = factory()->reader()->read(prompt + " > ");
+    while (true) {
+        title = f->reader()->read(prompt + " > ");
         title = title.empty() ? c.task().title() : title;
-    } while (!validateTitle(title));
-    if (!title.empty())
-        c.setTitle(title);
+        if (!validateTitle(title))
+            f->printer()->print("    Title cannot be empty!\n");
+        else
+            break;
+    }
+    c.setTitle(title);
 }
 
-void ReadTaskDataStep::readPriority(Context &c) const {
+void ReadTaskDataStep::readPriority(Context &c, const std::shared_ptr<Factory> &f) const {
     std::optional<ProtoTask::Task::Priority> priority{std::nullopt};
     std::string prompt = "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH)";
     if (c.task().priority() != ProtoTask::Task_Priority_NONE)
         prompt += (" [" + priorityToString(c.task().priority()) + "]");
     while (!priority) {
-        std::string str = factory()->reader()->read(prompt + " > ");
+        std::string str = f->reader()->read(prompt + " > ");
         priority = str.empty() ? c.task().priority() : stringToPriority(str);
+        if (!priority)
+            f->printer()->print("    Wrong priority option. Try again.\n");
     }
     c.setPriority(*priority);
 }
 
-void ReadTaskDataStep::readDueDate(Context &c) const {
+void ReadTaskDataStep::readDueDate(Context &c, const std::shared_ptr<Factory> &f) const {
     std::optional<time_t> due_date;
     std::string prompt = "    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)}";
     if (c.task().due_date())
         prompt += (" [" + timeToString(c.task().due_date()) + "]");
     while (!due_date) {
-        std::string str = factory()->reader()->read(prompt + " > ");
-        if (str.empty() && c.task().due_date())
+        std::string str = f->reader()->read(prompt + " > ");
+        if (str.empty() && c.task().due_date()) {
             due_date = std::make_optional(c.task().due_date());
-        else
+        } else {
             due_date = stringToTime(str);
+            if (!due_date)
+                f->printer()->print("    Wrong date format. Try again.\n");
+        }
     }
     c.setDueDate(*due_date);
 }
 
-std::shared_ptr<Step> ReadTaskDataStep::execute(Context &c) {
-    readTitle(c);
-    readPriority(c);
-    readDueDate(c);
-    return StepSwitcher::nextStep(*this);
+std::shared_ptr<Step> ReadTaskDataStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    readTitle(c, f);
+    readPriority(c, f);
+    readDueDate(c, f);
+    return StepSwitcher::nextStep(*this, f);
 }
 
-std::shared_ptr<Step> EditStep::execute(Context &c) {
-    factory()->printer()->print("[Edit Task]\n");
-    ActionResult result_get_task = factory()->controller()->ReadTaskWithChildren(c);
+std::shared_ptr<Step> EditStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    f->printer()->print("[Edit Task]\n");
+    ActionResult result_get_task = f->controller()->ReadTaskWithChildren(c);
     if (result_get_task)
         c.setTask(c.tasks()[*c.id()].first);
-    Machine wizard = factory()->createMachine(Factory::State::READTASK, c);
+    Machine wizard = f->createMachine(Factory::State::READTASK, c);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
 
-    ActionResult result = factory()->controller()->EditTask(c);
-    return processResult(*this, result, "Edited Task");
+    ActionResult result = f->controller()->EditTask(c);
+    return processResult(*this, f, result, "Edited Task");
 }
 
-std::shared_ptr<Step> SubtaskStep::execute(Context &c) {
-    factory()->printer()->print("[Add Subtask]\n");
-    Machine wizard = factory()->createMachine(Factory::State::READTASK);
+std::shared_ptr<Step> SubtaskStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    f->printer()->print("[Add Subtask]\n");
+    Machine wizard = f->createMachine(Factory::State::READTASK);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
 
-    ActionResult result = factory()->controller()->AddSubtask(c);
-    return processResult(*this, result, "Added Subtask");
+    ActionResult result = f->controller()->AddSubtask(c);
+    return processResult(*this, f, result, "Added Subtask");
 }
 
-std::shared_ptr<Step> QuitStep::execute(Context &c) {
-    return StepSwitcher::nextStep(*this);
+std::shared_ptr<Step> QuitStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    return StepSwitcher::nextStep(*this, f);
 }
 
-std::shared_ptr<Step> ShowStep::execute(Context &c) {
-    ActionResult result = factory()->controller()->ShowTasks(c);
+std::shared_ptr<Step> ShowStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    ActionResult result = f->controller()->ShowTasks(c);
 
     auto tasks = c.tasks();
     for (const auto &kv : tasks) {
         if (!kv.second.second.parent())
-            ShowStep::recursivePrint(kv, c, "");
+            ShowStep::recursivePrint(kv, f, c, "");
     }
 
-    return StepSwitcher::nextStep(*this);
+    return StepSwitcher::nextStep(*this, f);
 }
 
 void ShowStep::recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &kv,
+                              const std::shared_ptr<Factory> &f,
                               const Context &c,
                               const std::string &prefix) {
-    factory()->printer()->print(prefix + std::to_string(kv.first.value()) +
+    f->printer()->print(prefix + std::to_string(kv.first.value()) +
                      " – " + to_string(kv.second.first));
 
-    factory()->printer()->print("\n");
+    f->printer()->print("\n");
     for (const auto &id : kv.second.second.children()) {
         auto ch = std::make_pair(id, c.tasks().at(id));
-        recursivePrint(ch, c, prefix + "    ");
+        recursivePrint(ch, f, c, prefix + "    ");
     }
 }
 
-std::shared_ptr<Step> CompleteStep::execute(Context &c) {
-    ActionResult result = factory()->controller()->CompleteTask(c);
-    return processResult(*this, result, "Completed Task");
+std::shared_ptr<Step> CompleteStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    ActionResult result = f->controller()->CompleteTask(c);
+    return processResult(*this, f, result, "Completed Task");
 }
 
-std::shared_ptr<Step> UncompleteStep::execute(Context &c) {
-    ActionResult result = factory()->controller()->UncompleteTask(c);
-    return processResult(*this, result, "Uncompleted Task");
+std::shared_ptr<Step> UncompleteStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    ActionResult result = f->controller()->UncompleteTask(c);
+    return processResult(*this, f, result, "Uncompleted Task");
 }
 
-std::shared_ptr<Step> DeleteStep::execute(Context &c) {
-    ActionResult result = factory()->controller()->DeleteTask(c);
-    return processResult(*this, result, "Deleted Task");
+std::shared_ptr<Step> DeleteStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    ActionResult result = f->controller()->DeleteTask(c);
+    return processResult(*this, f, result, "Deleted Task");
 }
 
-std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c) {
-    ActionResult result = factory()->controller()->ReadTaskWithChildren(c);
+std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    ActionResult result = f->controller()->ReadTaskWithChildren(c);
 
     if (result) {
         auto ch = c.tasks().at(*result.id).second.children();
         if (!ch.empty()) {
             while (true) {
-                std::string reply = factory()->reader()->read("Task " + std::to_string(c.id()->value()) +
+                std::string reply = f->reader()->read("Task " + std::to_string(c.id()->value()) +
                                                               " has " + std::to_string(ch.size()) +
                                                               " subtask(s). Confirm to delete all. Y/[N] > ");
                 if (reply == "Y" || reply == "y") {
                     break;
                 } else if (reply.empty() || reply == "N" || reply == "n") {
                     // disregard nextStep and go to HomeStep
-                    return factory()->lazyInitStep(Factory::State::HOME);
+                    return f->lazyInitStep(Factory::State::HOME);
                 } else {
-                    factory()->printer()->print("Wrong option. Type Y or N.\n");
+                    f->printer()->print("Wrong option. Type Y or N.\n");
                 }
             }
         }
     } else {
-        factory()->printer()->print(result.message());
-        return factory()->lazyInitStep(Factory::State::HOME);
+        f->printer()->print(result.message());
+        return f->lazyInitStep(Factory::State::HOME);
     }
 
-    return StepSwitcher::nextStep(*this);
+    return StepSwitcher::nextStep(*this, f);
 }
 
-std::shared_ptr<Step> LabelStep::execute(Context &c) {
-    std::string label = readLabel();
-    factory()->controller()->setData(Controller::Data{label});
-    ActionResult result = factory()->controller()->LabelTask(c);
-    return processResult(*this, result, "Added label to Task");
+std::shared_ptr<Step> LabelStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    std::string label = readLabel(f);
+    f->controller()->setData(Controller::Data{label});
+    ActionResult result = f->controller()->LabelTask(c);
+    return processResult(*this, f, result, "Added label to Task");
 }
 
-std::string LabelStep::readLabel() const {
-    std::string label = factory()->reader()->read("[Add Label]\n    >> ");
+std::string LabelStep::readLabel(const std::shared_ptr<Factory> &f) const {
+    std::string label = f->reader()->read("[Add Label]\n    >> ");
     while (label.empty())
-        label = factory()->reader()->read("Label cannot be empty. Try again.\n    >> ");
+        label = f->reader()->read("Label cannot be empty. Try again.\n    >> ");
     return label;
 }
 
-std::shared_ptr<Step> SaveStep::execute(Context &c) {
-    ActionResult result = factory()->controller()->SaveTasks(c);
-    return processResult(*this, result, "Saved to file successfully.\n");
+std::shared_ptr<Step> SaveStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    ActionResult result = f->controller()->SaveTasks(c);
+    return processResult(*this, f, result, "Saved to file successfully.\n");
 }
 
-std::shared_ptr<Step> LoadStep::execute(Context &c) {
-    ActionResult result = factory()->controller()->LoadTasks(c);
-    return processResult(*this, result, "Loaded from file successfully.\n");
+std::shared_ptr<Step> LoadStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
+    ActionResult result = f->controller()->LoadTasks(c);
+    return processResult(*this, f, result, "Loaded from file successfully.\n");
 }

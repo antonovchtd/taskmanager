@@ -97,35 +97,35 @@ Machine Factory::createMachine(const State &state, const Context &context) {
 std::shared_ptr<Step> Factory::getNewStep(const State &s) {
     switch (s) {
         case State::HOME:
-            return std::shared_ptr<HomeStep>{new HomeStep(shared_from_this())};
+            return std::shared_ptr<HomeStep>{new HomeStep};
         case State::HELP:
-            return std::shared_ptr<HelpStep>{new HelpStep(shared_from_this())};
+            return std::shared_ptr<HelpStep>{new HelpStep};
         case State::ADD:
-            return std::shared_ptr<AddStep>{new AddStep(shared_from_this())};
+            return std::shared_ptr<AddStep>{new AddStep};
         case State::SUBTASK:
-            return std::shared_ptr<SubtaskStep>{new SubtaskStep(shared_from_this())};
+            return std::shared_ptr<SubtaskStep>{new SubtaskStep};
         case State::READTASK:
-            return std::shared_ptr<ReadTaskDataStep>{new ReadTaskDataStep(shared_from_this())};
+            return std::shared_ptr<ReadTaskDataStep>{new ReadTaskDataStep};
         case State::EDIT:
-            return std::shared_ptr<EditStep>{new EditStep(shared_from_this())};
+            return std::shared_ptr<EditStep>{new EditStep};
         case State::QUIT:
-            return std::shared_ptr<QuitStep>{new QuitStep(shared_from_this())};
+            return std::shared_ptr<QuitStep>{new QuitStep};
         case State::SHOW:
-            return std::shared_ptr<ShowStep>{new ShowStep(shared_from_this())};
+            return std::shared_ptr<ShowStep>{new ShowStep};
         case State::COMPLETE:
-            return std::shared_ptr<CompleteStep>{new CompleteStep(shared_from_this())};
+            return std::shared_ptr<CompleteStep>{new CompleteStep};
         case State::UNCOMPLETE:
-            return std::shared_ptr<UncompleteStep>{new UncompleteStep(shared_from_this())};
+            return std::shared_ptr<UncompleteStep>{new UncompleteStep};
         case State::DELETE:
-            return std::shared_ptr<DeleteStep>{new DeleteStep(shared_from_this())};
+            return std::shared_ptr<DeleteStep>{new DeleteStep};
         case State::CONFIRMDELETE:
-            return std::shared_ptr<ConfirmDeleteStep>{new ConfirmDeleteStep(shared_from_this())};
+            return std::shared_ptr<ConfirmDeleteStep>{new ConfirmDeleteStep};
         case State::LABEL:
-            return std::shared_ptr<LabelStep>{new LabelStep(shared_from_this())};
+            return std::shared_ptr<LabelStep>{new LabelStep};
         case State::SAVE:
-            return std::shared_ptr<SaveStep>{new SaveStep(shared_from_this())};
+            return std::shared_ptr<SaveStep>{new SaveStep};
         case State::LOAD:
-            return std::shared_ptr<LoadStep>{new LoadStep(shared_from_this())};
+            return std::shared_ptr<LoadStep>{new LoadStep};
     }
 }
 

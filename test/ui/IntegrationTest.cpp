@@ -60,10 +60,8 @@ private:
 
 TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 {
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-              std::shared_ptr<AbstractPrinter>(&mp));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+              std::shared_ptr<AbstractPrinter>(new MockPrinter));
     EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(15)
             .WillOnce(Return("add"))
@@ -107,10 +105,8 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
 {
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
     EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
@@ -174,10 +170,8 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
 
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
 {
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
     EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
@@ -260,15 +254,15 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
                                                  " > ", "Task 1 has 1 subtask(s). Confirm to delete all. Y/[N] > ",
                                                  " > "};
     std::string expected_output = "[Add Task]\nAdded Task (ID: 1)\n[Add Task]\nAdded Task (ID: 2)\n[Add Subtask]\nAdded Subtask (ID: 3)\nDeleted Task (ID: 1)\n";
-    MockReaderToVector mr{scenario};
-    MockPrinterToVector mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
 
     Machine m(f, Factory::State::HOME);
     m.run();
     auto tm = m.model();
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
     auto out = mp.messages();
+    auto mr = *std::dynamic_pointer_cast<MockReaderToVector>(f->reader());
     auto prompts = mr.prompts();
     ASSERT_EQ(1, tm->size());
 
@@ -312,15 +306,15 @@ TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
                                   "Added Task (ID: 1)\n"
                                   "1 – test title, Priority: None, Due: Tue Dec 21 00:00:00 2021 [overdue]\n";
 
-    MockReaderToVector mr{scenario};
-    MockPrinterToVector mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
 
     Machine m(f, Factory::State::HOME);
     m.run();
     auto tm = m.model();
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
     auto out = mp.messages();
+    auto mr = *std::dynamic_pointer_cast<MockReaderToVector>(f->reader());
     auto prompts = mr.prompts();
     ASSERT_EQ(1, tm->size());
 
@@ -338,10 +332,8 @@ TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
 
 TEST_F(IntegrationTest, shouldCreateNothingWithBadInput)
 {
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
     EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("bad"))
@@ -366,15 +358,14 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksAndShowByID)
     std::vector<std::string> scenario {"add", "test", "1", "21/12/21", "subtask 1", "sub", "2",
                                        "22/12/21", "subtask 2", "subsub", "3", "23/12/21", "show 1",
                                        "show 2", "show 3", "show 4", "quit"};
-    MockReaderToVector mr{scenario};
-    MockPrinterToVector mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
 
     Machine m(f, Factory::State::HOME);
     m.run();
     auto tm = m.model();
 
+    MockPrinterToVector mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
     auto out = mp.messages();
     ASSERT_EQ(3, tm->size());
 
@@ -393,10 +384,8 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
     std::vector<std::string> scenario = {"add", "Task 1", "1", "21/12", "subtask 1", "Subtask 2",
                                          "2", "22/12", "subtask 2", "Subtask 3", "3", "23/12",
                                          "complete 1", "save", "quit", "load", "quit"};
-    MockReaderToVector mr{scenario};
-    MockPrinterToVector mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
 
     Machine m(f, Factory::State::HOME);
     m.run();

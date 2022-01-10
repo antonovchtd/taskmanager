@@ -19,7 +19,7 @@ Context Machine::run() {
 
     auto step = factory_->lazyInitStep(initial_step_);
     while (step){
-        step = step->execute(context_);
+        step = step->execute(context_, factory_);
     }
     return context_;
 }

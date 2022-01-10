@@ -86,22 +86,22 @@ std::vector<std::string> homeStepExecuteCall(const std::string &command, Factory
     tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
                                   time(nullptr), "label", false));
     auto con = std::make_shared<Controller>(tm);
-    MockReader mr;
-    MockPrinterToVector mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr), std::shared_ptr<AbstractPrinter>(&mp), con);
-    EXPECT_CALL(mr, read(_))
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
+                                               std::shared_ptr<AbstractPrinter>(new MockPrinterToVector),
+                                               con);
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
         .Times(1)
         .WillOnce(Return(command));
 
     auto step = f->lazyInitStep(Factory::State::HOME);
     Context c;
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(expected_step));
     std::istringstream is{command};
     std::string function, argument;
     is >> function >> argument;
     EXPECT_EQ(f->controller()->data().arg, argument);
-    return mp.messages();
+    return std::dynamic_pointer_cast<MockPrinterToVector>(f->printer())->messages();
 }
 
 TEST_F(StepTest, executeHomeStepWithAddCommand)
@@ -350,7 +350,7 @@ std::vector<std::string> executeWithWizardCall(Factory::State current_step, Fact
     ProtoTask::TaskID id;
     id.set_value(1);
     c.setID(id);
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(expected_next_step));
 
     time_t rawtime;
@@ -418,7 +418,7 @@ TEST_F(StepTest, executeEditStepAllDefault)
     ProtoTask::TaskID id;
     id.set_value(1);
     c.setID(id);
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     EXPECT_EQ(t, c.task());
@@ -459,7 +459,7 @@ TEST_F(StepTest, executeEditStepAllNew)
     ProtoTask::TaskID id;
     id.set_value(1);
     c.setID(id);
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     time_t rawtime;
@@ -496,7 +496,7 @@ TEST_F(StepTest, executeHelpStep)
     auto f = Factory::create(mr, mp);
     auto step = f->lazyInitStep(Factory::State::HELP);
     Context c;
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     FileReader fr("../src/model/help.txt");
@@ -507,7 +507,7 @@ TEST_F(StepTest, executeHelpStep)
 
 TEST_F(StepTest, stringToTimeWithDateOnly)
 {
-    ReadTaskDataStep step{Factory::create()};
+    ReadTaskDataStep step;
     std::optional<time_t> out_time = step.stringToTime("31/12");
     time_t rawtime;
     time(&rawtime);
@@ -523,7 +523,7 @@ TEST_F(StepTest, stringToTimeWithDateOnly)
 
 TEST_F(StepTest, stringToTimeWithDateAndYear)
 {
-    ReadTaskDataStep step{Factory::create()};
+    ReadTaskDataStep step;
     std::optional<time_t> out_time = step.stringToTime("31.12.22");
     time_t rawtime;
     time(&rawtime);
@@ -540,7 +540,7 @@ TEST_F(StepTest, stringToTimeWithDateAndYear)
 
 TEST_F(StepTest, stringToTimeWithDateAndYearAndTime)
 {
-    ReadTaskDataStep step{Factory::create()};
+    ReadTaskDataStep step;
     std::optional<time_t> out_time = step.stringToTime("31.12.22 15:20");
     time_t rawtime;
     time(&rawtime);
@@ -557,7 +557,7 @@ TEST_F(StepTest, stringToTimeWithDateAndYearAndTime)
 
 TEST_F(StepTest, stringToTimeInFutureTime)
 {
-    ReadTaskDataStep step{Factory::create()};
+    ReadTaskDataStep step;
     std::optional<time_t> out_time = step.stringToTime("in 01:30");
     time_t expected_time = time(nullptr) + 3600 + 30*60;
     EXPECT_EQ(*out_time, expected_time);
@@ -565,7 +565,7 @@ TEST_F(StepTest, stringToTimeInFutureTime)
 
 TEST_F(StepTest, stringToTimeInFutureDayAndTime)
 {
-    ReadTaskDataStep step{Factory::create()};
+    ReadTaskDataStep step;
     std::optional<time_t> out_time = step.stringToTime("in 02:02:02");
     time_t expected_time = time(nullptr) + 2*24*3600 + 2*3600 + 2*60;
     EXPECT_EQ(*out_time, expected_time);
@@ -576,7 +576,7 @@ TEST_F(StepTest, executeQuitStep)
     auto f = Factory::create();
     auto step = f->lazyInitStep(Factory::State::QUIT);
     Context c;
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, nullptr);
 }
 
@@ -595,7 +595,7 @@ TEST_F(StepTest, executeShowStep)
 
     auto step = f->lazyInitStep(Factory::State::SHOW);
     Context c;
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     auto messages = mp->messages();
@@ -619,7 +619,7 @@ TEST_F(StepTest, executeCompleteStep)
     ProtoTask::TaskID id;
     id.set_value(1);
     c.setID(id);
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     EXPECT_TRUE((*tm)[id].first.is_complete());
@@ -645,7 +645,7 @@ TEST_F(StepTest, executeUncompleteStep)
     ProtoTask::TaskID id;
     id.set_value(1);
     c.setID(id);
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     EXPECT_FALSE((*tm)[id].first.is_complete());
@@ -671,7 +671,7 @@ TEST_F(StepTest, executeDeleteStep)
     ProtoTask::TaskID id;
     id.set_value(1);
     c.setID(id);
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     EXPECT_TRUE(tm->getTasks().empty());
@@ -696,7 +696,7 @@ void processConfirmDeleteCall(const std::vector<std::string> &scenario, Factory:
     auto step = f->lazyInitStep(Factory::State::CONFIRMDELETE);
     Context c;
     c.setID(result.id);
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(expected_step));
 
     auto prompts = mr->prompts();
@@ -732,20 +732,18 @@ TEST_F(StepTest, processConfirmDeleteStepIDNotFound)
     ProtoTask::TaskID id;
     id.set_value(42);
     ActionResult result{ActionResult::Status::ID_NOT_FOUND, id};
-    MockController con;
-    EXPECT_CALL(con, ReadTaskWithChildren)
-        .WillOnce(Return(result));
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector),
+                                               std::shared_ptr<AbstractPrinter>(new MockPrinterToVector),
+                                               std::shared_ptr<ControllerInterface>(new MockController));
 
-    auto mr = std::make_shared<MockReaderToVector>();
-    auto mp = std::make_shared<MockPrinterToVector>();
-    auto f = Factory::create(mr, mp, std::shared_ptr<ControllerInterface>(&con));
-
+    EXPECT_CALL(*std::dynamic_pointer_cast<MockController>(f->controller()), ReadTaskWithChildren)
+            .WillOnce(Return(result));
     auto step = f->lazyInitStep(Factory::State::CONFIRMDELETE);
     Context c;
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
-    auto messages = mp->messages();
+    auto messages = std::dynamic_pointer_cast<MockPrinterToVector>(f->printer())->messages();
     ASSERT_EQ(1, messages.size());
     EXPECT_EQ(messages[0], "ID 42 was not found.\n");
 
@@ -766,7 +764,7 @@ TEST_F(StepTest, executeLabelStep)
     auto step = f->lazyInitStep(Factory::State::LABEL);
     Context c;
     c.setID(result.id);
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     auto prompts = mr->prompts();
@@ -782,17 +780,16 @@ TEST_F(StepTest, executeLabelStep)
 std::vector<std::string> executeLoadStep(ActionResult::Status s) {
     ActionResult success_result{s, std::nullopt};
 
-    MockController con;
-    EXPECT_CALL(con, LoadTasks)
-            .WillOnce(Return(success_result));
-
     auto mr = std::make_shared<MockReaderToVector>();
     auto mp = std::make_shared<MockPrinterToVector>();
-    auto f = Factory::create(mr, mp, std::shared_ptr<ControllerInterface>(&con));
+    auto con = std::make_shared<MockController>();
+    auto f = Factory::create(mr, mp, con);
 
+    EXPECT_CALL(*con, LoadTasks)
+            .WillOnce(Return(success_result));
     auto step = f->lazyInitStep(Factory::State::LOAD);
     Context c;
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     return mp->messages();
@@ -815,17 +812,16 @@ TEST_F(StepTest, shouldExecuteLoadStepFileNotFound)
 std::vector<std::string> executeSaveStep(ActionResult::Status s) {
     ActionResult success_result{s, std::nullopt};
 
-    MockController con;
-    EXPECT_CALL(con, SaveTasks)
-            .WillOnce(Return(success_result));
-
     auto mr = std::make_shared<MockReaderToVector>();
     auto mp = std::make_shared<MockPrinterToVector>();
-    auto f = Factory::create(mr, mp, std::shared_ptr<ControllerInterface>(&con));
+    auto con = std::make_shared<MockController>();
+    auto f = Factory::create(mr, mp,con);
+    EXPECT_CALL(*con, SaveTasks)
+            .WillOnce(Return(success_result));
 
     auto step = f->lazyInitStep(Factory::State::SAVE);
     Context c;
-    auto next_step = step->execute(c);
+    auto next_step = step->execute(c, f);
     EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 
     return mp->messages();

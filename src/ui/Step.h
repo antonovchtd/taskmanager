@@ -26,23 +26,13 @@ class Factory;
 
 class Step{
 public:
-    explicit Step(const std::shared_ptr<Factory> &factory);
-
-public:
-    virtual std::shared_ptr<Step> execute(Context &c) = 0;
+    virtual std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) = 0;
     virtual ~Step() = default;
-
-public:
-    std::shared_ptr<Factory> factory() const;
-
-private:
-    std::shared_ptr<Factory> factory_;
 };
 
 class HomeStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
     std::string command() const;
 private:
     std::string command_;
@@ -50,20 +40,17 @@ private:
 
 class HelpStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class AddStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class ReadTaskDataStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 
 public:
     std::optional<time_t> stringToTime(const std::string &datestring) const;
@@ -73,81 +60,71 @@ public:
     std::string priorityToString(const ProtoTask::Task::Priority &priority) const;
 
 public:
-    void readTitle(Context &) const;
-    void readPriority(Context &) const;
-    void readDueDate(Context &) const;
+    void readTitle(Context &, const std::shared_ptr<Factory> &) const;
+    void readPriority(Context &, const std::shared_ptr<Factory> &) const;
+    void readDueDate(Context &, const std::shared_ptr<Factory> &) const;
 };
 
 class EditStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class SubtaskStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class QuitStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class ShowStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
     void recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &kv,
+                        const std::shared_ptr<Factory> &f,
                         const Context &c,
                         const std::string &prefix);
 };
 
 class CompleteStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class UncompleteStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class DeleteStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class ConfirmDeleteStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class LabelStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 
 public:
-    std::string readLabel() const;
+    std::string readLabel(const std::shared_ptr<Factory> &f) const;
 };
 
 class SaveStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 class LoadStep : public Step {
 public:
-    using Step::Step;
-    std::shared_ptr<Step> execute(Context &c) override;
+    std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
 };
 
 #endif //TASKMANAGER_SRC_UI_STATE_H_
