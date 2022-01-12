@@ -277,25 +277,28 @@ std::shared_ptr<Step> DeleteStep::execute(Context &c, const std::shared_ptr<Fact
     return processResult(*this, f, result, "Deleted Task");
 }
 
+std::shared_ptr<Step> ConfirmDeleteStep::getConfirmation(Context &c, const std::shared_ptr<Factory> &f) {
+    while (true) {
+        std::string reply = f->reader()->read("Task " + std::to_string(c.id()->value()) +
+                                              " has " + std::to_string(c.tasks().size()-1) +
+                                              " subtask(s). Confirm to delete all. Y/[N] > ");
+        if (reply == "Y" || reply == "y") {
+            return StepSwitcher::nextStep(*this, f);
+        } else if (reply.empty() || reply == "N" || reply == "n") {
+            // disregard nextStep and go to HomeStep
+            return f->lazyInitStep(Factory::State::HOME);
+        } else {
+            f->printer()->print("Wrong option. Type Y or N.\n");
+        }
+    }
+}
+
 std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
     ActionResult result = f->controller()->ReadTaskWithChildren(c);
 
     if (result) {
-        if (c.tasks().size() > 1) {
-            while (true) {
-                std::string reply = f->reader()->read("Task " + std::to_string(c.id()->value()) +
-                                                              " has " + std::to_string(c.tasks().size()) +
-                                                              " subtask(s). Confirm to delete all. Y/[N] > ");
-                if (reply == "Y" || reply == "y") {
-                    break;
-                } else if (reply.empty() || reply == "N" || reply == "n") {
-                    // disregard nextStep and go to HomeStep
-                    return f->lazyInitStep(Factory::State::HOME);
-                } else {
-                    f->printer()->print("Wrong option. Type Y or N.\n");
-                }
-            }
-        }
+        if (c.tasks().size() > 1)
+            return getConfirmation(c, f);
     } else {
         f->printer()->print(result.message());
         return f->lazyInitStep(Factory::State::HOME);

@@ -106,6 +106,9 @@ public:
 class ConfirmDeleteStep : public Step {
 public:
     std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
+
+public:
+    std::shared_ptr<Step> getConfirmation(Context &c, const std::shared_ptr<Factory> &f);
 };
 
 class LabelStep : public Step {
