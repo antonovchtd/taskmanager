@@ -12,7 +12,7 @@ std::optional<ProtoTask::TaskID> Context::id() const {
     return id_;
 }
 
-Container Context::tasks() const {
+std::vector<ProtoTask::TaskEntity> Context::tasks() const {
     return tasks_;
 }
 
@@ -37,6 +37,6 @@ void Context::setID(const std::optional<ProtoTask::TaskID> &id) {
     id_ = id;
 }
 
-void Context::setTasks(const Container &tasks) {
+void Context::setTasks(const std::vector<ProtoTask::TaskEntity> &tasks) {
     tasks_ = tasks;
 }

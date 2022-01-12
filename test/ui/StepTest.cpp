@@ -62,7 +62,7 @@ class MockController : public ControllerInterface {
 public:
     MOCK_METHOD(ActionResult, ValidateID, (Context &), (override));
     MOCK_METHOD(ActionResult, ValidateNoArg, (Context &), (override));
-    MOCK_METHOD(ActionResult, ValidateLabelOrID, (Context &), (override));
+    MOCK_METHOD(ActionResult, ValidateAlphaOrID, (Context &), (override));
     MOCK_METHOD(ActionResult, ValidateAlpha, (Context &), (override));
     MOCK_METHOD(ActionResult, AddTask, (Context &), (override));
     MOCK_METHOD(ActionResult, EditTask, (Context &), (override));
@@ -76,7 +76,7 @@ public:
     MOCK_METHOD(ActionResult, SaveTasks, (Context &), (override));
     MOCK_METHOD(ActionResult, LoadTasks, (Context &), (override));
     MOCK_METHOD(void, setData, (const ControllerInterface::Data &), (override));
-    MOCK_METHOD(std::shared_ptr<TaskManagerInterface>, model, (), (const, override));
+    MOCK_METHOD(std::shared_ptr<ModelInterface>, model, (), (const, override));
     MOCK_METHOD(ControllerInterface::Data, data, (), (const, override));
 };
 

@@ -19,16 +19,14 @@
 #include "utilities/TaskUtils.h"
 #include "utilities/NodeUtils.h"
 #include "ActionResult.h"
-#include "persistence/PersisterInterface.h"
+#include "persistence/Persister.h"
 
-typedef std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Container;
-
-class TaskManagerInterface {
+class ModelInterface {
 public:
     virtual std::pair<ProtoTask::Task, Node>& operator[](const ProtoTask::TaskID &) = 0;
-    virtual Container getTasks() const = 0;
-    virtual Container getTasks(const std::string &label) const = 0;
-    virtual Container getTasks(const ProtoTask::TaskID &id) = 0;
+    virtual std::vector<ProtoTask::TaskEntity> getTasks() const = 0;
+    virtual std::vector<ProtoTask::TaskEntity> getTasks(const std::string &label) const = 0;
+    virtual std::vector<ProtoTask::TaskEntity> getTasks(const ProtoTask::TaskID &id) const = 0;
     virtual std::shared_ptr<IDGenerator> gen() const = 0;
     virtual size_t size() const = 0;
 
@@ -42,8 +40,10 @@ public:
     virtual ActionResult SetLabel(const ProtoTask::TaskID &, const std::string &) = 0;
 
 public:
-    virtual std::vector<ProtoTask::TaskEntity> Export() = 0;
     virtual void Replace(const std::vector<ProtoTask::TaskEntity> &) = 0;
+
+public:
+    virtual ~ModelInterface() = default;
 
 };
 

@@ -1,25 +1,24 @@
 //
-// Created by Anton Ovcharenko on 15.12.2021.
+// Created by Anton O. on 1/5/22.
 //
 
-#ifndef TASKMANAGER_SRC_PERSISTENCE_PERSISTER_H_
-#define TASKMANAGER_SRC_PERSISTENCE_PERSISTER_H_
+#ifndef TASKMANAGER_SRC_PERSISTENCE_PERSISTERINTERFACE_H_
+#define TASKMANAGER_SRC_PERSISTENCE_PERSISTERINTERFACE_H_
 
-#include <vector>
-#include "PersisterInterface.h"
+#include <memory>
 #include "Task.pb.h"
+class ModelInterface;
 
-class Persister : public PersisterInterface {
+class Persister {
 public:
-    bool save(const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model) override;
-    bool load(const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model) override;
+    virtual bool save(const std::vector<ProtoTask::TaskEntity> &) = 0;
+    virtual bool load(std::vector<ProtoTask::TaskEntity> &) = 0;
 
 public:
-    std::string defaultLocation() const override;
+    virtual ~Persister() = default;
 
-private:
-    std::string default_filename_ = "data.bin";
 };
 
+#endif //TASKMANAGER_SRC_PERSISTENCE_PERSISTERINTERFACE_H_
 
-#endif //TASKMANAGER_SRC_PERSISTENCE_PERSISTER_H_
+

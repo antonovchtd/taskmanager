@@ -5,9 +5,11 @@
 #ifndef TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 #define TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 
-#include "TaskManagerInterface.h"
+#include "ModelInterface.h"
 
-class TaskManager : public TaskManagerInterface {
+typedef std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Container;
+
+class TaskManager : public ModelInterface {
 public:
     TaskManager();
     explicit TaskManager(const std::shared_ptr<IDGenerator> &generator);
@@ -16,9 +18,9 @@ public:
 
 public:
     std::pair<ProtoTask::Task, Node>& operator[](const ProtoTask::TaskID &) override;
-    Container getTasks() const override;
-    Container getTasks(const std::string &label) const override;
-    Container getTasks(const ProtoTask::TaskID &id) override;
+    std::vector<ProtoTask::TaskEntity> getTasks() const override;
+    std::vector<ProtoTask::TaskEntity> getTasks(const std::string &label) const override;
+    std::vector<ProtoTask::TaskEntity> getTasks(const ProtoTask::TaskID &id) const override;
     std::shared_ptr<IDGenerator> gen() const override;
     size_t size() const override;
 
@@ -32,7 +34,6 @@ public:
     ActionResult SetLabel(const ProtoTask::TaskID &, const std::string &) override;
 
 public:
-    std::vector<ProtoTask::TaskEntity> Export() override;
     void Replace(const std::vector<ProtoTask::TaskEntity> &) override;
 
 private:

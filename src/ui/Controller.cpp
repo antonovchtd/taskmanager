@@ -5,23 +5,13 @@
 #include "Controller.h"
 #include "Context.h"
 
-Controller::Controller() : model_{std::shared_ptr<TaskManagerInterface>(new TaskManager)},
-                           persister_{std::shared_ptr<PersisterInterface>(new Persister)} {
+Controller::Controller() : model_{std::unique_ptr<ModelInterface>(new TaskManager)},
+                           persister_{nullptr} {
 };
 
-Controller::Controller(const std::shared_ptr<TaskManagerInterface> &model,
-                       const std::shared_ptr<PersisterInterface> &persister) :
-                model_{model}, persister_{persister} {
+Controller::Controller(std::unique_ptr<ModelInterface> model) :
+                model_(std::move(model)), persister_{nullptr} {
 
-}
-
-Controller::Controller(const std::shared_ptr<TaskManagerInterface> &model) :
-                model_(model), persister_{std::shared_ptr<PersisterInterface>(new Persister)} {
-
-}
-
-std::shared_ptr<TaskManagerInterface> Controller::model() const {
-    return model_;
 }
 
 Controller::Data Controller::data() const {
@@ -53,7 +43,7 @@ ActionResult Controller::ValidateNoArg(Context &context) {
         return {ActionResult::Status::TAKES_NO_ARG, std::nullopt};
 }
 
-ActionResult Controller::ValidateLabelOrID(Context &context) {
+ActionResult Controller::ValidateAlphaOrID(Context &context) {
     // empty is OK
     ProtoTask::TaskID id;
     try {
@@ -67,56 +57,59 @@ ActionResult Controller::ValidateLabelOrID(Context &context) {
 }
 
 ActionResult Controller::ValidateAlpha(Context &context) {
-    // empty is OK
+    // empty is not OK
     ProtoTask::TaskID id;
     try {
         id.set_value(std::stoi(data().arg));
-        return {ActionResult::Status::TAKES_ALPHA, id};
+        return {ActionResult::Status::TAKES_ALPHA_NOT_ID, id};
     } catch (const std::invalid_argument &) {
-        return {ActionResult::Status::SUCCESS, std::nullopt};
+        if (data().arg.empty())
+            return {ActionResult::Status::TAKES_ALPHA, std::nullopt};
+        else
+            return {ActionResult::Status::SUCCESS, std::nullopt};
     }
 }
 
 ActionResult Controller::AddTask(Context &context) {
-    return model()->Add(context.task());
+    return model_->Add(context.task());
 }
 
 ActionResult Controller::EditTask(Context &context) {
-    return model()->Edit(*context.id(), context.task());
+    return model_->Edit(*context.id(), context.task());
 }
 
 ActionResult Controller::AddSubtask(Context &context) {
-    return model()->AddSubtask(context.task(), *context.id());
+    return model_->AddSubtask(context.task(), *context.id());
 }
 
 ActionResult Controller::ShowTasks(Context &context) {
     if (data().arg.empty())
-        context.setTasks(model()->getTasks());
+        context.setTasks(model_->getTasks());
     else if (context.id()) {
-        context.setTasks(model()->getTasks(*context.id()));
+        context.setTasks(model_->getTasks(*context.id()));
         return {ActionResult::Status::SUCCESS, *context.id()};
     }
     else
-        context.setTasks(model()->getTasks(data().arg));
+        context.setTasks(model_->getTasks(data().arg));
 
     return {ActionResult::Status::SUCCESS, std::nullopt};
 }
 
 ActionResult Controller::CompleteTask(Context &context) {
-    return model()->SetComplete(*context.id(), true);
+    return model_->SetComplete(*context.id(), true);
 }
 
 ActionResult Controller::UncompleteTask(Context &context) {
-    return model()->SetComplete(*context.id(), false);
+    return model_->SetComplete(*context.id(), false);
 }
 
 ActionResult Controller::DeleteTask(Context &context) {
-    return model()->Delete(*context.id(), true);
+    return model_->Delete(*context.id(), true);
 }
 
 ActionResult Controller::ReadTaskWithChildren(Context &context) {
     try {
-        context.setTasks(model()->getTasks(*context.id()));
+        context.setTasks(model_->getTasks(*context.id()));
         return {ActionResult::Status::SUCCESS, *context.id()};
     } catch (const std::out_of_range &) {
         return {ActionResult::Status::ID_NOT_FOUND, *context.id()};
@@ -124,21 +117,24 @@ ActionResult Controller::ReadTaskWithChildren(Context &context) {
 }
 
 ActionResult Controller::LabelTask(Context &context) {
-    return model()->SetLabel(*context.id(), data().arg);
+    return model_->SetLabel(*context.id(), data().arg);
 }
 
 ActionResult Controller::SaveTasks(Context &context) {
-    std::string filename = data().arg.empty() ? persister_->defaultLocation() : data().arg;
-    if (persister_->save(filename, model()))
+    persister_ = std::unique_ptr<Persister>(new FilePersistence{data().arg});
+    if (persister_->save(model_->getTasks()))
         return {ActionResult::Status::SUCCESS, std::nullopt};
     else
         return {ActionResult::Status::FAILED_TO_OPEN_FILE, std::nullopt};
 }
 
 ActionResult Controller::LoadTasks(Context &context) {
-    std::string filename = data().arg.empty() ? persister_->defaultLocation() : data().arg;
-    if (persister_->load(filename, model()))
+    persister_ = std::unique_ptr<Persister>(new FilePersistence{data().arg});
+    std::vector<ProtoTask::TaskEntity> data;
+    if (persister_->load(data)) {
+        model_->Replace(data);
         return {ActionResult::Status::SUCCESS, std::nullopt};
+    }
     else
         return {ActionResult::Status::FILE_NOT_FOUND, std::nullopt};
 }

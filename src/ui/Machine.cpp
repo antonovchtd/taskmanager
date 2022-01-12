@@ -23,7 +23,3 @@ Context Machine::run() {
     }
     return context_;
 }
-
-std::shared_ptr<TaskManagerInterface> Machine::model() const {
-    return factory_->controller()->model();
-}

@@ -41,7 +41,7 @@ TEST_F(PersisterTest, shouldSaveAndLoadTasksMapWithGeneratorState)
     auto id3 = *tm->AddSubtask(subsub, id2).id;
 
     std::string filename = "PersisterTest.bin";
-    Persister p;
+    FilePersistence p;
     p.save(filename, tm);
     auto tm_loaded = std::make_shared<TaskManager>();
     p.load(filename, tm_loaded);
@@ -58,6 +58,6 @@ TEST_F(PersisterTest, shouldFailedToLoadNonExistingFile)
 {
     auto tm = std::make_shared<TaskManager>();
     std::string filename = "Missing.bin";
-    Persister p;
+    FilePersistence p;
     EXPECT_FALSE(p.load(filename, tm));
 }

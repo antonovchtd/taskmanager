@@ -434,7 +434,7 @@ TEST_F(TaskManagerTest, shouldExportTasks)
     auto child_id = gen->genID();
     con[child_id] = std::make_pair(child, Node(parent_id));
     TaskManager tm{gen, con};
-    auto vec = tm.Export();
+    auto vec = tm.getTasks();
     EXPECT_EQ(vec[0].id(), parent_id);
     EXPECT_EQ(vec[0].data(), parent);
     EXPECT_FALSE(vec[0].has_parent());

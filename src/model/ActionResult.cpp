@@ -30,8 +30,10 @@ std::string ActionResult::message() const {
             return "This function requires an argument.\n";
         case Status::TAKES_ID:
             return "This function requires an ID argument.\n";
-        case Status::TAKES_ALPHA:
+        case Status::TAKES_ALPHA_NOT_ID:
             return "This function requires a word, not an ID argument.\n";
+        case Status::TAKES_ALPHA:
+            return "This function requires an alpha argument.\n";
     }
 
 }

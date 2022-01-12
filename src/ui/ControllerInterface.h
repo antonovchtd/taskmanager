@@ -7,7 +7,7 @@
 
 class Context;
 class ActionResult;
-class TaskManagerInterface;
+class ModelInterface;
 
 class ControllerInterface {
 public:
@@ -18,7 +18,7 @@ public:
 public:
     virtual ActionResult ValidateID(Context &) = 0;
     virtual ActionResult ValidateNoArg(Context &) = 0;
-    virtual ActionResult ValidateLabelOrID(Context &) = 0;
+    virtual ActionResult ValidateAlphaOrID(Context &) = 0;
     virtual ActionResult ValidateAlpha(Context &) = 0;
     virtual ActionResult AddTask(Context &) = 0;
     virtual ActionResult EditTask(Context &) = 0;
@@ -36,7 +36,6 @@ public:
     virtual void setData(const ControllerInterface::Data &data) = 0;
 
 public:
-    virtual std::shared_ptr<TaskManagerInterface> model() const = 0;
     virtual ControllerInterface::Data data() const = 0;
 
 public:

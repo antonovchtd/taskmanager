@@ -11,13 +11,12 @@
 
 #include "Step.h"
 #include "Factory.h"
-#include "model/TaskManager.h"
 
 class Context{
 public:
     ProtoTask::Task task() const;
     std::optional<ProtoTask::TaskID> id() const;
-    Container tasks() const;
+    std::vector<ProtoTask::TaskEntity> tasks() const;
 
 public:
     void setTitle(const std::string &);
@@ -25,12 +24,12 @@ public:
     void setPriority(const ProtoTask::Task::Priority &);
     void setTask(const ProtoTask::Task &);
     void setID(const std::optional<ProtoTask::TaskID> &);
-    void setTasks(const Container &);
+    void setTasks(const std::vector<ProtoTask::TaskEntity> &);
 
 private:
     ProtoTask::Task task_;
     std::optional<ProtoTask::TaskID> id_;
-    Container tasks_;
+    std::vector<ProtoTask::TaskEntity> tasks_;
 };
 
 #endif //TASKMANAGER_SRC_UI_CONTEXT_H_

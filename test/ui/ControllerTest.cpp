@@ -17,12 +17,12 @@ using ::testing::DoAll;
 class ControllerTest : public ::testing::Test
 {
 public:
-    std::shared_ptr<TaskManagerInterface> tm_;
+    std::shared_ptr<ModelInterface> tm_;
     Context context_;
     Controller ctr_;
 
     void SetUp() override {
-        tm_ = std::shared_ptr<TaskManagerInterface>(new TaskManager);
+        tm_ = std::shared_ptr<ModelInterface>(new TaskManager);
         ctr_ = Controller{tm_};
         ProtoTask::Task t;
         t.set_title("test");
@@ -114,7 +114,7 @@ TEST_F(ControllerTest, shouldValidateNoArgNoID)
 TEST_F(ControllerTest, shouldValidateLabelOrIdEmptyStr)
 {
     ctr_.setData(Controller::Data{""});
-    ActionResult result = ctr_.ValidateLabelOrID(context_);
+    ActionResult result = ctr_.ValidateAlphaOrID(context_);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     EXPECT_EQ(result.id, std::nullopt);
 }
@@ -125,7 +125,7 @@ TEST_F(ControllerTest, shouldValidateLabelOrIDValidID)
     ctr_.setData(Controller::Data{std::to_string(result.id->value())});
     ProtoTask::TaskID id_expected;
     id_expected.set_value(1);
-    ActionResult result_validate = ctr_.ValidateLabelOrID(context_);
+    ActionResult result_validate = ctr_.ValidateAlphaOrID(context_);
     EXPECT_EQ(result_validate.status, ActionResult::Status::SUCCESS);
     EXPECT_EQ(result_validate.id, result.id);
 }
@@ -134,7 +134,7 @@ TEST_F(ControllerTest, shouldValidateLabelOrIDInvalidID)
 {
     ActionResult result = ctr_.AddTask(context_);
     ctr_.setData(Controller::Data{std::to_string(result.id->value()) + "0"});
-    ActionResult result_validate = ctr_.ValidateLabelOrID(context_);
+    ActionResult result_validate = ctr_.ValidateAlphaOrID(context_);
     EXPECT_EQ(result_validate.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_EQ(result_validate.id->value(), result.id->value()*10);
 }
@@ -349,7 +349,7 @@ TEST_F(ControllerTest, shouldNotLabelTaskWithInvalidID)
     EXPECT_EQ("label", (*tm_)[*result.id].first.label());
 }
 
-class MockPersister : public Persister {
+class MockPersister : public FilePersistence {
 public:
     MOCK_METHOD(bool, save, (const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model), (override));
     MOCK_METHOD(bool, load, (const std::string &filename, const std::shared_ptr<TaskManagerInterface> &model), (override));

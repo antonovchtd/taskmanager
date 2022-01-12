@@ -5,21 +5,20 @@
 #ifndef TASKMANAGER_SRC_UI_ACTION_H_
 #define TASKMANAGER_SRC_UI_ACTION_H_
 
-#include "model/TaskManagerInterface.h"
+#include "model/ModelInterface.h"
 #include "ui/ControllerInterface.h"
-#include "persistence/PersisterInterface.h"
 #include "persistence/Persister.h"
+#include "persistence/FilePersistence.h"
 
 class Controller : public ControllerInterface {
 public:
     Controller();
-    explicit Controller(const std::shared_ptr<TaskManagerInterface> &);
-    Controller(const std::shared_ptr<TaskManagerInterface> &, const std::shared_ptr<PersisterInterface> &);
+    explicit Controller(std::unique_ptr<ModelInterface>);
 
 public:
     ActionResult ValidateID(Context &) override;
     ActionResult ValidateNoArg(Context &) override;
-    ActionResult ValidateLabelOrID(Context &) override;
+    ActionResult ValidateAlphaOrID(Context &) override;
     ActionResult ValidateAlpha(Context &) override;
     ActionResult AddTask(Context &) override;
     ActionResult EditTask(Context &) override;
@@ -37,13 +36,12 @@ public:
     void setData(const Controller::Data &data) override;
 
 public:
-    std::shared_ptr<TaskManagerInterface> model() const override;
     Controller::Data data() const override;
 
 private:
-    std::shared_ptr<TaskManagerInterface> model_;
+    std::unique_ptr<ModelInterface> model_;
     Controller::Data data_;
-    std::shared_ptr<PersisterInterface> persister_;
+    std::unique_ptr<Persister> persister_;
 };
 
 

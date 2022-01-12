@@ -5,7 +5,7 @@
 #ifndef TASKMANAGER_SRC_UI_MACHINE_H_
 #define TASKMANAGER_SRC_UI_MACHINE_H_
 
-#include "model/TaskManagerInterface.h"
+#include "model/ModelInterface.h"
 #include "Context.h"
 #include "Factory.h"
 
@@ -17,9 +17,6 @@ public:
 
 public:
     Context run();
-
-public:
-    std::shared_ptr<TaskManagerInterface> model() const;
 
 private:
     Context context_;

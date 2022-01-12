@@ -35,12 +35,22 @@ ActionResult TaskManager::AddSubtask(const ProtoTask::Task &t, const ProtoTask::
     return {ActionResult::Status::SUCCESS, id};
 }
 
-Container TaskManager::getTasks() const {
-    return tasks_;
+std::vector<ProtoTask::TaskEntity> TaskManager::getTasks() const {
+    std::vector<ProtoTask::TaskEntity> vec;
+    for (const auto &kv : tasks_) {
+        ProtoTask::TaskEntity te;
+        te.set_allocated_id(new ProtoTask::TaskID(kv.first));
+        te.set_allocated_data(new ProtoTask::Task(kv.second.first));
+        if (kv.second.second.parent()) {
+            te.set_allocated_parent(new ProtoTask::TaskID(*kv.second.second.parent()));
+        }
+        vec.push_back(te);
+    }
+    return vec;
 }
 
-Container TaskManager::getTasks(const std::string &label) const {
-    decltype(tasks_) tasks;
+std::vector<ProtoTask::TaskEntity> TaskManager::getTasks(const std::string &label) const {
+    Container tasks;
     for (const auto &kv : tasks_) {
         if (kv.second.first.label() == label) {
             tasks.insert(kv);
@@ -48,19 +58,22 @@ Container TaskManager::getTasks(const std::string &label) const {
             tasks.at(kv.first).second.RemoveChildren();
         }
     }
-    return tasks;
+    TaskManager tm{gen(), tasks};
+    return tm.getTasks();
 }
 
-Container TaskManager::getTasks(const ProtoTask::TaskID &id) {
-    Container tasks;
-    tasks.insert(std::make_pair(id, tasks_.at(id)));
-    tasks.at(id).second.RemoveParent();
-    for (const auto &ch : tasks.at(id).second.children()) {
+std::vector<ProtoTask::TaskEntity> TaskManager::getTasks(const ProtoTask::TaskID &id) const {
+    std::vector<ProtoTask::TaskEntity> tasks;
+    ProtoTask::TaskEntity te;
+    te.set_allocated_id(new ProtoTask::TaskID(id));
+    te.set_allocated_data(new ProtoTask::Task(tasks_.at(id).first));
+    tasks.push_back(te);
+    for (const auto &ch : tasks_.at(id).second.children()) {
         auto ch_tasks = getTasks(ch);
         for (auto it = ch_tasks.begin(); it != ch_tasks.end(); it++) {
-            it->second.second.SetParent(*tasks_.at(ch).second.parent());
+            it->set_allocated_parent(new ProtoTask::TaskID(*tasks_.at(ch).second.parent()));
         }
-        tasks.insert(ch_tasks.begin(), ch_tasks.end());
+        tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
     }
     return tasks;
 }
@@ -124,20 +137,6 @@ ActionResult TaskManager::SetLabel(const ProtoTask::TaskID &id, const std::strin
         return {ActionResult::Status::ID_NOT_FOUND, id};
     }
     return {ActionResult::Status::SUCCESS, id};
-}
-
-std::vector<ProtoTask::TaskEntity> TaskManager::Export() {
-    std::vector<ProtoTask::TaskEntity> vec;
-    for (const auto &kv : tasks_) {
-        ProtoTask::TaskEntity te;
-        te.set_allocated_id(new ProtoTask::TaskID(kv.first));
-        te.set_allocated_data(new ProtoTask::Task(kv.second.first));
-        if (kv.second.second.parent()) {
-            te.set_allocated_parent(new ProtoTask::TaskID(*kv.second.second.parent()));
-        }
-        vec.push_back(te);
-    }
-    return vec;
 }
 
 void TaskManager::Replace(const std::vector<ProtoTask::TaskEntity> &vec) {

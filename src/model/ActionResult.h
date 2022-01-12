@@ -20,6 +20,7 @@ struct ActionResult {
         TAKES_NO_ARG,
         TAKES_ARG,
         TAKES_ID,
+        TAKES_ALPHA_NOT_ID,
         TAKES_ALPHA
     };
 

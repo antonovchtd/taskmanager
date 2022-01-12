@@ -83,7 +83,7 @@ public:
 class ShowStep : public Step {
 public:
     std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
-    void recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &kv,
+    void recursivePrint(const ProtoTask::TaskEntity &te,
                         const std::shared_ptr<Factory> &f,
                         const Context &c,
                         const std::string &prefix);

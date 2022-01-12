@@ -43,8 +43,8 @@ std::shared_ptr<Step> HomeStep::execute(Context &c, const std::shared_ptr<Factor
         command_ == "uncomplete" ||command_ == "label") {
         result = f->controller()->ValidateID(c);
     } else if (command_ == "show") {
-        result = f->controller()->ValidateLabelOrID(c);
-    } else if (command_ == "save" || command_ == "load" || command_.empty()) {
+        result = f->controller()->ValidateAlphaOrID(c);
+    } else if (command_ == "save" || command_ == "load") {
         result = f->controller()->ValidateAlpha(c);
     } else {
         result = f->controller()->ValidateNoArg(c);
@@ -203,7 +203,7 @@ std::shared_ptr<Step> EditStep::execute(Context &c, const std::shared_ptr<Factor
     f->printer()->print("[Edit Task]\n");
     ActionResult result_get_task = f->controller()->ReadTaskWithChildren(c);
     if (result_get_task)
-        c.setTask(c.tasks()[*c.id()].first);
+        c.setTask(c.tasks()[0].data());
     Machine wizard = f->createMachine(Factory::State::READTASK, c);
     Context input_context = wizard.run();
     c.setTask(input_context.task());
@@ -230,25 +230,25 @@ std::shared_ptr<Step> ShowStep::execute(Context &c, const std::shared_ptr<Factor
     ActionResult result = f->controller()->ShowTasks(c);
 
     auto tasks = c.tasks();
-    for (const auto &kv : tasks) {
-        if (!kv.second.second.parent())
-            ShowStep::recursivePrint(kv, f, c, "");
+    for (const auto &te : tasks) {
+        if (!te.has_parent())
+            ShowStep::recursivePrint(te, f, c, "");
     }
 
     return StepSwitcher::nextStep(*this, f);
 }
 
-void ShowStep::recursivePrint(const std::pair<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> &kv,
+void ShowStep::recursivePrint(const ProtoTask::TaskEntity &te,
                               const std::shared_ptr<Factory> &f,
                               const Context &c,
                               const std::string &prefix) {
-    f->printer()->print(prefix + std::to_string(kv.first.value()) +
-                     " – " + to_string(kv.second.first));
+    f->printer()->print(prefix + std::to_string(te.id().value()) +
+                        " – " + to_string(te.data()));
 
     f->printer()->print("\n");
-    for (const auto &id : kv.second.second.children()) {
-        auto ch = std::make_pair(id, c.tasks().at(id));
-        recursivePrint(ch, f, c, prefix + "    ");
+    for (const auto &ch : c.tasks()) {
+        if (ch.parent() == te.id())
+            recursivePrint(ch, f, c, prefix + "    ");
     }
 }
 
@@ -271,11 +271,10 @@ std::shared_ptr<Step> ConfirmDeleteStep::execute(Context &c, const std::shared_p
     ActionResult result = f->controller()->ReadTaskWithChildren(c);
 
     if (result) {
-        auto ch = c.tasks().at(*result.id).second.children();
-        if (!ch.empty()) {
+        if (c.tasks().size() > 1) {
             while (true) {
                 std::string reply = f->reader()->read("Task " + std::to_string(c.id()->value()) +
-                                                              " has " + std::to_string(ch.size()) +
+                                                              " has " + std::to_string(c.tasks().size()) +
                                                               " subtask(s). Confirm to delete all. Y/[N] > ");
                 if (reply == "Y" || reply == "y") {
                     break;
