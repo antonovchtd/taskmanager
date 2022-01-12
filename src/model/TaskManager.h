@@ -17,7 +17,6 @@ public:
                 const Container &tasks);
 
 public:
-    std::pair<Core::Task, Node>& operator[](const Core::TaskID &) override;
     std::vector<Core::TaskEntity> getTasks() const override;
     std::vector<Core::TaskEntity> getTasks(const std::string &label) const override;
     std::vector<Core::TaskEntity> getTasks(const Core::TaskID &id) const override;

@@ -3,6 +3,7 @@
 //
 
 #include "TaskManager.h"
+#include "Node.h"
 
 TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator)) {
 }
@@ -123,10 +124,6 @@ ActionResult TaskManager::Uncomplete(const Core::TaskID &id) {
     for (auto const &ch : tasks_.at(id).second.children())
         Uncomplete(ch);
     return {ActionResult::Status::SUCCESS, id};
-}
-
-std::pair<Core::Task, Node>& TaskManager::operator[](const Core::TaskID &id) {
-    return tasks_.at(id);
 }
 
 ActionResult TaskManager::Validate(const Core::TaskID &id) const{

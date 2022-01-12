@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include "IDGenerator.h"
-#include "Node.h"
 #include "Task.pb.h"
 #include "utilities/TaskIDUtils.h"
 #include "utilities/TaskUtils.h"
@@ -23,7 +22,6 @@
 
 class ModelInterface {
 public:
-    virtual std::pair<Core::Task, Node>& operator[](const Core::TaskID &) = 0;
     virtual std::vector<Core::TaskEntity> getTasks() const = 0;
     virtual std::vector<Core::TaskEntity> getTasks(const std::string &label) const = 0;
     virtual std::vector<Core::TaskEntity> getTasks(const Core::TaskID &id) const = 0;
