@@ -30,12 +30,12 @@ public:
 TEST_F(PersisterTest, shouldSaveAndLoadTasksMapWithGeneratorState)
 {
     auto tm = std::make_shared<TaskManager>();
-    ProtoTask::Task t = ProtoTask::createTask("task 1", ProtoTask::Task_Priority_HIGH,
-                                            time(nullptr), "a", false);
-    ProtoTask::Task sub = ProtoTask::createTask("subtask 2", ProtoTask::Task_Priority_MEDIUM,
-                                            time(nullptr), "b", false);
-    ProtoTask::Task subsub = ProtoTask::createTask("subsubtask 3", ProtoTask::Task_Priority_LOW,
-                                            time(nullptr), "c", false);
+    Core::Task t = Core::createTask("task 1", Core::Task_Priority_HIGH,
+                                    time(nullptr), "a", false);
+    Core::Task sub = Core::createTask("subtask 2", Core::Task_Priority_MEDIUM,
+                                      time(nullptr), "b", false);
+    Core::Task subsub = Core::createTask("subsubtask 3", Core::Task_Priority_LOW,
+                                         time(nullptr), "c", false);
     auto id1 = *tm->Add(t).id;
     auto id2 = *tm->AddSubtask(sub, id1).id;
     auto id3 = *tm->AddSubtask(subsub, id2).id;

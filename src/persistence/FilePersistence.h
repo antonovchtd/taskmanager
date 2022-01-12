@@ -14,8 +14,8 @@ public:
     explicit FilePersistence(const std::string &filename);
 
 public:
-    bool save(const std::vector<ProtoTask::TaskEntity> &) override;
-    bool load(std::vector<ProtoTask::TaskEntity> &) override;
+    bool save(const std::vector<Core::TaskEntity> &) override;
+    bool load(std::vector<Core::TaskEntity> &) override;
 
 private:
     std::string filename_;

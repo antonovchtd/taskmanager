@@ -24,9 +24,9 @@ public:
     void SetUp() override {
         tm_ = std::shared_ptr<ModelInterface>(new TaskManager);
         ctr_ = Controller{tm_};
-        ProtoTask::Task t;
+        Core::Task t;
         t.set_title("test");
-        t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+        t.set_priority(Core::Task::Priority::Task_Priority_HIGH);
         t.set_due_date(time(nullptr));
         t.set_label("label");
         t.set_is_complete(false);
@@ -47,7 +47,7 @@ TEST_F(ControllerTest, shouldAddSubtask)
     ActionResult result = ctr_.AddTask(context_);
     auto t = context_.task();
     t.set_title("sub");
-    t.set_priority(ProtoTask::Task::Priority::Task_Priority_MEDIUM);
+    t.set_priority(Core::Task::Priority::Task_Priority_MEDIUM);
     context_.setTask(t);
     context_.setID(result.id);
     ActionResult result_subtask = ctr_.AddSubtask(context_);
@@ -123,7 +123,7 @@ TEST_F(ControllerTest, shouldValidateLabelOrIDValidID)
 {
     ActionResult result = ctr_.AddTask(context_);
     ctr_.setData(Controller::Data{std::to_string(result.id->value())});
-    ProtoTask::TaskID id_expected;
+    Core::TaskID id_expected;
     id_expected.set_value(1);
     ActionResult result_validate = ctr_.ValidateAlphaOrID(context_);
     EXPECT_EQ(result_validate.status, ActionResult::Status::SUCCESS);
@@ -161,7 +161,7 @@ TEST_F(ControllerTest, shouldEditTask)
     auto t = context_.task();
     std::string new_title = "edited";
     t.set_title(new_title);
-    ProtoTask::Task::Priority new_priority = ProtoTask::Task::Priority::Task_Priority_MEDIUM;
+    Core::Task::Priority new_priority = Core::Task::Priority::Task_Priority_MEDIUM;
     t.set_priority(new_priority);
     context_.setTask(t);
     context_.setID(result.id);
@@ -188,9 +188,9 @@ TEST_F(ControllerTest, shouldShowTasksWithLabelArg)
     ctr_.AddTask(context_);
 
     std::string label = "custom";
-    ProtoTask::Task t;
+    Core::Task t;
     t.set_title("test 2");
-    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_priority(Core::Task::Priority::Task_Priority_HIGH);
     t.set_due_date(time(nullptr));
     t.set_label(label);
     t.set_is_complete(false);
@@ -210,9 +210,9 @@ TEST_F(ControllerTest, shouldShowTasksWithIDArg)
     ctr_.AddTask(context_);
 
     std::string label = "custom";
-    ProtoTask::Task t;
+    Core::Task t;
     t.set_title("test 2");
-    t.set_priority(ProtoTask::Task::Priority::Task_Priority_HIGH);
+    t.set_priority(Core::Task::Priority::Task_Priority_HIGH);
     t.set_due_date(time(nullptr));
     t.set_label(label);
     t.set_is_complete(false);
@@ -241,7 +241,7 @@ TEST_F(ControllerTest, shouldCompleteTaskWithValidID)
 TEST_F(ControllerTest, shouldNotCompleteTaskWithInvalidID)
 {
     ActionResult result = ctr_.AddTask(context_);
-    ProtoTask::TaskID new_id;
+    Core::TaskID new_id;
     new_id.set_value(result.id->value() + 1);
     context_.setID(new_id);
     ActionResult result_complete = ctr_.CompleteTask(context_);
@@ -288,7 +288,7 @@ TEST_F(ControllerTest, shouldGetTasksForConfirmDelete)
 TEST_F(ControllerTest, shouldGetTasksForConfirmDeleteWithWrongID)
 {
     ActionResult result = ctr_.AddTask(context_);
-    ProtoTask::TaskID new_id;
+    Core::TaskID new_id;
     new_id.set_value(result.id->value() + 1);
     context_.setID(new_id);
 
@@ -302,7 +302,7 @@ TEST_F(ControllerTest, shouldGetTasksForConfirmDeleteWithWrongID)
 TEST_F(ControllerTest, shouldDeleteTaskInvalidIDNoSubtasks)
 {
     ActionResult result = ctr_.AddTask(context_);
-    ProtoTask::TaskID new_id;
+    Core::TaskID new_id;
     new_id.set_value(result.id->value() + 1);
     context_.setID(new_id);
     ActionResult result_delete = ctr_.DeleteTask(context_);
@@ -337,7 +337,7 @@ TEST_F(ControllerTest, shouldLabelTask)
 TEST_F(ControllerTest, shouldNotLabelTaskWithInvalidID)
 {
     ActionResult result = ctr_.AddTask(context_);
-    ProtoTask::TaskID new_id;
+    Core::TaskID new_id;
     new_id.set_value(result.id->value()+1);
     context_.setID(new_id);
     std::string label = "custom";

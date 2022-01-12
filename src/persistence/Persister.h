@@ -11,8 +11,8 @@ class ModelInterface;
 
 class Persister {
 public:
-    virtual bool save(const std::vector<ProtoTask::TaskEntity> &) = 0;
-    virtual bool load(std::vector<ProtoTask::TaskEntity> &) = 0;
+    virtual bool save(const std::vector<Core::TaskEntity> &) = 0;
+    virtual bool load(std::vector<Core::TaskEntity> &) = 0;
 
 public:
     virtual ~Persister() = default;

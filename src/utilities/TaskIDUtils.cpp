@@ -4,22 +4,22 @@
 
 #include "TaskIDUtils.h"
 
-bool ProtoTask::operator==(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
+bool Core::operator==(const Core::TaskID &lhs, const Core::TaskID &rhs) {
     return rhs.value() == lhs.value();
 }
 
-bool ProtoTask::operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
+bool Core::operator!=(const Core::TaskID &lhs, const Core::TaskID &rhs) {
     return !(lhs == rhs);
 }
 
-bool ProtoTask::operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
+bool Core::operator<(const Core::TaskID &lhs, const Core::TaskID &rhs) {
     return lhs.value() < rhs.value();
 }
-bool ProtoTask::operator>(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs) {
+bool Core::operator>(const Core::TaskID &lhs, const Core::TaskID &rhs) {
     return lhs.value() > rhs.value();
 }
 
-bool operator==(const std::vector<ProtoTask::TaskID> &lhs, const std::vector<ProtoTask::TaskID> &rhs) {
+bool operator==(const std::vector<Core::TaskID> &lhs, const std::vector<Core::TaskID> &rhs) {
     for (const auto &id : lhs) {
         auto it = std::find(rhs.cbegin(), rhs.cend(), id);
         if (it == rhs.cend())
@@ -28,6 +28,6 @@ bool operator==(const std::vector<ProtoTask::TaskID> &lhs, const std::vector<Pro
     return true;
 }
 
-bool operator!=(const std::vector<ProtoTask::TaskID> &lhs, const std::vector<ProtoTask::TaskID> &rhs) {
+bool operator!=(const std::vector<Core::TaskID> &lhs, const std::vector<Core::TaskID> &rhs) {
     return !(lhs == rhs);
 }

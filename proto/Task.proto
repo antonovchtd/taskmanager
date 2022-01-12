@@ -1,7 +1,7 @@
 syntax = "proto3";
 //import "google/protobuf/timestamp.proto";
 
-package ProtoTask;
+package Core;
 
 message TaskID {
   int32 value = 1;

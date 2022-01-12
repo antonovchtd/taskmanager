@@ -7,13 +7,13 @@
 
 #include "Task.pb.h"
 
-namespace ProtoTask {
-    bool operator==(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
-    bool operator!=(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
-    bool operator<(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
-    bool operator>(const ProtoTask::TaskID &lhs, const ProtoTask::TaskID &rhs);
+namespace Core {
+    bool operator==(const Core::TaskID &lhs, const Core::TaskID &rhs);
+    bool operator!=(const Core::TaskID &lhs, const Core::TaskID &rhs);
+    bool operator<(const Core::TaskID &lhs, const Core::TaskID &rhs);
+    bool operator>(const Core::TaskID &lhs, const Core::TaskID &rhs);
 }
-bool operator==(const std::vector<ProtoTask::TaskID> &lhs, const std::vector<ProtoTask::TaskID> &rhs);
-bool operator!=(const std::vector<ProtoTask::TaskID> &lhs, const std::vector<ProtoTask::TaskID> &rhs);
+bool operator==(const std::vector<Core::TaskID> &lhs, const std::vector<Core::TaskID> &rhs);
+bool operator!=(const std::vector<Core::TaskID> &lhs, const std::vector<Core::TaskID> &rhs);
 
 #endif //TASKMANAGER_SRC_UTILITIES_TASKIDUTILS_H_

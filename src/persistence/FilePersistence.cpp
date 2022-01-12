@@ -10,7 +10,7 @@
 FilePersistence::FilePersistence(const std::string &filename) : filename_{filename} {
 }
 
-bool FilePersistence::save(const std::vector<ProtoTask::TaskEntity> &vec) {
+bool FilePersistence::save(const std::vector<Core::TaskEntity> &vec) {
     std::ofstream file(filename_, std::ios::trunc | std::ios::binary);
     if (file.is_open()) {
         for (const auto &te : vec) {
@@ -23,11 +23,11 @@ bool FilePersistence::save(const std::vector<ProtoTask::TaskEntity> &vec) {
         return false;
 }
 
-bool FilePersistence::load(std::vector<ProtoTask::TaskEntity> &vec) {
+bool FilePersistence::load(std::vector<Core::TaskEntity> &vec) {
     std::ifstream file(filename_, std::ios::binary);
     google::protobuf::io::IstreamInputStream iis{&file};
     if (file.is_open()) {
-        ProtoTask::TaskEntity te;
+        Core::TaskEntity te;
         bool clean_eof = false;
         while (!clean_eof) {
             google::protobuf::util::ParseDelimitedFromZeroCopyStream(&te, &iis, &clean_eof);

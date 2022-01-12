@@ -83,8 +83,8 @@ public:
 std::vector<std::string> homeStepExecuteCall(const std::string &command, Factory::State expected_step) {
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
-                                  time(nullptr), "label", false));
+    tm->Add(Core::createTask("title", Core::Task_Priority_MEDIUM,
+                             time(nullptr), "label", false));
     auto con = std::make_shared<Controller>(tm);
     auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
                                                std::shared_ptr<AbstractPrinter>(new MockPrinterToVector),
@@ -330,8 +330,8 @@ std::vector<std::string> executeWithWizardCall(Factory::State current_step, Fact
     std::vector<std::string> scenario = {"", "test", "10", "low", "", "31-12-22", "31/12/2022 15:00"};
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
-                                  time(nullptr), "label", false));
+    tm->Add(Core::createTask("title", Core::Task_Priority_MEDIUM,
+                             time(nullptr), "label", false));
     auto con = std::make_shared<Controller>(tm);
     auto mr = std::make_shared<MockReaderToVector>(scenario);
     auto mp = std::make_shared<MockPrinterToVector>();
@@ -347,7 +347,7 @@ std::vector<std::string> executeWithWizardCall(Factory::State current_step, Fact
 
     auto step = f->lazyInitStep(current_step);
     Context c;
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     c.setID(id);
     auto next_step = step->execute(c, f);
@@ -362,7 +362,7 @@ std::vector<std::string> executeWithWizardCall(Factory::State current_step, Fact
     timeinfo->tm_mon = 11;
     timeinfo->tm_mday = 31;
     timeinfo->tm_year = 122;
-    ProtoTask::Task t = ProtoTask::createTask("test", ProtoTask::Task_Priority_NONE, mktime(timeinfo), "", false);
+    Core::Task t = Core::createTask("test", Core::Task_Priority_NONE, mktime(timeinfo), "", false);
     EXPECT_EQ(t, c.task());
 
     auto prompts = mr->prompts();
@@ -400,8 +400,8 @@ TEST_F(StepTest, executeEditStepAllDefault)
     std::vector<std::string> scenario = {"", "", ""};
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    auto t = ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
-                                   1767218399, "label", false);
+    auto t = Core::createTask("title", Core::Task_Priority_MEDIUM,
+                              1767218399, "label", false);
     tm->Add(t);
     auto con = std::make_shared<Controller>(tm);
     auto mr = std::make_shared<MockReaderToVector>(scenario);
@@ -415,7 +415,7 @@ TEST_F(StepTest, executeEditStepAllDefault)
 
     auto step = f->lazyInitStep(Factory::State::EDIT);
     Context c;
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     c.setID(id);
     auto next_step = step->execute(c, f);
@@ -439,8 +439,8 @@ TEST_F(StepTest, executeEditStepAllNew)
     std::vector<std::string> scenario = {"edited", "10", "low", "3", "31-12-22", "31/12/2022 15:00"};
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    tm->Add(ProtoTask::createTask("original", ProtoTask::Task_Priority_MEDIUM,
-                                  1767218399, "label", false));
+    tm->Add(Core::createTask("original", Core::Task_Priority_MEDIUM,
+                             1767218399, "label", false));
     auto con = std::make_shared<Controller>(tm);
     auto mr = std::make_shared<MockReaderToVector>(scenario);
     auto mp = std::make_shared<MockPrinterToVector>();
@@ -456,7 +456,7 @@ TEST_F(StepTest, executeEditStepAllNew)
 
     auto step = f->lazyInitStep(Factory::State::EDIT);
     Context c;
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     c.setID(id);
     auto next_step = step->execute(c, f);
@@ -471,8 +471,8 @@ TEST_F(StepTest, executeEditStepAllNew)
     timeinfo->tm_mon = 11;
     timeinfo->tm_mday = 31;
     timeinfo->tm_year = 122;
-    ProtoTask::Task t = ProtoTask::createTask("edited", ProtoTask::Task_Priority_HIGH,
-                                              mktime(timeinfo), "label", false);
+    Core::Task t = Core::createTask("edited", Core::Task_Priority_HIGH,
+                                    mktime(timeinfo), "label", false);
     EXPECT_EQ(t, c.task());
 
     auto prompts = mr->prompts();
@@ -508,10 +508,10 @@ TEST_F(StepTest, executeHelpStep)
 TEST_F(StepTest, shouldConvertPriorityToString)
 {
     ReadTaskDataStep step;
-    EXPECT_EQ("None", step.priorityToString(ProtoTask::Task_Priority_NONE));
-    EXPECT_EQ("Low", step.priorityToString(ProtoTask::Task_Priority_LOW));
-    EXPECT_EQ("Medium", step.priorityToString(ProtoTask::Task_Priority_MEDIUM));
-    EXPECT_EQ("High", step.priorityToString(ProtoTask::Task_Priority_HIGH));
+    EXPECT_EQ("None", step.priorityToString(Core::Task_Priority_NONE));
+    EXPECT_EQ("Low", step.priorityToString(Core::Task_Priority_LOW));
+    EXPECT_EQ("Medium", step.priorityToString(Core::Task_Priority_MEDIUM));
+    EXPECT_EQ("High", step.priorityToString(Core::Task_Priority_HIGH));
 }
 
 TEST_F(StepTest, stringToTimeWithDateOnly)
@@ -593,10 +593,10 @@ TEST_F(StepTest, executeShowStep)
 {
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    ActionResult result = tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
-                                  1767218399, "label", false));
-    tm->AddSubtask(ProtoTask::createTask("subtitle", ProtoTask::Task_Priority_HIGH,
-                                         1767218399, "sub_label", true), *result.id);
+    ActionResult result = tm->Add(Core::createTask("title", Core::Task_Priority_MEDIUM,
+                                                   1767218399, "label", false));
+    tm->AddSubtask(Core::createTask("subtitle", Core::Task_Priority_HIGH,
+                                    1767218399, "sub_label", true), *result.id);
     auto con = std::make_shared<Controller>(tm);
     auto mr = std::make_shared<MockReaderToVector>();
     auto mp = std::make_shared<MockPrinterToVector>();
@@ -616,8 +616,8 @@ TEST_F(StepTest, executeCompleteStep)
 {
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
-                                  1767218399, "label", false));
+    tm->Add(Core::createTask("title", Core::Task_Priority_MEDIUM,
+                             1767218399, "label", false));
     auto con = std::make_shared<Controller>(tm);
     auto mr = std::make_shared<MockReaderToVector>();
     auto mp = std::make_shared<MockPrinterToVector>();
@@ -625,7 +625,7 @@ TEST_F(StepTest, executeCompleteStep)
 
     auto step = f->lazyInitStep(Factory::State::COMPLETE);
     Context c;
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     c.setID(id);
     auto next_step = step->execute(c, f);
@@ -642,8 +642,8 @@ TEST_F(StepTest, executeUncompleteStep)
 {
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
-                                  1767218399, "label", true));
+    tm->Add(Core::createTask("title", Core::Task_Priority_MEDIUM,
+                             1767218399, "label", true));
     auto con = std::make_shared<Controller>(tm);
     auto mr = std::make_shared<MockReaderToVector>();
     auto mp = std::make_shared<MockPrinterToVector>();
@@ -651,7 +651,7 @@ TEST_F(StepTest, executeUncompleteStep)
 
     auto step = f->lazyInitStep(Factory::State::UNCOMPLETE);
     Context c;
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     c.setID(id);
     auto next_step = step->execute(c, f);
@@ -668,8 +668,8 @@ TEST_F(StepTest, executeDeleteStep)
 {
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
-                                  1767218399, "label", false));
+    tm->Add(Core::createTask("title", Core::Task_Priority_MEDIUM,
+                             1767218399, "label", false));
     auto con = std::make_shared<Controller>(tm);
     auto mr = std::make_shared<MockReaderToVector>();
     auto mp = std::make_shared<MockPrinterToVector>();
@@ -677,7 +677,7 @@ TEST_F(StepTest, executeDeleteStep)
 
     auto step = f->lazyInitStep(Factory::State::DELETE);
     Context c;
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     c.setID(id);
     auto next_step = step->execute(c, f);
@@ -693,10 +693,10 @@ TEST_F(StepTest, executeDeleteStep)
 void processConfirmDeleteCall(const std::vector<std::string> &scenario, Factory::State expected_step) {
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    ActionResult result = tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
-                                                        1767218399, "label", false));
-    tm->AddSubtask(ProtoTask::createTask("subtitle", ProtoTask::Task_Priority_HIGH,
-                                         1767218399, "sub_label", true), *result.id);
+    ActionResult result = tm->Add(Core::createTask("title", Core::Task_Priority_MEDIUM,
+                                                   1767218399, "label", false));
+    tm->AddSubtask(Core::createTask("subtitle", Core::Task_Priority_HIGH,
+                                    1767218399, "sub_label", true), *result.id);
     auto con = std::make_shared<Controller>(tm);
     auto mr = std::make_shared<MockReaderToVector>(scenario);
     auto mp = std::make_shared<MockPrinterToVector>();
@@ -738,7 +738,7 @@ TEST_F(StepTest, processConfirmDeleteStepWithBadStr)
 
 TEST_F(StepTest, processConfirmDeleteStepIDNotFound)
 {
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(42);
     ActionResult result{ActionResult::Status::ID_NOT_FOUND, id};
     auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector),
@@ -762,8 +762,8 @@ TEST_F(StepTest, executeLabelStep)
 {
     auto gen = std::make_shared<IDGenerator>(1);
     auto tm = std::make_shared<TaskManager>(gen);
-    ActionResult result = tm->Add(ProtoTask::createTask("title", ProtoTask::Task_Priority_MEDIUM,
-                                  1767218399, "", false));
+    ActionResult result = tm->Add(Core::createTask("title", Core::Task_Priority_MEDIUM,
+                                                   1767218399, "", false));
     auto con = std::make_shared<Controller>(tm);
     std::vector<std::string> scenario {"", "label"};
     auto mr = std::make_shared<MockReaderToVector>(scenario);

@@ -23,25 +23,25 @@
 
 class ModelInterface {
 public:
-    virtual std::pair<ProtoTask::Task, Node>& operator[](const ProtoTask::TaskID &) = 0;
-    virtual std::vector<ProtoTask::TaskEntity> getTasks() const = 0;
-    virtual std::vector<ProtoTask::TaskEntity> getTasks(const std::string &label) const = 0;
-    virtual std::vector<ProtoTask::TaskEntity> getTasks(const ProtoTask::TaskID &id) const = 0;
+    virtual std::pair<Core::Task, Node>& operator[](const Core::TaskID &) = 0;
+    virtual std::vector<Core::TaskEntity> getTasks() const = 0;
+    virtual std::vector<Core::TaskEntity> getTasks(const std::string &label) const = 0;
+    virtual std::vector<Core::TaskEntity> getTasks(const Core::TaskID &id) const = 0;
     virtual std::shared_ptr<IDGenerator> gen() const = 0;
     virtual size_t size() const = 0;
 
 public:
-    virtual ActionResult Add(const ProtoTask::Task &) = 0;
-    virtual ActionResult AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &) = 0;
-    virtual ActionResult Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) = 0;
-    virtual ActionResult Complete(const ProtoTask::TaskID &) = 0;
-    virtual ActionResult Uncomplete(const ProtoTask::TaskID &) = 0;
-    virtual ActionResult Delete(const ProtoTask::TaskID &, bool deleteChildren) = 0;
-    virtual ActionResult Validate(const ProtoTask::TaskID &) const = 0;
-    virtual ActionResult AddLabel(const ProtoTask::TaskID &, const std::string &label) = 0;
+    virtual ActionResult Add(const Core::Task &) = 0;
+    virtual ActionResult AddSubtask(const Core::Task &, const Core::TaskID &) = 0;
+    virtual ActionResult Edit(const Core::TaskID &id, const Core::Task &t) = 0;
+    virtual ActionResult Complete(const Core::TaskID &) = 0;
+    virtual ActionResult Uncomplete(const Core::TaskID &) = 0;
+    virtual ActionResult Delete(const Core::TaskID &, bool deleteChildren) = 0;
+    virtual ActionResult Validate(const Core::TaskID &) const = 0;
+    virtual ActionResult AddLabel(const Core::TaskID &, const std::string &label) = 0;
 
 public:
-    virtual void Replace(const std::vector<ProtoTask::TaskEntity> &) = 0;
+    virtual void Replace(const std::vector<Core::TaskEntity> &) = 0;
 
 public:
     virtual ~ModelInterface() = default;

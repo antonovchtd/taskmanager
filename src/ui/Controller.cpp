@@ -23,7 +23,7 @@ void Controller::setData(const Controller::Data &data) {
 }
 
 ActionResult Controller::ValidateID(Context &context) {
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     if (data().arg.empty())
         return {ActionResult::Status::TAKES_ARG, std::nullopt};
     try {
@@ -45,7 +45,7 @@ ActionResult Controller::ValidateNoArg(Context &context) {
 
 ActionResult Controller::ValidateAlphaOrID(Context &context) {
     // empty is OK
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     try {
         id.set_value(std::stoi(data().arg));
         context.setID(id);
@@ -58,7 +58,7 @@ ActionResult Controller::ValidateAlphaOrID(Context &context) {
 
 ActionResult Controller::ValidateAlpha(Context &context) {
     // empty is not OK
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     try {
         id.set_value(std::stoi(data().arg));
         return {ActionResult::Status::TAKES_ALPHA_NOT_ID, id};
@@ -130,7 +130,7 @@ ActionResult Controller::SaveTasks(Context &context) {
 
 ActionResult Controller::LoadTasks(Context &context) {
     persister_ = std::unique_ptr<Persister>(new FilePersistence{data().arg});
-    std::vector<ProtoTask::TaskEntity> data;
+    std::vector<Core::TaskEntity> data;
     if (persister_->load(data)) {
         model_->Replace(data);
         return {ActionResult::Status::SUCCESS, std::nullopt};

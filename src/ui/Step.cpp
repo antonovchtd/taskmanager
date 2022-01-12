@@ -73,7 +73,7 @@ bool ReadTaskDataStep::validateTitle(const std::string &title) const {
     return !title.empty();
 }
 
-std::optional<ProtoTask::Task::Priority> ReadTaskDataStep::stringToPriority(const std::string &priority) const {
+std::optional<Core::Task::Priority> ReadTaskDataStep::stringToPriority(const std::string &priority) const {
     int pint;
     try {
         pint = priority.empty() ? 0 : std::stoi(priority);
@@ -81,21 +81,21 @@ std::optional<ProtoTask::Task::Priority> ReadTaskDataStep::stringToPriority(cons
         pint = -1;
     }
     if (pint >= 0 && pint <= 3)
-        return static_cast<ProtoTask::Task::Priority>(pint);
+        return static_cast<Core::Task::Priority>(pint);
     else {
         return std::nullopt;
     }
 }
 
-std::string ReadTaskDataStep::priorityToString(const ProtoTask::Task::Priority &priority) const {
+std::string ReadTaskDataStep::priorityToString(const Core::Task::Priority &priority) const {
     switch (priority) {
-        case ProtoTask::Task_Priority_NONE:
+        case Core::Task_Priority_NONE:
             return "None";
-        case ProtoTask::Task_Priority_LOW:
+        case Core::Task_Priority_LOW:
             return "Low";
-        case ProtoTask::Task_Priority_MEDIUM:
+        case Core::Task_Priority_MEDIUM:
             return "Medium";
-        case ProtoTask::Task_Priority_HIGH:
+        case Core::Task_Priority_HIGH:
             return "High";
         default:
             return "";
@@ -161,9 +161,9 @@ void ReadTaskDataStep::readTitle(Context &c, const std::shared_ptr<Factory> &f) 
 }
 
 void ReadTaskDataStep::readPriority(Context &c, const std::shared_ptr<Factory> &f) const {
-    std::optional<ProtoTask::Task::Priority> priority{std::nullopt};
+    std::optional<Core::Task::Priority> priority{std::nullopt};
     std::string prompt = "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH)";
-    if (c.task().priority() != ProtoTask::Task_Priority_NONE)
+    if (c.task().priority() != Core::Task_Priority_NONE)
         prompt += (" [" + priorityToString(c.task().priority()) + "]");
     while (!priority) {
         std::string str = f->reader()->read(prompt + " > ");
@@ -238,7 +238,7 @@ std::shared_ptr<Step> ShowStep::execute(Context &c, const std::shared_ptr<Factor
     return StepSwitcher::nextStep(*this, f);
 }
 
-void ShowStep::recursivePrint(const ProtoTask::TaskEntity &te,
+void ShowStep::recursivePrint(const Core::TaskEntity &te,
                               const std::shared_ptr<Factory> &f,
                               const Context &c,
                               const std::string &prefix) {

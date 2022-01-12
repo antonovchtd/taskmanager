@@ -4,15 +4,15 @@
 
 #include "Context.h"
 
-ProtoTask::Task Context::task() const {
+Core::Task Context::task() const {
     return task_;
 }
 
-std::optional<ProtoTask::TaskID> Context::id() const {
+std::optional<Core::TaskID> Context::id() const {
     return id_;
 }
 
-std::vector<ProtoTask::TaskEntity> Context::tasks() const {
+std::vector<Core::TaskEntity> Context::tasks() const {
     return tasks_;
 }
 
@@ -25,18 +25,18 @@ void Context::setDueDate(const time_t & dd) {
     task_.set_due_date(dd);
 }
 
-void Context::setPriority(const ProtoTask::Task::Priority &p) {
+void Context::setPriority(const Core::Task::Priority &p) {
     task_.set_priority(p);
 }
 
-void Context::setTask(const ProtoTask::Task &t) {
+void Context::setTask(const Core::Task &t) {
     task_ = t;
 }
 
-void Context::setID(const std::optional<ProtoTask::TaskID> &id) {
+void Context::setID(const std::optional<Core::TaskID> &id) {
     id_ = id;
 }
 
-void Context::setTasks(const std::vector<ProtoTask::TaskEntity> &tasks) {
+void Context::setTasks(const std::vector<Core::TaskEntity> &tasks) {
     tasks_ = tasks;
 }

@@ -16,7 +16,7 @@ public:
     int state() const;
 
 public:
-    virtual ProtoTask::TaskID genID();
+    virtual Core::TaskID genID();
     virtual ~IDGenerator() = default;
 
 protected:

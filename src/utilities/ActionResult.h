@@ -28,7 +28,7 @@ struct ActionResult {
     std::string message() const;
 
     Status status;
-    std::optional<ProtoTask::TaskID> id;
+    std::optional<Core::TaskID> id;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_ACTIONRESULT_H_

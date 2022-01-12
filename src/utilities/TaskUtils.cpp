@@ -4,7 +4,7 @@
 
 #include "TaskUtils.h"
 
-bool ProtoTask::operator==(const ProtoTask::Task &lhs, const ProtoTask::Task &rhs) {
+bool Core::operator==(const Core::Task &lhs, const Core::Task &rhs) {
     return rhs.title() == lhs.title() &&
            rhs.priority() == lhs.priority() &&
            rhs.is_complete() == lhs.is_complete() &&
@@ -12,7 +12,7 @@ bool ProtoTask::operator==(const ProtoTask::Task &lhs, const ProtoTask::Task &rh
            rhs.due_date() == lhs.due_date();
 }
 
-std::string to_string(const ProtoTask::Task &t) {
+std::string to_string(const Core::Task &t) {
     std::ostringstream os;
     const std::string priorityName[] = { "None", "Low", "Medium", "High"};
     os << t.title() << ", Priority: " <<
@@ -38,12 +38,12 @@ std::string to_string(const ProtoTask::Task &t) {
     return os.str();
 }
 
-ProtoTask::Task ProtoTask::createTask(const std::string &title,
-                                      const ProtoTask::Task::Priority &priority,
-                                      const time_t &due_date,
-                                      const std::string &label,
-                                      bool is_complete) {
-    ProtoTask::Task t;
+Core::Task Core::createTask(const std::string &title,
+                            const Core::Task::Priority &priority,
+                            const time_t &due_date,
+                            const std::string &label,
+                            bool is_complete) {
+    Core::Task t;
     t.set_title(title);
     t.set_priority(priority);
     t.set_due_date(due_date);

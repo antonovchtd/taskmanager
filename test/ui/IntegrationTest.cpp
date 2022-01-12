@@ -88,7 +88,7 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
     auto tm = m.model();
     ASSERT_EQ(2, tm->size());
 
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     ASSERT_TRUE(tm->Validate(id));
     EXPECT_TRUE(tm->getTasks()[id].first.is_complete());
@@ -133,17 +133,17 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
     ASSERT_EQ(3, tm->size());
 
     // check completeness
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     ASSERT_TRUE(tm->Validate(id));
     EXPECT_TRUE(tm->getTasks()[id].first.is_complete());
 
-    ProtoTask::TaskID id2;
+    Core::TaskID id2;
     id2.set_value(2);
     ASSERT_TRUE(tm->Validate(id2));
     EXPECT_TRUE(tm->getTasks()[id2].first.is_complete());
 
-    ProtoTask::TaskID id3;
+    Core::TaskID id3;
     id3.set_value(3);
     ASSERT_TRUE(tm->Validate(id3));
     EXPECT_TRUE(tm->getTasks()[id3].first.is_complete());
@@ -201,17 +201,17 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
     ASSERT_EQ(3, tm->size());
 
     // check labels
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     ASSERT_TRUE(tm->Validate(id));
     EXPECT_EQ("", tm->getTasks()[id].first.label());
 
-    ProtoTask::TaskID id2;
+    Core::TaskID id2;
     id2.set_value(2);
     ASSERT_TRUE(tm->Validate(id2));
     EXPECT_EQ("l2", tm->getTasks()[id2].first.label());
 
-    ProtoTask::TaskID id3;
+    Core::TaskID id3;
     id3.set_value(3);
     ASSERT_TRUE(tm->Validate(id3));
     EXPECT_EQ("l3", tm->getTasks()[id3].first.label());
@@ -266,7 +266,7 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
     auto prompts = mr.prompts();
     ASSERT_EQ(1, tm->size());
 
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     EXPECT_FALSE(tm->Validate(id));
     id.set_value(2);
@@ -318,7 +318,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
     auto prompts = mr.prompts();
     ASSERT_EQ(1, tm->size());
 
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(1);
     EXPECT_TRUE(tm->Validate(id));
 
@@ -394,7 +394,7 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
     auto tm = m2.model();
     ASSERT_EQ(3, tm->size());
 
-    ProtoTask::TaskID id1, id2, id3;
+    Core::TaskID id1, id2, id3;
     id1.set_value(1);
     id2.set_value(2);
     id3.set_value(3);

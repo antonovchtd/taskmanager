@@ -56,8 +56,8 @@ public:
     std::optional<time_t> stringToTime(const std::string &datestring) const;
     std::string timeToString(const time_t &date) const;
     bool validateTitle(const std::string &title) const;
-    std::optional<ProtoTask::Task::Priority> stringToPriority(const std::string &priority) const;
-    std::string priorityToString(const ProtoTask::Task::Priority &priority) const;
+    std::optional<Core::Task::Priority> stringToPriority(const std::string &priority) const;
+    std::string priorityToString(const Core::Task::Priority &priority) const;
 
 public:
     void readTitle(Context &, const std::shared_ptr<Factory> &) const;
@@ -83,7 +83,7 @@ public:
 class ShowStep : public Step {
 public:
     std::shared_ptr<Step> execute(Context &c, const std::shared_ptr<Factory> &f) override;
-    void recursivePrint(const ProtoTask::TaskEntity &te,
+    void recursivePrint(const Core::TaskEntity &te,
                         const std::shared_ptr<Factory> &f,
                         const Context &c,
                         const std::string &prefix);

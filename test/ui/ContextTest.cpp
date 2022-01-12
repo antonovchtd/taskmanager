@@ -14,7 +14,7 @@ class ContextTest : public ::testing::Test
 TEST_F(ContextTest, shouldSetID)
 {
     Context c;
-    ProtoTask::TaskID id;
+    Core::TaskID id;
     id.set_value(42);
     c.setID(id);
     EXPECT_EQ(id, *c.id());
@@ -23,13 +23,13 @@ TEST_F(ContextTest, shouldSetID)
 TEST_F(ContextTest, shouldSetTasks)
 {
     TaskManager tm;
-    ProtoTask::Task t;
+    Core::Task t;
     t.set_title("test");
-    t.set_priority(ProtoTask::Task_Priority_NONE);
+    t.set_priority(Core::Task_Priority_NONE);
     t.set_label("label");
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
-    ProtoTask::TaskID id = *tm.Add(t).id;
+    Core::TaskID id = *tm.Add(t).id;
     Context c;
     c.setTasks(tm.getTasks());
     auto tasks = c.tasks();
@@ -38,9 +38,9 @@ TEST_F(ContextTest, shouldSetTasks)
 }
 
 TEST_F(ContextTest, shouldSetData){
-    ProtoTask::Task t;
+    Core::Task t;
     t.set_title("test");
-    t.set_priority(ProtoTask::Task_Priority_NONE);
+    t.set_priority(Core::Task_Priority_NONE);
     t.set_label("label");
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
@@ -68,7 +68,7 @@ TEST_F(ContextTest, shouldSetDueDate){
 }
 
 TEST_F(ContextTest, shouldSetPriority){
-    ProtoTask::Task::Priority p = ProtoTask::Task_Priority_MEDIUM;
+    Core::Task::Priority p = Core::Task_Priority_MEDIUM;
     Context c;
     c.setPriority(p);
     EXPECT_EQ(p, c.task().priority());

@@ -13,22 +13,22 @@
 class Node{
 public:
     Node();
-    explicit Node(const ProtoTask::TaskID &parent);
+    explicit Node(const Core::TaskID &parent);
 
 public:
-    std::optional<ProtoTask::TaskID> parent() const;
-    std::vector<ProtoTask::TaskID> children() const;
+    std::optional<Core::TaskID> parent() const;
+    std::vector<Core::TaskID> children() const;
 
 public:
-    void SetParent(const ProtoTask::TaskID &);
+    void SetParent(const Core::TaskID &);
     void RemoveParent();
-    void RemoveChild(const ProtoTask::TaskID &id);
+    void RemoveChild(const Core::TaskID &id);
     void RemoveChildren();
-    void AddChild(const ProtoTask::TaskID &);
+    void AddChild(const Core::TaskID &);
 
 private:
-    std::optional<ProtoTask::TaskID> parent_;
-    std::vector<ProtoTask::TaskID> children_;
+    std::optional<Core::TaskID> parent_;
+    std::vector<Core::TaskID> children_;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_NODE_H_

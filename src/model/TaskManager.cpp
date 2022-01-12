@@ -14,8 +14,8 @@ TaskManager::TaskManager(const std::shared_ptr<IDGenerator> &generator,
                          gen_(generator), tasks_(tasks) {
 }
 
-ActionResult TaskManager::Add(const ProtoTask::Task &t) {
-    ProtoTask::TaskID id = gen_->genID();
+ActionResult TaskManager::Add(const Core::Task &t) {
+    Core::TaskID id = gen_->genID();
     if (Validate(id))
         return {ActionResult::Status::DUPLICATE_ID, id};
 
@@ -23,8 +23,8 @@ ActionResult TaskManager::Add(const ProtoTask::Task &t) {
     return {ActionResult::Status::SUCCESS, id};
 }
 
-ActionResult TaskManager::AddSubtask(const ProtoTask::Task &t, const ProtoTask::TaskID &parent) {
-    ProtoTask::TaskID id = gen_->genID();
+ActionResult TaskManager::AddSubtask(const Core::Task &t, const Core::TaskID &parent) {
+    Core::TaskID id = gen_->genID();
     if (Validate(id))
         return {ActionResult::Status::DUPLICATE_ID, id};
     if (!Validate(parent))
@@ -35,21 +35,21 @@ ActionResult TaskManager::AddSubtask(const ProtoTask::Task &t, const ProtoTask::
     return {ActionResult::Status::SUCCESS, id};
 }
 
-std::vector<ProtoTask::TaskEntity> TaskManager::getTasks() const {
-    std::vector<ProtoTask::TaskEntity> vec;
+std::vector<Core::TaskEntity> TaskManager::getTasks() const {
+    std::vector<Core::TaskEntity> vec;
     for (const auto &kv : tasks_) {
-        ProtoTask::TaskEntity te;
-        te.set_allocated_id(new ProtoTask::TaskID(kv.first));
-        te.set_allocated_data(new ProtoTask::Task(kv.second.first));
+        Core::TaskEntity te;
+        te.set_allocated_id(new Core::TaskID(kv.first));
+        te.set_allocated_data(new Core::Task(kv.second.first));
         if (kv.second.second.parent()) {
-            te.set_allocated_parent(new ProtoTask::TaskID(*kv.second.second.parent()));
+            te.set_allocated_parent(new Core::TaskID(*kv.second.second.parent()));
         }
         vec.push_back(te);
     }
     return vec;
 }
 
-std::vector<ProtoTask::TaskEntity> TaskManager::getTasks(const std::string &label) const {
+std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) const {
     Container tasks;
     for (const auto &kv : tasks_) {
         if (kv.second.first.label() == label) {
@@ -62,27 +62,27 @@ std::vector<ProtoTask::TaskEntity> TaskManager::getTasks(const std::string &labe
     return tm.getTasks();
 }
 
-std::vector<ProtoTask::TaskEntity> TaskManager::getTasks(const ProtoTask::TaskID &id) const {
-    std::vector<ProtoTask::TaskEntity> tasks;
-    ProtoTask::TaskEntity te;
-    te.set_allocated_id(new ProtoTask::TaskID(id));
-    te.set_allocated_data(new ProtoTask::Task(tasks_.at(id).first));
+std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::TaskID &id) const {
+    std::vector<Core::TaskEntity> tasks;
+    Core::TaskEntity te;
+    te.set_allocated_id(new Core::TaskID(id));
+    te.set_allocated_data(new Core::Task(tasks_.at(id).first));
     tasks.push_back(te);
     for (const auto &ch : tasks_.at(id).second.children()) {
         auto ch_tasks = getTasks(ch);
         for (auto it = ch_tasks.begin(); it != ch_tasks.end(); it++) {
-            it->set_allocated_parent(new ProtoTask::TaskID(*tasks_.at(ch).second.parent()));
+            it->set_allocated_parent(new Core::TaskID(*tasks_.at(ch).second.parent()));
         }
         tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
     }
     return tasks;
 }
 
-ActionResult TaskManager::Delete(const ProtoTask::TaskID &id, bool deleteChildren) {
+ActionResult TaskManager::Delete(const Core::TaskID &id, bool deleteChildren) {
     try {
         if (!tasks_.at(id).second.children().empty() && !deleteChildren)
             return {ActionResult::Status::HAS_CHILDREN, id};
-        std::optional<ProtoTask::TaskID> ancestor = tasks_.at(id).second.parent();
+        std::optional<Core::TaskID> ancestor = tasks_.at(id).second.parent();
         if (ancestor && Validate(ancestor.value()))
             tasks_.at(ancestor.value()).second.RemoveChild(id);
         for (auto const &ch: tasks_.at(id).second.children())
@@ -94,7 +94,7 @@ ActionResult TaskManager::Delete(const ProtoTask::TaskID &id, bool deleteChildre
     }
 }
 
-ActionResult TaskManager::Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) {
+ActionResult TaskManager::Edit(const Core::TaskID &id, const Core::Task &t) {
     try {
         tasks_.at(id).first = t;
         return {ActionResult::Status::SUCCESS, id};
@@ -103,7 +103,7 @@ ActionResult TaskManager::Edit(const ProtoTask::TaskID &id, const ProtoTask::Tas
     }
 }
 
-ActionResult TaskManager::Complete(const ProtoTask::TaskID &id) {
+ActionResult TaskManager::Complete(const Core::TaskID &id) {
     try {
         tasks_.at(id).first.set_is_complete(true);
     } catch (const std::out_of_range &) {
@@ -114,7 +114,7 @@ ActionResult TaskManager::Complete(const ProtoTask::TaskID &id) {
     return {ActionResult::Status::SUCCESS, id};
 }
 
-ActionResult TaskManager::Uncomplete(const ProtoTask::TaskID &id) {
+ActionResult TaskManager::Uncomplete(const Core::TaskID &id) {
     try {
         tasks_.at(id).first.set_is_complete(false);
     } catch (const std::out_of_range &) {
@@ -125,11 +125,11 @@ ActionResult TaskManager::Uncomplete(const ProtoTask::TaskID &id) {
     return {ActionResult::Status::SUCCESS, id};
 }
 
-std::pair<ProtoTask::Task, Node>& TaskManager::operator[](const ProtoTask::TaskID &id) {
+std::pair<Core::Task, Node>& TaskManager::operator[](const Core::TaskID &id) {
     return tasks_.at(id);
 }
 
-ActionResult TaskManager::Validate(const ProtoTask::TaskID &id) const{
+ActionResult TaskManager::Validate(const Core::TaskID &id) const{
     if (tasks_.find(id) != tasks_.end())
         return {ActionResult::Status::SUCCESS, id};
     else
@@ -140,8 +140,8 @@ size_t TaskManager::size() const {
     return tasks_.size();
 }
 
-ActionResult TaskManager::AddLabel(const ProtoTask::TaskID &id, const std::string &label) {
-    ProtoTask::Task t;
+ActionResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &label) {
+    Core::Task t;
     try {
         tasks_.at(id).first.set_label(label);
     } catch (const std::out_of_range &) {
@@ -150,9 +150,9 @@ ActionResult TaskManager::AddLabel(const ProtoTask::TaskID &id, const std::strin
     return {ActionResult::Status::SUCCESS, id};
 }
 
-void TaskManager::Replace(const std::vector<ProtoTask::TaskEntity> &vec) {
+void TaskManager::Replace(const std::vector<Core::TaskEntity> &vec) {
     tasks_.clear();
-    ProtoTask::TaskID max_id;
+    Core::TaskID max_id;
     max_id.set_value(0);
     for (const auto &te : vec) {
         Node n;

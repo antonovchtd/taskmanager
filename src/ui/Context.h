@@ -14,22 +14,22 @@
 
 class Context{
 public:
-    ProtoTask::Task task() const;
-    std::optional<ProtoTask::TaskID> id() const;
-    std::vector<ProtoTask::TaskEntity> tasks() const;
+    Core::Task task() const;
+    std::optional<Core::TaskID> id() const;
+    std::vector<Core::TaskEntity> tasks() const;
 
 public:
     void setTitle(const std::string &);
     void setDueDate(const time_t &);
-    void setPriority(const ProtoTask::Task::Priority &);
-    void setTask(const ProtoTask::Task &);
-    void setID(const std::optional<ProtoTask::TaskID> &);
-    void setTasks(const std::vector<ProtoTask::TaskEntity> &);
+    void setPriority(const Core::Task::Priority &);
+    void setTask(const Core::Task &);
+    void setID(const std::optional<Core::TaskID> &);
+    void setTasks(const std::vector<Core::TaskEntity> &);
 
 private:
-    ProtoTask::Task task_;
-    std::optional<ProtoTask::TaskID> id_;
-    std::vector<ProtoTask::TaskEntity> tasks_;
+    Core::Task task_;
+    std::optional<Core::TaskID> id_;
+    std::vector<Core::TaskEntity> tasks_;
 };
 
 #endif //TASKMANAGER_SRC_UI_CONTEXT_H_

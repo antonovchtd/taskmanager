@@ -7,7 +7,7 @@
 
 #include "ModelInterface.h"
 
-typedef std::map<ProtoTask::TaskID, std::pair<ProtoTask::Task, Node>> Container;
+typedef std::map<Core::TaskID, std::pair<Core::Task, Node>> Container;
 
 class TaskManager : public ModelInterface {
 public:
@@ -17,25 +17,25 @@ public:
                 const Container &tasks);
 
 public:
-    std::pair<ProtoTask::Task, Node>& operator[](const ProtoTask::TaskID &) override;
-    std::vector<ProtoTask::TaskEntity> getTasks() const override;
-    std::vector<ProtoTask::TaskEntity> getTasks(const std::string &label) const override;
-    std::vector<ProtoTask::TaskEntity> getTasks(const ProtoTask::TaskID &id) const override;
+    std::pair<Core::Task, Node>& operator[](const Core::TaskID &) override;
+    std::vector<Core::TaskEntity> getTasks() const override;
+    std::vector<Core::TaskEntity> getTasks(const std::string &label) const override;
+    std::vector<Core::TaskEntity> getTasks(const Core::TaskID &id) const override;
     std::shared_ptr<IDGenerator> gen() const override;
     size_t size() const override;
 
 public:
-    ActionResult Add(const ProtoTask::Task &) override;
-    ActionResult AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &) override;
-    ActionResult Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) override;
-    ActionResult Complete(const ProtoTask::TaskID &) override;
-    ActionResult Uncomplete(const ProtoTask::TaskID &) override;
-    ActionResult Delete(const ProtoTask::TaskID &id, bool deleteChildren) override;
-    ActionResult Validate(const ProtoTask::TaskID &id) const override;
-    ActionResult AddLabel(const ProtoTask::TaskID &, const std::string &) override;
+    ActionResult Add(const Core::Task &) override;
+    ActionResult AddSubtask(const Core::Task &, const Core::TaskID &) override;
+    ActionResult Edit(const Core::TaskID &id, const Core::Task &t) override;
+    ActionResult Complete(const Core::TaskID &) override;
+    ActionResult Uncomplete(const Core::TaskID &) override;
+    ActionResult Delete(const Core::TaskID &id, bool deleteChildren) override;
+    ActionResult Validate(const Core::TaskID &id) const override;
+    ActionResult AddLabel(const Core::TaskID &, const std::string &) override;
 
 public:
-    void Replace(const std::vector<ProtoTask::TaskEntity> &) override;
+    void Replace(const std::vector<Core::TaskEntity> &) override;
 
 private:
     Container tasks_;
