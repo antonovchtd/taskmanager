@@ -289,7 +289,7 @@ TEST_F(TaskManagerTest, shouldUncompleteTask)
     t.set_label("label");
     t.set_is_complete(true);
     Core::TaskID id = *tm.Add(t).id;
-    tm.Unomplete(id);
+    tm.Uncomplete(id);
     EXPECT_FALSE(tm[id].first.is_complete());
 }
 

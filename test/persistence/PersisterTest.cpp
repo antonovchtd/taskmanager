@@ -58,6 +58,6 @@ TEST_F(PersisterTest, shouldFailedToLoadNonExistingFile)
 {
     auto tm = std::make_shared<TaskManager>();
     std::string filename = "Missing.bin";
-    FilePersistence p;
-    EXPECT_FALSE(p.load(filename, tm));
+    FilePersistence p{filename};
+    EXPECT_FALSE(p.load(tm->getTasks()));
 }

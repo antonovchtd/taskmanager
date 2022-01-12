@@ -16,7 +16,6 @@
 #include "Task.pb.h"
 #include "model/Node.h"
 #include "io/AbstractReader.h"
-#include "io/FileReader.h"
 #include "io/AbstractPrinter.h"
 
 class StepSwitcher;

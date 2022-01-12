@@ -54,8 +54,18 @@ std::shared_ptr<Step> HomeStep::execute(Context &c, const std::shared_ptr<Factor
 }
 
 std::shared_ptr<Step> HelpStep::execute(Context &c, const std::shared_ptr<Factory> &f) {
-    FileReader fr("../src/model/help.txt");
-    f->printer()->print(fr.read(""));
+    std::string filename{"../src/model/help.txt"};
+    std::ifstream file(filename);
+    std::ostringstream os;
+    std::string line;
+    if (file.is_open()) {
+        while (getline(file, line))
+            os << line << "\n";
+        file.close();
+    } else {
+        os << "Failed to open file " + filename << std::endl;
+    }
+    f->printer()->print(os.str());
     return StepSwitcher::nextStep(*this, f);
 }
 
