@@ -12,13 +12,9 @@
 #include <utility>
 #include <fstream>
 
-#include "IDGenerator.h"
 #include "Task.pb.h"
-#include "utilities/TaskIDUtils.h"
-#include "utilities/TaskUtils.h"
-#include "utilities/NodeUtils.h"
 #include "utilities/ActionResult.h"
-#include "persistence/Persister.h"
+class IDGenerator;
 
 class ModelInterface {
 public:

@@ -5,7 +5,11 @@
 #ifndef TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 #define TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 
+#include "utilities/TaskIDUtils.h"
+#include "utilities/TaskUtils.h"
+#include "utilities/NodeUtils.h"
 #include "ModelInterface.h"
+#include "IDGenerator.h"
 
 typedef std::map<Core::TaskID, std::pair<Core::Task, Node>> Container;
 
