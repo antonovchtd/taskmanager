@@ -323,7 +323,7 @@ TEST_F(TaskManagerTest, shouldAddLabel){
     t.set_is_complete(false);
     ProtoTask::TaskID id = *tm.Add(t).id;
     std::string label = "testing";
-    tm.SetLabel(id, label);
+    tm.AddLabel(id, label);
     EXPECT_EQ(label, tm[id].first.label());
 }
 
@@ -339,7 +339,7 @@ TEST_F(TaskManagerTest, shouldFailToAddLabelWithWrongID){
     ProtoTask::TaskID id = *tm.Add(t).id;
     std::string label = "testing";
     id.set_value(id.value()+1);
-    ActionResult result = tm.SetLabel(id, label);
+    ActionResult result = tm.AddLabel(id, label);
     EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_EQ(*result.id, id);
 }
@@ -415,7 +415,7 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
     ProtoTask::TaskID id3 = *tm.AddSubtask(t, id1).id;
 
     std::string label = "testing";
-    tm.SetLabel(id2, label);
+    tm.AddLabel(id2, label);
     auto tasks = tm.getTasks(label);
     ASSERT_EQ(1, tasks.size());
     EXPECT_EQ(tm[id2].first, tasks.at(id2).first);

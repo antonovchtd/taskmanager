@@ -28,10 +28,11 @@ public:
     ActionResult Add(const ProtoTask::Task &) override;
     ActionResult AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &) override;
     ActionResult Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) override;
-    ActionResult SetComplete(const ProtoTask::TaskID &, bool) override;
+    ActionResult Complete(const ProtoTask::TaskID &) override;
+    ActionResult Uncomplete(const ProtoTask::TaskID &) override;
     ActionResult Delete(const ProtoTask::TaskID &id, bool deleteChildren) override;
     ActionResult Validate(const ProtoTask::TaskID &id) const override;
-    ActionResult SetLabel(const ProtoTask::TaskID &, const std::string &) override;
+    ActionResult AddLabel(const ProtoTask::TaskID &, const std::string &) override;
 
 public:
     void Replace(const std::vector<ProtoTask::TaskEntity> &) override;

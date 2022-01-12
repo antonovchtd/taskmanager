@@ -96,11 +96,11 @@ ActionResult Controller::ShowTasks(Context &context) {
 }
 
 ActionResult Controller::CompleteTask(Context &context) {
-    return model_->SetComplete(*context.id(), true);
+    return model_->Complete(*context.id());
 }
 
 ActionResult Controller::UncompleteTask(Context &context) {
-    return model_->SetComplete(*context.id(), false);
+    return model_->Uncomplete(*context.id());
 }
 
 ActionResult Controller::DeleteTask(Context &context) {
@@ -117,7 +117,7 @@ ActionResult Controller::ReadTaskWithChildren(Context &context) {
 }
 
 ActionResult Controller::LabelTask(Context &context) {
-    return model_->SetLabel(*context.id(), data().arg);
+    return model_->AddLabel(*context.id(), data().arg);
 }
 
 ActionResult Controller::SaveTasks(Context &context) {

@@ -18,7 +18,7 @@
 #include "utilities/TaskIDUtils.h"
 #include "utilities/TaskUtils.h"
 #include "utilities/NodeUtils.h"
-#include "ActionResult.h"
+#include "utilities/ActionResult.h"
 #include "persistence/Persister.h"
 
 class ModelInterface {
@@ -34,10 +34,11 @@ public:
     virtual ActionResult Add(const ProtoTask::Task &) = 0;
     virtual ActionResult AddSubtask(const ProtoTask::Task &, const ProtoTask::TaskID &) = 0;
     virtual ActionResult Edit(const ProtoTask::TaskID &id, const ProtoTask::Task &t) = 0;
-    virtual ActionResult SetComplete(const ProtoTask::TaskID &, bool) = 0;
-    virtual ActionResult Delete(const ProtoTask::TaskID &id, bool deleteChildren) = 0;
-    virtual ActionResult Validate(const ProtoTask::TaskID &id) const = 0;
-    virtual ActionResult SetLabel(const ProtoTask::TaskID &, const std::string &) = 0;
+    virtual ActionResult Complete(const ProtoTask::TaskID &) = 0;
+    virtual ActionResult Uncomplete(const ProtoTask::TaskID &) = 0;
+    virtual ActionResult Delete(const ProtoTask::TaskID &, bool deleteChildren) = 0;
+    virtual ActionResult Validate(const ProtoTask::TaskID &) const = 0;
+    virtual ActionResult AddLabel(const ProtoTask::TaskID &, const std::string &label) = 0;
 
 public:
     virtual void Replace(const std::vector<ProtoTask::TaskEntity> &) = 0;

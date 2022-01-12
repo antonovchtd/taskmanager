@@ -103,14 +103,25 @@ ActionResult TaskManager::Edit(const ProtoTask::TaskID &id, const ProtoTask::Tas
     }
 }
 
-ActionResult TaskManager::SetComplete(const ProtoTask::TaskID &id, bool flag) {
+ActionResult TaskManager::Complete(const ProtoTask::TaskID &id) {
     try {
-        tasks_.at(id).first.set_is_complete(flag);
+        tasks_.at(id).first.set_is_complete(true);
     } catch (const std::out_of_range &) {
         return {ActionResult::Status::ID_NOT_FOUND, id};
     }
     for (auto const &ch : tasks_.at(id).second.children())
-        SetComplete(ch, flag);
+        Complete(ch);
+    return {ActionResult::Status::SUCCESS, id};
+}
+
+ActionResult TaskManager::Uncomplete(const ProtoTask::TaskID &id) {
+    try {
+        tasks_.at(id).first.set_is_complete(false);
+    } catch (const std::out_of_range &) {
+        return {ActionResult::Status::ID_NOT_FOUND, id};
+    }
+    for (auto const &ch : tasks_.at(id).second.children())
+        Uncomplete(ch);
     return {ActionResult::Status::SUCCESS, id};
 }
 
@@ -129,7 +140,7 @@ size_t TaskManager::size() const {
     return tasks_.size();
 }
 
-ActionResult TaskManager::SetLabel(const ProtoTask::TaskID &id, const std::string &label) {
+ActionResult TaskManager::AddLabel(const ProtoTask::TaskID &id, const std::string &label) {
     ProtoTask::Task t;
     try {
         tasks_.at(id).first.set_label(label);
