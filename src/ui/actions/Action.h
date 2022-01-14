@@ -12,7 +12,7 @@ class Context;
 
 class Action {
 public:
-    virtual ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) = 0;
+    virtual ActionResult execute(const std::shared_ptr<ModelInterface> &) = 0;
     virtual ~Action() = default;
 };
 

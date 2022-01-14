@@ -3,9 +3,10 @@
 //
 
 #include "DeleteStep.h"
+#include "ui/Context.h"
 
-std::unique_ptr<Action> DeleteStep::genAction(Context &) {
-    return std::unique_ptr<Action>(new DeleteTaskAction);
+std::unique_ptr<Action> DeleteStep::genAction(Context &context) {
+    return std::unique_ptr<Action>(new DeleteTaskAction(*context.id()));
 }
 
 std::shared_ptr<Step> DeleteStep::genNextStep(const ActionResult &result, const std::shared_ptr<Factory> &factory) {
