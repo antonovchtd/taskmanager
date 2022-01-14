@@ -4,6 +4,6 @@
 
 #include "DoNothingAction.h"
 
-ActionResult DoNothingAction::execute(Context &, const std::shared_ptr<ModelInterface> &) {
+ActionResult DoNothingAction::execute(const std::shared_ptr<ModelInterface> &) {
     return {ActionResult::Status::SUCCESS, std::nullopt};
 }

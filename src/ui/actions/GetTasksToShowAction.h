@@ -7,13 +7,13 @@
 
 #include "Action.h"
 
-class ShowTasksAction : public Action {
+class GetTasksToShowAction : public Action {
 public:
-    ShowTasksAction();
-    ShowTasksAction(const std::string &arg);
+    GetTasksToShowAction();
+    GetTasksToShowAction(const std::string &arg);
 
 public:
-    ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) override;
+    ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
 
 private:
     std::string arg_;

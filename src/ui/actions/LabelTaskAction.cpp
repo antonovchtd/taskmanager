@@ -5,9 +5,10 @@
 #include "LabelTaskAction.h"
 #include "ui/Context.h"
 
-LabelTaskAction::LabelTaskAction(const std::string &label) : label_{label} {
+LabelTaskAction::LabelTaskAction(const Core::TaskID &id, const std::string &label) :
+                 id_{id}, label_{label} {
 }
 
-ActionResult LabelTaskAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
-    return model->AddLabel(*context.id(), label_);
+ActionResult LabelTaskAction::execute(const std::shared_ptr<ModelInterface> &model) {
+    return model->AddLabel(id_, label_);
 }

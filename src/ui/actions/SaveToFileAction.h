@@ -13,7 +13,7 @@ public:
     SaveToFileAction(const std::string &filename);
 
 public:
-    ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) override;
+    ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
 
 private:
     std::string filename_;

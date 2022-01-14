@@ -10,6 +10,8 @@
 class DeleteTaskAction : public Action {
 public:
     DeleteTaskAction(const Core::TaskID &);
+
+public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
 
 private:

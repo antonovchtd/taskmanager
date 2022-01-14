@@ -4,8 +4,8 @@
 
 #include "AddSubtaskAction.h"
 
-AddSubtaskAction::AddSubtaskAction(const Core::Task &task, const Core::TaskID &id) :
-                  task_{task}, id_{id} {
+AddSubtaskAction::AddSubtaskAction(const Core::TaskID &id, const Core::Task &task) :
+                  id_{id}, task_{task} {
 }
 
 ActionResult AddSubtaskAction::execute(const std::shared_ptr<ModelInterface> &model) {

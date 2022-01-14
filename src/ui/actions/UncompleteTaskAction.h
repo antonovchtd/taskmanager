@@ -9,7 +9,13 @@
 
 class UncompleteTaskAction : public Action {
 public:
-    ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) override;
+    UncompleteTaskAction(const Core::TaskID &);
+
+public:
+    ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
+
+private:
+    Core::TaskID id_;
 };
 
 

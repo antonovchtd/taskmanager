@@ -3,10 +3,11 @@
 //
 
 #include "LabelStep.h"
+#include "ui/Context.h"
 
-std::unique_ptr<Action> LabelStep::genAction(Context &) {
+std::unique_ptr<Action> LabelStep::genAction(Context &context) {
     std::string label = readLabel();
-    return std::unique_ptr<Action>(new LabelTaskAction(label));
+    return std::unique_ptr<Action>(new LabelTaskAction(*context.id(), label));
 }
 
 std::shared_ptr<Step> LabelStep::genNextStep(const ActionResult &result, const std::shared_ptr<Factory> &factory) {

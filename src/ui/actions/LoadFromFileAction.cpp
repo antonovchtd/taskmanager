@@ -9,7 +9,7 @@
 LoadFromFileAction::LoadFromFileAction(const std::string &filename) : filename_{filename} {
 }
 
-ActionResult LoadFromFileAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
+ActionResult LoadFromFileAction::execute(const std::shared_ptr<ModelInterface> &model) {
     persister_ = std::unique_ptr<Persister>(new FilePersistence{filename_});
     std::vector<Core::TaskEntity> data;
     if (persister_->load(data)) {
