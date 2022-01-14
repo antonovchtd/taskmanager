@@ -5,25 +5,17 @@
 #include "Factory.h"
 #include "Step.h"
 #include "Machine.h"
+#include "Context.h"
 
 Factory::Factory() :
         reader_(std::shared_ptr<AbstractReader>(new ConsoleReader)),
-        printer_(std::shared_ptr<AbstractPrinter>(new ConsolePrinter)),
-        controller_(std::shared_ptr<ControllerInterface>(new Controller))  {
+        printer_(std::shared_ptr<AbstractPrinter>(new ConsolePrinter)) {
 
 }
 
 Factory::Factory(const std::shared_ptr<AbstractReader> &reader,
                  const std::shared_ptr<AbstractPrinter> &printer) :
-         reader_(reader), printer_(printer),
-         controller_(std::shared_ptr<ControllerInterface>(new Controller)) {
-
-}
-
-Factory::Factory(const std::shared_ptr<AbstractReader> &reader,
-        const std::shared_ptr<AbstractPrinter> &printer,
-        const std::shared_ptr<ControllerInterface> &controller) :
-        reader_(reader), printer_(printer), controller_(controller) {
+         reader_(reader), printer_(printer) {
 
 }
 
@@ -36,22 +28,12 @@ std::shared_ptr<Factory> Factory::create(const std::shared_ptr<AbstractReader> &
     return std::shared_ptr<Factory>(new Factory(reader, printer));
 }
 
-std::shared_ptr<Factory> Factory::create(const std::shared_ptr<AbstractReader> &reader,
-                                         const std::shared_ptr<AbstractPrinter> &printer,
-                                         const std::shared_ptr<ControllerInterface> &controller) {
-    return std::shared_ptr<Factory>(new Factory(reader, printer, controller));
-}
-
 std::shared_ptr<AbstractPrinter> Factory::printer() const {
     return printer_;
 }
 
 std::shared_ptr<AbstractReader> Factory::reader() const {
     return reader_;
-}
-
-std::shared_ptr<ControllerInterface> Factory::controller() const {
-    return controller_;
 }
 
 std::shared_ptr<Step> Factory::createStep(const std::string &command) {
