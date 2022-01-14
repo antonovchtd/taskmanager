@@ -9,7 +9,14 @@
 
 class AddSubtaskAction : public Action {
 public:
-    ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) override;
+    AddSubtaskAction(const Core::TaskID &, const Core::Task &);
+
+public:
+    ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
+
+private:
+    Core::TaskID id_;
+    Core::Task task_;
 };
 
 

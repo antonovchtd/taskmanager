@@ -4,12 +4,11 @@
 
 #include "SaveToFileAction.h"
 #include "persistence/FilePersistence.h"
-#include "ui/Context.h"
 
 SaveToFileAction::SaveToFileAction(const std::string &filename) : filename_{filename} {
 }
 
-ActionResult SaveToFileAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
+ActionResult SaveToFileAction::execute(const std::shared_ptr<ModelInterface> &model) {
     persister_ = std::unique_ptr<Persister>(new FilePersistence{filename_});
     if (persister_->save(model->getTasks()))
         return {ActionResult::Status::SUCCESS, std::nullopt};

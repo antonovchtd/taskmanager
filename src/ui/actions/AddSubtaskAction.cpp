@@ -3,8 +3,11 @@
 //
 
 #include "AddSubtaskAction.h"
-#include "ui/Context.h"
 
-ActionResult AddSubtaskAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
-    return model->AddSubtask(context.task(), *context.id());
+AddSubtaskAction::AddSubtaskAction(const Core::TaskID &id, const Core::Task &task) :
+                  id_{id}, task_{task} {
+}
+
+ActionResult AddSubtaskAction::execute(const std::shared_ptr<ModelInterface> &model) {
+    return model->AddSubtask(task_, id_);
 }

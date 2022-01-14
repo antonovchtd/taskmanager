@@ -10,10 +10,8 @@
 #include "Step.h"
 #include "utilities/StepUtils.h"
 #include "ui/actions/ValidateIDAction.h"
-#include "ui/actions/ValidateAlphaOrIDAction.h"
-#include "ui/actions/ValidateAlphaAction.h"
 #include "ui/actions/ValidateNoArgAction.h"
-#include "ui/actions/ShowTasksAction.h"
+#include "ui/actions/GetTasksToShowAction.h"
 #include "ui/actions/LoadFromFileAction.h"
 #include "ui/actions/SaveToFileAction.h"
 

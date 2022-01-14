@@ -3,8 +3,10 @@
 //
 
 #include "UncompleteTaskAction.h"
-#include "ui/Context.h"
 
-ActionResult UncompleteTaskAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
-    return model->Uncomplete(*context.id());
+UncompleteTaskAction::UncompleteTaskAction(const Core::TaskID &id) : id_{id} {
+}
+
+ActionResult UncompleteTaskAction::execute(const std::shared_ptr<ModelInterface> &model) {
+    return model->Uncomplete(id_);
 }

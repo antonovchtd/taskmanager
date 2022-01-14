@@ -19,7 +19,7 @@ std::unique_ptr<Action> HomeStep::genAction(Context &) {
         command_ == "uncomplete" || command_ == "label") {
         return std::unique_ptr<Action>(new ValidateIDAction(arg));
     } else if (command_ == "show") {
-        return std::unique_ptr<Action>(new ShowTasksAction(arg));
+        return std::unique_ptr<Action>(new GetTasksToShowAction(arg));
     } else if (command_ == "save") {
         return std::unique_ptr<Action>(new SaveToFileAction(arg));
     } else if (command_ == "load") {

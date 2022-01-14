@@ -15,9 +15,8 @@ AddStep::AddStep(std::shared_ptr<AbstractReader> reader,
 std::unique_ptr<Action> AddStep::genAction(Context &context) {
     printer()->print("[Add Task]\n");
     Context input_context = submachine_.run();
-    context.setTask(input_context.task());
 
-    return std::unique_ptr<Action>(new AddTaskAction);
+    return std::unique_ptr<Action>(new AddTaskAction(input_context.task()));
 }
 
 std::shared_ptr<Step> AddStep::genNextStep(const ActionResult &result, const std::shared_ptr<Factory> &factory) {

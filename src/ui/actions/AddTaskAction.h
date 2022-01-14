@@ -9,7 +9,13 @@
 
 class AddTaskAction : public Action {
 public:
-    ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) override;
+    AddTaskAction(const Core::Task &);
+
+public:
+    ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
+
+private:
+    Core::Task task_;
 };
 
 #endif //TASKMANAGER_SRC_UI_ACTIONS_ADDTASKACTION_H_

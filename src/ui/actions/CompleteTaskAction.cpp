@@ -3,8 +3,10 @@
 //
 
 #include "CompleteTaskAction.h"
-#include "ui/Context.h"
 
-ActionResult CompleteTaskAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
-    return model->Complete(*context.id());
+CompleteTaskAction::CompleteTaskAction(const Core::TaskID &id) : id_{id} {
+}
+
+ActionResult CompleteTaskAction::execute(const std::shared_ptr<ModelInterface> &model) {
+    return model->Complete(id_);
 }

@@ -3,9 +3,10 @@
 //
 
 #include "ConfirmDeleteStep.h"
+#include "ui/Context.h"
 
 std::unique_ptr<Action> ConfirmDeleteStep::genAction(Context &) {
-    return std::unique_ptr<Action>(new ReadTaskWithChildrenAction);
+    return std::unique_ptr<Action>(new DoNothingAction);
 }
 
 std::shared_ptr<Step> ConfirmDeleteStep::genNextStep(const ActionResult &result, const std::shared_ptr<Factory> &factory) {

@@ -9,12 +9,13 @@
 
 class LabelTaskAction : public Action {
 public:
-    LabelTaskAction(const std::string &label);
+    LabelTaskAction(const Core::TaskID &, const std::string &label);
 
 public:
-    ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) override;
+    ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
 
 private:
+    Core::TaskID id_;
     std::string label_;
 };
 

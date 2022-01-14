@@ -4,6 +4,26 @@
 
 #include "ActionResult.h"
 
+ActionResult::ActionResult(Status s, const std::optional<Core::TaskID> &tid) :
+              status{s}, id{tid}, type_id{kID} {
+}
+
+ActionResult::ActionResult(Status s, const std::vector<Core::TaskEntity> &vec) :
+              status{s}, tasks{vec}, type_id{kEntity} {
+
+}
+
+ActionResult::~ActionResult() {
+    switch (type_id) {
+        case kID:
+            if (id)
+                id->Core::TaskID::~TaskID();
+            break;
+        case kEntity:
+            break;
+    }
+}
+
 ActionResult::operator bool() const {
     return status == ActionResult::Status::SUCCESS;
 }

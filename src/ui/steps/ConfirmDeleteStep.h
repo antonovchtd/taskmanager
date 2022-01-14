@@ -7,7 +7,7 @@
 
 #include "Step.h"
 #include "utilities/StepUtils.h"
-#include "ui/actions/ReadTaskWithChildrenAction.h"
+#include "ui/actions/DoNothingAction.h"
 
 class ConfirmDeleteStep : public Step {
 public:

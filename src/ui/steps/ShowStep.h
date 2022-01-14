@@ -19,7 +19,7 @@ public:
 
 public:
     void recursivePrint(const Core::TaskEntity &,
-                        const Context &,
+                        const std::vector<Core::TaskEntity> &,
                         const std::string &prefix);
 };
 

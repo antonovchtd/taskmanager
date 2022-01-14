@@ -9,7 +9,13 @@
 
 class CompleteTaskAction : public Action {
 public:
-    ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) override;
+    CompleteTaskAction(const Core::TaskID &);
+
+public:
+    ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
+
+private:
+    Core::TaskID id_;
 };
 
 

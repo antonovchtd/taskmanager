@@ -9,7 +9,12 @@
 
 class EditTaskAction : public Action {
 public:
-    ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) override;
+    EditTaskAction(const Core::Task &, const Core::TaskID &);
+    ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
+
+private:
+    Core::Task task_;
+    Core::TaskID id_;
 };
 
 

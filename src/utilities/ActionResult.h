@@ -24,11 +24,24 @@ struct ActionResult {
         TAKES_ALPHA
     };
 
+public:
+    ActionResult(Status, const std::optional<Core::TaskID> &);
+    ActionResult(Status, const std::vector<Core::TaskEntity> &);
+
+public:
     explicit operator bool() const;
     std::string message() const;
 
+public:
     Status status;
-    std::optional<Core::TaskID> id;
+    union {
+        std::optional<Core::TaskID> id;
+        std::vector<Core::TaskEntity> tasks;
+    };
+    enum {kID, kEntity} type_id;
+
+public:
+    ~ActionResult();
 };
 
 #endif //TASKMANAGER_SRC_MODEL_ACTIONRESULT_H_
