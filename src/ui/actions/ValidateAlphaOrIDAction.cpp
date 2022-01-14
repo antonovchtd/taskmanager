@@ -3,6 +3,7 @@
 //
 
 #include "ValidateAlphaOrIDAction.h"
+#include "ui/Context.h"
 
 ValidateAlphaOrIDAction::ValidateAlphaOrIDAction(const std::string &arg) : arg_{arg} {
 }

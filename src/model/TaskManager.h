@@ -10,6 +10,7 @@
 #include "utilities/NodeUtils.h"
 #include "ModelInterface.h"
 #include "IDGenerator.h"
+#include "Node.h"
 
 typedef std::map<Core::TaskID, std::pair<Core::Task, Node>> Container;
 

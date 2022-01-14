@@ -4,6 +4,7 @@
 
 #include "SaveToFileAction.h"
 #include "persistence/FilePersistence.h"
+#include "ui/Context.h"
 
 SaveToFileAction::SaveToFileAction(const std::string &filename) : filename_{filename} {
 }

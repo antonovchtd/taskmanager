@@ -3,6 +3,7 @@
 //
 
 #include "ValidateNoArgAction.h"
+#include "ui/Context.h"
 
 ValidateNoArgAction::ValidateNoArgAction(const std::string &arg) : arg_{arg} {
 }

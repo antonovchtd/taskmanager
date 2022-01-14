@@ -3,6 +3,7 @@
 //
 
 #include "ShowTasksAction.h"
+#include "ui/Context.h"
 
 ShowTasksAction::ShowTasksAction() = default;
 
@@ -10,14 +11,24 @@ ShowTasksAction::ShowTasksAction(const std::string &arg) : arg_{arg} {
 }
 
 ActionResult ShowTasksAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
-    if (arg_.empty())
-        context.setTasks(model->getTasks());
-    else if (context.id()) {
-        context.setTasks(model->getTasks(*context.id()));
-        return {ActionResult::Status::SUCCESS, *context.id()};
+    Core::TaskID id;
+    try {
+        id.set_value(std::stoi(arg_));
+        if(model->Validate(id))
+            context.setID(id);
+    } catch (const std::invalid_argument &) {
+        context.setID(std::nullopt);
     }
-    else
-        context.setTasks(model->getTasks(arg_));
 
-    return {ActionResult::Status::SUCCESS, std::nullopt};
+    std::vector<Core::TaskEntity> tasks;
+    if (arg_.empty())
+        tasks = model->getTasks();
+    else if (context.id())
+        tasks = model->getTasks(*context.id());
+    else
+        tasks = model->getTasks(arg_);
+
+    context.setTasks(tasks);
+
+    return {ActionResult::Status::SUCCESS, context.id()};
 }

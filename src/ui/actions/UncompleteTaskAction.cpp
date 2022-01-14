@@ -3,6 +3,7 @@
 //
 
 #include "UncompleteTaskAction.h"
+#include "ui/Context.h"
 
 ActionResult UncompleteTaskAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
     return model->Uncomplete(*context.id());

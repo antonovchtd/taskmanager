@@ -4,6 +4,7 @@
 
 #include "LoadFromFileAction.h"
 #include "persistence/FilePersistence.h"
+#include "ui/Context.h"
 
 LoadFromFileAction::LoadFromFileAction(const std::string &filename) : filename_{filename} {
 }

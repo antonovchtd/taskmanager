@@ -14,9 +14,9 @@
 #include "io/AbstractPrinter.h"
 #include "io/ConsolePrinter.h"
 
-class Step;
 class Machine;
 class Context;
+class Step;
 
 class Factory : public std::enable_shared_from_this<Factory> {
 public:
@@ -33,9 +33,7 @@ public:
         UNCOMPLETE,
         DELETE,
         CONFIRMDELETE,
-        LABEL,
-        SAVE,
-        LOAD
+        LABEL
     };
 
 public:
@@ -55,7 +53,6 @@ public:
     std::shared_ptr<Step> lazyInitStep(const State &state);
 
     Machine createMachine(const State &state);
-    Machine createMachine(const State &state, const Context &context);
 
 public:
     std::shared_ptr<AbstractReader> reader() const;

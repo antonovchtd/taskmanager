@@ -3,7 +3,6 @@
 //
 
 #include "TaskManager.h"
-#include "Node.h"
 
 TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator)) {
 }

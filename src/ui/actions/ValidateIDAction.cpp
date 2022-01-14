@@ -3,6 +3,7 @@
 //
 
 #include "ValidateIDAction.h"
+#include "ui/Context.h"
 
 ValidateIDAction::ValidateIDAction(const std::string &arg) : arg_{arg} {
 }
@@ -14,7 +15,10 @@ ActionResult ValidateIDAction::execute(Context &context, const std::shared_ptr<M
     try {
         id.set_value(std::stoi(arg_));
         context.setID(id);
-        return model->Validate(id);
+        auto result = model->Validate(id);
+        if (result)
+            context.setTask(model->getTasks(id)[0].data());
+        return result;
     } catch (const std::invalid_argument &) {
         context.setID(std::nullopt);
         return {ActionResult::Status::TAKES_ID, std::nullopt};

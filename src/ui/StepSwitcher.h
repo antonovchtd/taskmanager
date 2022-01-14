@@ -5,8 +5,24 @@
 #ifndef TASKMANAGER_SRC_UI_STEPSWITCHER_H_
 #define TASKMANAGER_SRC_UI_STEPSWITCHER_H_
 
-#include "Step.h"
-#include "Factory.h"
+#include <memory>
+
+class Factory;
+class Step;
+class HomeStep;
+class HelpStep;
+class AddStep;
+class ReadTaskDataStep;
+class SubtaskStep;
+class EditStep;
+class QuitStep;
+class ShowStep;
+class CompleteStep;
+class UncompleteStep;
+class DeleteStep;
+class DeleteStep;
+class ConfirmDeleteStep;
+class LabelStep;
 
 class StepSwitcher {
 public:
@@ -23,8 +39,6 @@ public:
     static std::shared_ptr<Step> nextStep(const DeleteStep &, const std::shared_ptr<Factory> &);
     static std::shared_ptr<Step> nextStep(const ConfirmDeleteStep &, const std::shared_ptr<Factory> &);
     static std::shared_ptr<Step> nextStep(const LabelStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const SaveStep &, const std::shared_ptr<Factory> &);
-    static std::shared_ptr<Step> nextStep(const LoadStep &, const std::shared_ptr<Factory> &);
 };
 
 #endif //TASKMANAGER_SRC_UI_STEPSWITCHER_H_

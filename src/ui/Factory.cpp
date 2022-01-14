@@ -3,7 +3,20 @@
 //
 
 #include "Factory.h"
-#include "Step.h"
+#include "ui/steps/Step.h"
+#include "ui/steps/HomeStep.h"
+#include "ui/steps/HelpStep.h"
+#include "ui/steps/AddStep.h"
+#include "ui/steps/ReadTaskDataStep.h"
+#include "ui/steps/SubtaskStep.h"
+#include "ui/steps/EditStep.h"
+#include "ui/steps/QuitStep.h"
+#include "ui/steps/ShowStep.h"
+#include "ui/steps/CompleteStep.h"
+#include "ui/steps/UncompleteStep.h"
+#include "ui/steps/DeleteStep.h"
+#include "ui/steps/ConfirmDeleteStep.h"
+#include "ui/steps/LabelStep.h"
 #include "Machine.h"
 #include "Context.h"
 
@@ -58,9 +71,9 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
     } else if (command == "label") {
         return lazyInitStep(Factory::State::LABEL);
     } else if (command == "save") {
-        return lazyInitStep(Factory::State::SAVE);
+        return lazyInitStep(Factory::State::HOME);
     } else if (command == "load") {
-        return lazyInitStep(Factory::State::LOAD);
+        return lazyInitStep(Factory::State::HOME);
     } else {
         if (!command.empty())
             printer()->print("Wrong command. Try again. Type `help` for help.\n");
@@ -72,42 +85,34 @@ Machine Factory::createMachine(const State &state) {
     return {shared_from_this(), state};
 }
 
-Machine Factory::createMachine(const State &state, const Context &context) {
-    return {shared_from_this(), state, context};
-}
-
 std::shared_ptr<Step> Factory::getNewStep(const State &s) {
     switch (s) {
         case State::HOME:
-            return std::shared_ptr<HomeStep>{new HomeStep};
+            return std::shared_ptr<HomeStep>{new HomeStep(reader(), printer())};
         case State::HELP:
-            return std::shared_ptr<HelpStep>{new HelpStep};
+            return std::shared_ptr<HelpStep>{new HelpStep(reader(), printer())};
         case State::ADD:
-            return std::shared_ptr<AddStep>{new AddStep};
+            return std::shared_ptr<AddStep>{new AddStep(reader(), printer(), Factory::createMachine(State::READTASK))};
         case State::SUBTASK:
-            return std::shared_ptr<SubtaskStep>{new SubtaskStep};
+            return std::shared_ptr<SubtaskStep>{new SubtaskStep(reader(), printer(), Factory::createMachine(State::READTASK))};
         case State::READTASK:
-            return std::shared_ptr<ReadTaskDataStep>{new ReadTaskDataStep};
+            return std::shared_ptr<ReadTaskDataStep>{new ReadTaskDataStep(reader(), printer())};
         case State::EDIT:
-            return std::shared_ptr<EditStep>{new EditStep};
+            return std::shared_ptr<EditStep>{new EditStep(reader(), printer(), Factory::createMachine(State::READTASK))};
         case State::QUIT:
-            return std::shared_ptr<QuitStep>{new QuitStep};
+            return std::shared_ptr<QuitStep>{new QuitStep(reader(), printer())};
         case State::SHOW:
-            return std::shared_ptr<ShowStep>{new ShowStep};
+            return std::shared_ptr<ShowStep>{new ShowStep(reader(), printer())};
         case State::COMPLETE:
-            return std::shared_ptr<CompleteStep>{new CompleteStep};
+            return std::shared_ptr<CompleteStep>{new CompleteStep(reader(), printer())};
         case State::UNCOMPLETE:
-            return std::shared_ptr<UncompleteStep>{new UncompleteStep};
+            return std::shared_ptr<UncompleteStep>{new UncompleteStep(reader(), printer())};
         case State::DELETE:
-            return std::shared_ptr<DeleteStep>{new DeleteStep};
+            return std::shared_ptr<DeleteStep>{new DeleteStep(reader(), printer())};
         case State::CONFIRMDELETE:
-            return std::shared_ptr<ConfirmDeleteStep>{new ConfirmDeleteStep};
+            return std::shared_ptr<ConfirmDeleteStep>{new ConfirmDeleteStep(reader(), printer())};
         case State::LABEL:
-            return std::shared_ptr<LabelStep>{new LabelStep};
-        case State::SAVE:
-            return std::shared_ptr<SaveStep>{new SaveStep};
-        case State::LOAD:
-            return std::shared_ptr<LoadStep>{new LoadStep};
+            return std::shared_ptr<LabelStep>{new LabelStep(reader(), printer())};
     }
 }
 

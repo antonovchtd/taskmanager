@@ -3,6 +3,7 @@
 //
 
 #include "ReadTaskWithChildrenAction.h"
+#include "ui/Context.h"
 
 ActionResult ReadTaskWithChildrenAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
     try {

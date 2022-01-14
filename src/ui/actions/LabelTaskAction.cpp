@@ -3,6 +3,7 @@
 //
 
 #include "LabelTaskAction.h"
+#include "ui/Context.h"
 
 LabelTaskAction::LabelTaskAction(const std::string &label) : label_{label} {
 }

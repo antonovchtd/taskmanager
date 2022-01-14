@@ -4,22 +4,27 @@
 
 #include "Machine.h"
 
-Machine::Machine() : initial_step_{Factory::State::HOME} {
+Machine::Machine() : initial_step_{Factory::State::HOME},
+                     model_{std::shared_ptr<ModelInterface>(new TaskManager)} {
     factory_ = Factory::create();
 }
 
-Machine::Machine(const std::shared_ptr<Factory> &f, const Factory::State &s) : factory_{f}, initial_step_{s} {
-}
-
-Machine::Machine(const std::shared_ptr<Factory> &f, const Factory::State &s, const Context &c) :
-                 factory_{f}, initial_step_{s}, context_{c} {
+Machine::Machine(const std::shared_ptr<Factory> &f, const Factory::State &s) :
+        factory_{f}, initial_step_{s},
+        model_{std::shared_ptr<ModelInterface>(new TaskManager)} {
 }
 
 Context Machine::run() {
+    return run(context_);
+}
+
+Context Machine::run(Context &context) {
 
     auto step = factory_->lazyInitStep(initial_step_);
     while (step){
-        step = step->execute(context_, factory_);
+        auto action = step->genAction(context);
+        auto result = action->execute(context, model_);
+        step = step->genNextStep(result, factory_);
     }
-    return context_;
+    return context;
 }
