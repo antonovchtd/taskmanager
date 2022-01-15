@@ -19,7 +19,7 @@ public:
 
 public:
     Context run();
-    Context run(Context &context);
+    Context run(const Context &context);
 
 private:
     Context context_;

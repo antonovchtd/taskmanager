@@ -9,6 +9,7 @@
 #include "utilities/StepUtils.h"
 #include "utilities/TaskUtils.h"
 #include "utilities/TaskIDUtils.h"
+#include "ui/actions/GetTasksToShowAction.h"
 #include "ui/actions/DoNothingAction.h"
 
 class ShowStep : public Step {

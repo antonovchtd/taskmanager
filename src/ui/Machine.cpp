@@ -18,13 +18,31 @@ Context Machine::run() {
     return run(context_);
 }
 
-Context Machine::run(Context &context) {
+void updateContext(Context &context, const ActionResult &result) {
+    switch (result.type_id) {
+        case ActionResult::kID:
+            if (result.id)
+                context.setID(result.id);
+            break;
+        case ActionResult::kEntity:
+            context.setTasks(result.tasks);
+            if (!result.tasks.empty()) {
+                context.setTask(result.tasks[0].data());
+                context.setID(result.tasks[0].id());
+            }
+            break;
+    }
+}
 
+Context Machine::run(const Context &context) {
+
+    Context local_context = context;
     auto step = factory_->lazyInitStep(initial_step_);
     while (step){
-        auto action = step->genAction(context);
-        auto result = action->execute(context, model_);
+        auto action = step->genAction(local_context);
+        auto result = action->execute(model_);
+        updateContext(local_context, result); // pass data to next step
         step = step->genNextStep(result, factory_);
     }
-    return context;
+    return local_context;
 }

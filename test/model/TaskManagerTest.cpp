@@ -17,7 +17,7 @@ class TaskManagerTest : public ::testing::Test
 
 class MockIDGenerator : public IDGenerator {
 public:
-    MockIDGenerator(int last) {last_ = last;};
+    explicit MockIDGenerator(int last) {last_ = last;};
     MockIDGenerator() {last_ = 1;};
     MOCK_METHOD(Core::TaskID, genID, (), (override));
 };
@@ -109,10 +109,7 @@ TEST_F(TaskManagerTest, shouldAddSubtask)
     ASSERT_EQ(2, tm.size());
     EXPECT_TRUE(tm.Validate(id));
     EXPECT_TRUE(tm.Validate(id_ch));
-    EXPECT_EQ(id, tm[id_ch].second.parent());
-    auto children = tm[id].second.children();
-    auto it = std::find(children.begin(), children.end(), id_ch);
-    EXPECT_NE(it, children.end());
+    EXPECT_EQ(id, tm.getTasks()[1].parent());
 }
 
 TEST_F(TaskManagerTest, shouldChangeParent)

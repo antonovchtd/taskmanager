@@ -4,10 +4,10 @@
 
 #include "EditTaskAction.h"
 
-EditTaskAction::EditTaskAction(const Core::Task &task, const Core::TaskID &id) :
-        task_{task}, id_{id} {
+EditTaskAction::EditTaskAction(const Core::TaskID &id, const Core::Task &task) :
+                id_{id}, task_{task} {
 }
 
-ActionResult EditTaskAction::execute(Context &context, const std::shared_ptr<ModelInterface> &model) {
+ActionResult EditTaskAction::execute(const std::shared_ptr<ModelInterface> &model) {
     return model->Edit(id_, task_);
 }

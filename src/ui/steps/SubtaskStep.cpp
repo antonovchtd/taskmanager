@@ -17,7 +17,7 @@ std::unique_ptr<Action> SubtaskStep::genAction(Context &context) {
 
     Context input_context = submachine_.run();
 
-    return std::unique_ptr<Action>(new AddSubtaskAction(input_context.task(), *context.id()));
+    return std::unique_ptr<Action>(new AddSubtaskAction(*context.id(), input_context.task()));
 }
 
 std::shared_ptr<Step> SubtaskStep::genNextStep(const ActionResult &result, const std::shared_ptr<Factory> &factory) {

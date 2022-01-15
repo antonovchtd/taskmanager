@@ -3,18 +3,15 @@
 //
 
 #include "GetTasksToShowAction.h"
-#include "ui/Context.h"
-
-GetTasksToShowAction::GetTasksToShowAction() = default;
 
 GetTasksToShowAction::GetTasksToShowAction(const std::string &arg) : arg_{arg} {
 }
 
 ActionResult GetTasksToShowAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    std::optional<Core::TaskID> id;
+    std::optional<Core::TaskID> id{Core::TaskID()};
     try {
         id->set_value(std::stoi(arg_));
-        if (model->Validate(*id))
+        if (!model->Validate(*id))
             return {ActionResult::Status::ID_NOT_FOUND, id};
     } catch (const std::invalid_argument &) {
         id = std::nullopt;

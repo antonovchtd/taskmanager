@@ -92,13 +92,13 @@ std::shared_ptr<Step> Factory::getNewStep(const State &s) {
         case State::HELP:
             return std::shared_ptr<HelpStep>{new HelpStep(reader(), printer())};
         case State::ADD:
-            return std::shared_ptr<AddStep>{new AddStep(reader(), printer(), Factory::createMachine(State::READTASK))};
+            return std::shared_ptr<AddStep>{new AddStep(reader(), printer(), createMachine(State::READTASK))};
         case State::SUBTASK:
-            return std::shared_ptr<SubtaskStep>{new SubtaskStep(reader(), printer(), Factory::createMachine(State::READTASK))};
+            return std::shared_ptr<SubtaskStep>{new SubtaskStep(reader(), printer(), createMachine(State::READTASK))};
         case State::READTASK:
             return std::shared_ptr<ReadTaskDataStep>{new ReadTaskDataStep(reader(), printer())};
         case State::EDIT:
-            return std::shared_ptr<EditStep>{new EditStep(reader(), printer(), Factory::createMachine(State::READTASK))};
+            return std::shared_ptr<EditStep>{new EditStep(reader(), printer(), createMachine(State::READTASK))};
         case State::QUIT:
             return std::shared_ptr<QuitStep>{new QuitStep(reader(), printer())};
         case State::SHOW:

@@ -12,7 +12,7 @@ AddStep::AddStep(std::shared_ptr<AbstractReader> reader,
 }
 
 
-std::unique_ptr<Action> AddStep::genAction(Context &context) {
+std::unique_ptr<Action> AddStep::genAction(Context &) {
     printer()->print("[Add Task]\n");
     Context input_context = submachine_.run();
 

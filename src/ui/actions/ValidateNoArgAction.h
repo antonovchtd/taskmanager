@@ -9,10 +9,10 @@
 
 class ValidateNoArgAction : public Action {
 public:
-    ValidateNoArgAction(const std::string &arg);
+    explicit ValidateNoArgAction(const std::string &arg);
 
 public:
-    ActionResult execute(Context &, const std::shared_ptr<ModelInterface> &) override;
+    ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
 
 private:
     std::string arg_;
