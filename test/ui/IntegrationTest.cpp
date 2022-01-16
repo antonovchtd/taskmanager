@@ -60,10 +60,13 @@ private:
 
 TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 {
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
-              std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
-            .Times(15)
+    auto tm = std::make_shared<TaskManager>();
+    MockReader mr;
+    MockPrinter mp;
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
+              std::shared_ptr<AbstractPrinter>(&mp));
+    EXPECT_CALL(mr, read)
+            .Times(16)
             .WillOnce(Return("add"))
             .WillOnce(Return("test 1"))
             .WillOnce(Return("1"))
@@ -78,24 +81,26 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
             .WillOnce(Return("23/12"))
             .WillOnce(Return("complete 1"))
             .WillOnce(Return("delete 3"))
+            .WillOnce(Return("Y"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
+    EXPECT_CALL(mp, print)
             .Times(AtLeast(1));
 
-    Machine m(f, Factory::State::HOME);
+    Machine m(tm, f, Factory::State::HOME);
     m.run();
-    auto tm = m.model();
     ASSERT_EQ(2, tm->size());
 
     Core::TaskID id;
     id.set_value(1);
     ASSERT_TRUE(tm->Validate(id));
-    EXPECT_TRUE(tm->getTasks()[id].first.is_complete());
+    EXPECT_EQ(tm->getTasks()[0].id(), id);
+    EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
 
     id.set_value(2);
     ASSERT_TRUE(tm->Validate(id));
-    EXPECT_FALSE(tm->getTasks()[id].first.is_complete());
+    EXPECT_EQ(tm->getTasks()[1].id(), id);
+    EXPECT_FALSE(tm->getTasks()[1].data().is_complete());
 
     id.set_value(3);
     EXPECT_FALSE(tm->Validate(id));
@@ -105,8 +110,11 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
 {
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
-                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
+    auto tm = std::make_shared<TaskManager>();
+    MockReader mr;
+    MockPrinter mp;
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
+                             std::shared_ptr<AbstractPrinter>(&mp));
     EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
@@ -124,55 +132,48 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
             .WillOnce(Return("complete 1"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
+    EXPECT_CALL(mp, print(_))
             .Times(AtLeast(1));
 
-    Machine m(f, Factory::State::HOME);
+    Machine m(tm, f, Factory::State::HOME);
     m.run();
-    auto tm = m.model();
     ASSERT_EQ(3, tm->size());
 
     // check completeness
     Core::TaskID id;
     id.set_value(1);
     ASSERT_TRUE(tm->Validate(id));
-    EXPECT_TRUE(tm->getTasks()[id].first.is_complete());
+    EXPECT_EQ(tm->getTasks()[0].id(), id);
+    EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
 
     Core::TaskID id2;
     id2.set_value(2);
     ASSERT_TRUE(tm->Validate(id2));
-    EXPECT_TRUE(tm->getTasks()[id2].first.is_complete());
+    EXPECT_EQ(tm->getTasks()[1].id(), id2);
+    EXPECT_TRUE(tm->getTasks()[1].data().is_complete());
 
     Core::TaskID id3;
     id3.set_value(3);
     ASSERT_TRUE(tm->Validate(id3));
-    EXPECT_TRUE(tm->getTasks()[id3].first.is_complete());
+    EXPECT_EQ(tm->getTasks()[2].id(), id3);
+    EXPECT_TRUE(tm->getTasks()[2].data().is_complete());
 
     // check parents
-    EXPECT_EQ(tm->getTasks()[id].second.parent(), std::nullopt);
-    EXPECT_EQ(tm->getTasks()[id2].second.parent(), id);
-    EXPECT_EQ(tm->getTasks()[id3].second.parent(), id2);
-
-    // check children
-    auto ch1 = tm->getTasks()[id].second.children();
-    ASSERT_EQ(1, ch1.size());
-    EXPECT_EQ(ch1[0], id2);
-
-    auto ch2 = tm->getTasks()[id2].second.children();
-    ASSERT_EQ(1, ch2.size());
-    EXPECT_EQ(ch2[0], id3);
-
-    auto ch3 = tm->getTasks()[id3].second.children();
-    ASSERT_EQ(0, ch3.size());
+    EXPECT_FALSE(tm->getTasks()[0].has_parent());
+    EXPECT_EQ(tm->getTasks()[1].parent(), id);
+    EXPECT_EQ(tm->getTasks()[2].parent(), id2);
 
     EXPECT_EQ(4, tm->gen()->state());
 }
 
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
 {
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReader),
-                             std::shared_ptr<AbstractPrinter>(new MockPrinter));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
+    auto tm = std::make_shared<TaskManager>();
+    MockReader mr;
+    MockPrinter mp;
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
+                             std::shared_ptr<AbstractPrinter>(&mp));
+    EXPECT_CALL(mr, read)
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("task 1"))
@@ -192,45 +193,33 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
             .WillOnce(Return("l2"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
+    EXPECT_CALL(mp, print)
             .Times(AtLeast(1));
 
-    Machine m(f, Factory::State::HOME);
+    Machine m(tm, f, Factory::State::HOME);
     m.run();
-    auto tm = m.model();
     ASSERT_EQ(3, tm->size());
 
     // check labels
     Core::TaskID id;
     id.set_value(1);
     ASSERT_TRUE(tm->Validate(id));
-    EXPECT_EQ("", tm->getTasks()[id].first.label());
+    EXPECT_EQ("", tm->getTasks()[0].data().label());
 
     Core::TaskID id2;
     id2.set_value(2);
     ASSERT_TRUE(tm->Validate(id2));
-    EXPECT_EQ("l2", tm->getTasks()[id2].first.label());
+    EXPECT_EQ("l2", tm->getTasks()[1].data().label());
 
     Core::TaskID id3;
     id3.set_value(3);
     ASSERT_TRUE(tm->Validate(id3));
-    EXPECT_EQ("l3", tm->getTasks()[id3].first.label());
+    EXPECT_EQ("l3", tm->getTasks()[2].data().label());
 
     // check parents
-    EXPECT_EQ(tm->getTasks()[id].second.parent(), std::nullopt);
-    EXPECT_EQ(tm->getTasks()[id2].second.parent(), id);
-    EXPECT_EQ(tm->getTasks()[id3].second.parent(), std::nullopt);
-
-    // check children
-    auto ch1 = tm->getTasks()[id].second.children();
-    ASSERT_EQ(1, ch1.size());
-    EXPECT_EQ(ch1[0], id2);
-
-    auto ch2 = tm->getTasks()[id2].second.children();
-    ASSERT_EQ(0, ch2.size());
-
-    auto ch3 = tm->getTasks()[id3].second.children();
-    ASSERT_EQ(0, ch3.size());
+    EXPECT_FALSE(tm->getTasks()[0].has_parent());
+    EXPECT_EQ(tm->getTasks()[1].parent(), id);
+    EXPECT_FALSE(tm->getTasks()[2].has_parent());
 
     EXPECT_EQ(4, tm->gen()->state());
 }
@@ -250,16 +239,16 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
                                                  " > ", "    Title > ",
                                                  "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > ",
                                                  "    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} > ",
-                                                 " > ", "Task 1 has 1 subtask(s). Confirm to delete all. Y/[N] > ",
-                                                 " > ", "Task 1 has 1 subtask(s). Confirm to delete all. Y/[N] > ",
+                                                 " > ", "Delete task with all its subtasks? Y/[N] > ",
+                                                 " > ", "Delete task with all its subtasks? Y/[N] > ",
                                                  " > "};
     std::string expected_output = "[Add Task]\nAdded Task (ID: 1)\n[Add Task]\nAdded Task (ID: 2)\n[Add Subtask]\nAdded Subtask (ID: 3)\nDeleted Task (ID: 1)\n";
     auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
                              std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
 
-    Machine m(f, Factory::State::HOME);
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
     m.run();
-    auto tm = m.model();
     auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
     auto out = mp.messages();
     auto mr = *std::dynamic_pointer_cast<MockReaderToVector>(f->reader());
@@ -309,9 +298,9 @@ TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
     auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
                              std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
 
-    Machine m(f, Factory::State::HOME);
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
     m.run();
-    auto tm = m.model();
     auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
     auto out = mp.messages();
     auto mr = *std::dynamic_pointer_cast<MockReaderToVector>(f->reader());
@@ -347,9 +336,9 @@ TEST_F(IntegrationTest, shouldCreateNothingWithBadInput)
     EXPECT_CALL(*std::dynamic_pointer_cast<MockPrinter>(f->printer()), print(_))
             .Times(5);
 
-    Machine m(f, Factory::State::HOME);
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
     m.run();
-    auto tm = m.model();
     ASSERT_EQ(0, tm->size());
 }
 
@@ -361,9 +350,9 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksAndShowByID)
     auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
                              std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
 
-    Machine m(f, Factory::State::HOME);
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
     m.run();
-    auto tm = m.model();
 
     MockPrinterToVector mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
     auto out = mp.messages();
@@ -383,15 +372,17 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
 {
     std::vector<std::string> scenario = {"add", "Task 1", "1", "21/12", "subtask 1", "Subtask 2",
                                          "2", "22/12", "subtask 2", "Subtask 3", "3", "23/12",
-                                         "complete 1", "save", "quit", "load", "quit"};
+                                         "complete 1", "save test.bin", "quit", "load test.bin", "quit"};
     auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
                              std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
 
-    Machine m(f, Factory::State::HOME);
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
     m.run();
-    Machine m2(f, Factory::State::HOME);
+    tm.reset();
+    tm = std::make_shared<TaskManager>();
+    Machine m2(tm, f, Factory::State::HOME);
     m2.run();
-    auto tm = m2.model();
     ASSERT_EQ(3, tm->size());
 
     Core::TaskID id1, id2, id3;
@@ -400,26 +391,17 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
     id3.set_value(3);
 
     ASSERT_TRUE(tm->Validate(id1));
-    EXPECT_TRUE(tm->getTasks()[id1].first.is_complete());
-    EXPECT_EQ(tm->getTasks()[id1].first.title(), "Task 1");
-    EXPECT_EQ(std::nullopt, tm->getTasks()[id1].second.parent());
-    auto ch = tm->getTasks()[id1].second.children();
-    ASSERT_EQ(1, ch.size());
-    auto it = std::find(ch.cbegin(), ch.cend(), id2);
-    EXPECT_NE(it, ch.cend());
+    EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
+    EXPECT_EQ(tm->getTasks()[0].data().title(), "Task 1");
+    EXPECT_FALSE(tm->getTasks()[0].has_parent());
 
     ASSERT_TRUE(tm->Validate(id2));
-    EXPECT_TRUE(tm->getTasks()[id2].first.is_complete());
-    EXPECT_EQ(tm->getTasks()[id2].first.title(), "Subtask 2");
-    EXPECT_EQ(id1, *tm->getTasks()[id2].second.parent());
-    ch = tm->getTasks()[id2].second.children();
-    EXPECT_EQ(1, ch.size());
-    it = std::find(ch.cbegin(), ch.cend(), id3);
-    EXPECT_NE(it, ch.cend());
+    EXPECT_TRUE(tm->getTasks()[1].data().is_complete());
+    EXPECT_EQ(tm->getTasks()[1].data().title(), "Subtask 2");
+    EXPECT_EQ(id1, tm->getTasks()[1].parent());
 
     ASSERT_TRUE(tm->Validate(id3));
-    EXPECT_TRUE(tm->getTasks()[id3].first.is_complete());
-    EXPECT_EQ(tm->getTasks()[id3].first.title(), "Subtask 3");
-    EXPECT_EQ(0, tm->getTasks()[id3].second.children().size());
-    EXPECT_EQ(id2, *tm->getTasks()[id3].second.parent());
+    EXPECT_TRUE(tm->getTasks()[2].data().is_complete());
+    EXPECT_EQ(tm->getTasks()[2].data().title(), "Subtask 3");
+    EXPECT_EQ(id2, tm->getTasks()[2].parent());
 }
