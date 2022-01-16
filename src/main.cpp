@@ -18,7 +18,8 @@
 
 int main() {
 
-    Machine m;
+    auto tm = std::make_shared<TaskManager>();
+    Machine m{tm};
     m.run();
     return 0;
 }

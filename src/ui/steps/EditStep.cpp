@@ -6,7 +6,7 @@
 
 EditStep::EditStep(std::shared_ptr<AbstractReader> reader,
                  std::shared_ptr<AbstractPrinter> printer,
-                 Machine submachine) :
+                   std::shared_ptr<Machine> submachine) :
         Step(reader, printer) {
     submachine_ = submachine;
 }
@@ -15,7 +15,7 @@ EditStep::EditStep(std::shared_ptr<AbstractReader> reader,
 std::unique_ptr<Action> EditStep::genAction(Context &context) {
     printer()->print("[Edit Task]\n");
 
-    Context input_context = submachine_.run(context);
+    Context input_context = submachine_->run(context);
 
     return std::unique_ptr<Action>(new EditTaskAction(*context.id(), input_context.task()));
 }

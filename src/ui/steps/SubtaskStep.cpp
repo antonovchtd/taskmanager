@@ -6,7 +6,7 @@
 
 SubtaskStep::SubtaskStep(std::shared_ptr<AbstractReader> reader,
                    std::shared_ptr<AbstractPrinter> printer,
-                   Machine submachine) :
+                         std::shared_ptr<Machine> submachine) :
             Step(reader, printer) {
     submachine_ = submachine;
 }
@@ -15,7 +15,7 @@ SubtaskStep::SubtaskStep(std::shared_ptr<AbstractReader> reader,
 std::unique_ptr<Action> SubtaskStep::genAction(Context &context) {
     printer()->print("[Add Subtask]\n");
 
-    Context input_context = submachine_.run();
+    Context input_context = submachine_->run();
 
     return std::unique_ptr<Action>(new AddSubtaskAction(*context.id(), input_context.task()));
 }

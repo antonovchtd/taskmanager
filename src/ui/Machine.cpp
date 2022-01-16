@@ -4,14 +4,14 @@
 
 #include "Machine.h"
 
-Machine::Machine() : initial_step_{Factory::State::HOME},
-                     model_{std::shared_ptr<ModelInterface>(new TaskManager)} {
-    factory_ = Factory::create();
+Machine::Machine(const std::shared_ptr<ModelInterface> &model) :
+                 initial_step_{Factory::State::HOME},
+                 model_{model},
+                 factory_{Factory::create()} {
 }
 
-Machine::Machine(const std::shared_ptr<Factory> &f, const Factory::State &s) :
-        factory_{f}, initial_step_{s},
-        model_{std::shared_ptr<ModelInterface>(new TaskManager)} {
+Machine::Machine(const std::shared_ptr<ModelInterface> &model, const std::shared_ptr<Factory> &f, const Factory::State &s) :
+        factory_{f}, initial_step_{s}, model_{model} {
 }
 
 Context Machine::run() {

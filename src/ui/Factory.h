@@ -13,6 +13,7 @@
 #include "io/ConsoleReader.h"
 #include "io/AbstractPrinter.h"
 #include "io/ConsolePrinter.h"
+#include "model/TaskManager.h"
 
 class Machine;
 class Context;
@@ -52,7 +53,7 @@ public:
     std::shared_ptr<Step> getNewStep(const State &s);
     std::shared_ptr<Step> lazyInitStep(const State &state);
 
-    Machine createMachine(const State &state);
+    std::shared_ptr<Machine> createMachine(const State &state);
 
 public:
     std::shared_ptr<AbstractReader> reader() const;

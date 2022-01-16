@@ -6,7 +6,6 @@
 #define TASKMANAGER_SRC_UI_MACHINE_H_
 
 #include "model/ModelInterface.h"
-#include "model/TaskManager.h"
 #include "Context.h"
 #include "ui/steps/Step.h"
 #include "ui/actions/Action.h"
@@ -14,8 +13,8 @@
 
 class Machine {
 public:
-    Machine();
-    Machine(const std::shared_ptr<Factory> &f, const Factory::State &s);
+    explicit Machine(const std::shared_ptr<ModelInterface> &model);
+    Machine(const std::shared_ptr<ModelInterface> &model, const std::shared_ptr<Factory> &f, const Factory::State &s);
 
 public:
     Context run();
