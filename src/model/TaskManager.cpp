@@ -67,11 +67,12 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::TaskID &id) cons
     Core::TaskEntity te;
     te.set_allocated_id(new Core::TaskID(id));
     te.set_allocated_data(new Core::Task(tasks_.at(id).first));
+    // not including parent, but will include children
     tasks.push_back(te);
-    for (const auto &ch : tasks_.at(id).second.children()) {
-        auto ch_tasks = getTasks(ch);
-        for (auto it = ch_tasks.begin(); it != ch_tasks.end(); it++) {
-            it->set_allocated_parent(new Core::TaskID(*tasks_.at(ch).second.parent()));
+    for (const auto &ch_id : tasks_.at(id).second.children()) {
+        auto ch_tasks = getTasks(ch_id);
+        for (auto &ch_task : ch_tasks) {
+            ch_task.set_allocated_parent(new Core::TaskID(*tasks_.at(ch_task.id()).second.parent()));
         }
         tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
     }
