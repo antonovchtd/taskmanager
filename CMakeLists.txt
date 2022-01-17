@@ -22,10 +22,10 @@ find_package(Threads REQUIRED)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-file(GLOB_RECURSE PROTO_SOURCES CONFIGURE_DEPENDS proto/*.proto)
+file(GLOB_RECURSE PROTO_SOURCES CONFIGURE_DEPENDS ${taskmanager_SOURCE_DIR}/proto/*.proto)
 message("PROTO_SOURCES ${PROTO_SOURCES}")
 
-set(PROTO_DIR proto/)
+set(PROTO_DIR ${taskmanager_SOURCE_DIR}/proto)
 set(GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 macro(compile_proto_file filename)
@@ -50,7 +50,7 @@ foreach(proto_file ${PROTO_SOURCES})
     message("compiling ${proto_file}")
     compile_proto_file(${proto_file})
     get_filename_component(basename ${proto_file} NAME_WE)
-    set(spine_generated_files ${spine_generated_files} ${GENERATED_DIR}/${basename}.pb.cc ${GENERATED_DIR}/${basename}.grpc.pb.cc)
+    set(spine_generated_files ${spine_generated_files} ${GENERATED_DIR}/${basename}.pb.cc ${GENERATED_DIR}/${basename}.pb.h ${GENERATED_DIR}/${basename}.grpc.pb.cc)
 endforeach(proto_file)
 
 include_directories(${GENERATED_DIR})
