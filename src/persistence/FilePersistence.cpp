@@ -29,9 +29,12 @@ bool FilePersistence::load(std::vector<Core::TaskEntity> &vec) {
     if (file.is_open()) {
         Core::TaskEntity te;
         bool clean_eof = false;
-        while (!clean_eof) {
+        while (true) {
             google::protobuf::util::ParseDelimitedFromZeroCopyStream(&te, &iis, &clean_eof);
-            vec.push_back(te);
+            if (!clean_eof)
+                vec.push_back(te);
+            else
+                break;
         }
         file.close();
         return true;

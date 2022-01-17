@@ -3,6 +3,7 @@
 //
 
 #include "ui/Context.h"
+#include "utilities/TaskEntityUtils.h"
 
 #include <gtest/gtest.h>
 
@@ -31,10 +32,12 @@ TEST_F(ContextTest, shouldSetTasks)
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     Context c;
-    c.setTasks(tm.getTasks());
-    auto tasks = c.tasks();
-    ASSERT_EQ(1, tasks.size());
-    EXPECT_EQ(tm[id].first, tasks.at(id).first);
+    auto tasks = tm.getTasks();
+    c.setTasks(tasks);
+    auto tasks_from_context = c.tasks();
+    ASSERT_EQ(tasks_from_context.size(), tasks.size());
+    ASSERT_EQ(tasks_from_context.size(), 1);
+    EXPECT_EQ(tasks_from_context[0], tasks[0]);
 }
 
 TEST_F(ContextTest, shouldSetData){

@@ -10,12 +10,7 @@ std::unique_ptr<Action> ConfirmDeleteStep::genAction(Context &) {
 }
 
 std::shared_ptr<Step> ConfirmDeleteStep::genNextStep(const ActionResult &result, const std::shared_ptr<Factory> &factory) {
-    if (result)
-        return getConfirmation(factory);
-    else {
-        printer()->print(result.message());
-        return factory->lazyInitStep(Factory::State::HOME);
-    }
+    return getConfirmation(factory);
 }
 
 std::shared_ptr<Step> ConfirmDeleteStep::getConfirmation(const std::shared_ptr<Factory> &factory) {

@@ -9,10 +9,6 @@ TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator))
 
 TaskManager::TaskManager(const std::shared_ptr<IDGenerator> &generator) : gen_(generator) {
 }
-TaskManager::TaskManager(const std::shared_ptr<IDGenerator> &generator,
-                         const Container &tasks) :
-                         gen_(generator), tasks_(tasks) {
-}
 
 ActionResult TaskManager::Add(const Core::Task &t) {
     Core::TaskID id = gen_->genID();
@@ -50,16 +46,16 @@ std::vector<Core::TaskEntity> TaskManager::getTasks() const {
 }
 
 std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) const {
-    Container tasks;
+    std::vector<Core::TaskEntity> tasks;
     for (const auto &kv : tasks_) {
         if (kv.second.first.label() == label) {
-            tasks.insert(kv);
-            tasks.at(kv.first).second.RemoveParent();
-            tasks.at(kv.first).second.RemoveChildren();
+            Core::TaskEntity te;
+            te.set_allocated_id(new Core::TaskID(kv.first));
+            te.set_allocated_data(new Core::Task(kv.second.first));
+            tasks.push_back(te);
         }
     }
-    TaskManager tm{gen(), tasks};
-    return tm.getTasks();
+    return tasks;
 }
 
 std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::TaskID &id) const {

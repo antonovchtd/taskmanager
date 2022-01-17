@@ -12,14 +12,10 @@
 #include "IDGenerator.h"
 #include "Node.h"
 
-typedef std::map<Core::TaskID, std::pair<Core::Task, Node>> Container;
-
 class TaskManager : public ModelInterface {
 public:
     TaskManager();
     explicit TaskManager(const std::shared_ptr<IDGenerator> &generator);
-    TaskManager(const std::shared_ptr<IDGenerator> &generator,
-                const Container &tasks);
 
 public:
     std::vector<Core::TaskEntity> getTasks() const override;
@@ -42,7 +38,7 @@ public:
     void Replace(const std::vector<Core::TaskEntity> &) override;
 
 private:
-    Container tasks_;
+    std::map<Core::TaskID, std::pair<Core::Task, Node>> tasks_;
     std::shared_ptr<IDGenerator> gen_;
 };
 

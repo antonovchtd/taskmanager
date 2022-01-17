@@ -66,7 +66,7 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
     auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
               std::shared_ptr<AbstractPrinter>(&mp));
     EXPECT_CALL(mr, read)
-            .Times(16)
+            .Times(17)
             .WillOnce(Return("add"))
             .WillOnce(Return("test 1"))
             .WillOnce(Return("1"))
@@ -81,6 +81,7 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
             .WillOnce(Return("23/12"))
             .WillOnce(Return("complete 1"))
             .WillOnce(Return("delete 3"))
+            .WillOnce(Return("?"))
             .WillOnce(Return("Y"))
             .WillOnce(Return("quit"));
 
@@ -188,6 +189,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
             .WillOnce(Return("3"))
             .WillOnce(Return("23/12"))
             .WillOnce(Return("label 3"))
+            .WillOnce(Return(""))
             .WillOnce(Return("l3"))
             .WillOnce(Return("label 2"))
             .WillOnce(Return("l2"))
@@ -273,7 +275,7 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
 
 TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
 {
-    std::vector<std::string> scenario = {"", "???", "add", "", "test title", "42", "-1",
+    std::vector<std::string> scenario = {"", "???", "add", "", "test title", "42", "low",
                                          "", "", "21,12", "21/12/2021", "show", "quit"};
 
     std::vector<std::string> prompts_expected = {" > ", " > ", " > ",
@@ -404,4 +406,117 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
     EXPECT_TRUE(tm->getTasks()[2].data().is_complete());
     EXPECT_EQ(tm->getTasks()[2].data().title(), "Subtask 3");
     EXPECT_EQ(id2, tm->getTasks()[2].parent());
+}
+
+TEST_F(IntegrationTest, shouldEditTask)
+{
+    std::vector<std::string> scenario = {"add", "Test Task", "1", "21/12/21", "show", "edit",
+                                         "edit 1", "edited", "2", "", "show", "quit"};
+
+    std::vector<std::string> prompts_expected = {" > ", "    Title > ",
+                                                 "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) > ",
+                                                 "    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} > ",
+                                                 " > ", " > ", " > ", "    Title [Test Task] > ",
+                                                 "    priority ([0]:NONE, [1]:LOW, [2]:MEDIUM, [3]:HIGH) [Low] > ",
+                                                 "    Due {Format: dd[/.]mm[/.](/(yy)yy) (hh:mm)} [Tue Dec 21 00:00:00 2021] > ",
+                                                 " > ", " > "};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                  "Added Task", " (ID: 1)\n",
+                                  "1 – Test Task, Priority: Low, Due: Tue Dec 21 00:00:00 2021 [overdue]", "\n",
+                                  "This function requires an argument.\n",
+                                  "[Edit Task]\n",
+                                  "Edited Task", " (ID: 1)\n",
+                                  "1 – edited, Priority: Medium, Due: Tue Dec 21 00:00:00 2021 [overdue]", "\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(1, tm->size());
+
+    auto mr = *std::dynamic_pointer_cast<MockReaderToVector>(f->reader());
+    auto prompts = mr.prompts();
+    ASSERT_EQ(prompts.size(), prompts_expected.size());
+    for (int i = 0; i <  prompts.size(); ++i) {
+        EXPECT_EQ(prompts[i], prompts_expected[i]);
+    }
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
+}
+
+TEST_F(IntegrationTest, shouldUncompleteTaskWithSubtasks)
+{
+    std::vector<std::string> scenario = {"add", "test", "1", "21/12/21",
+                                         "subtask 1", "sub", "2", "22/12/21 15:10",
+                                         "complete 1", "show", "uncomplete 1", "show", "quit"};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                                 "Added Task", " (ID: 1)\n",
+                                                 "[Add Subtask]\n",
+                                                 "Added Subtask", " (ID: 2)\n",
+                                                 "Completed Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Tue Dec 21 00:00:00 2021 [overdue] [completed]", "\n",
+                                                 "    2 – sub, Priority: Medium, Due: Wed Dec 22 15:10:00 2021 [overdue] [completed]", "\n",
+                                                 "Uncompleted Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Tue Dec 21 00:00:00 2021 [overdue]", "\n",
+                                                 "    2 – sub, Priority: Medium, Due: Wed Dec 22 15:10:00 2021 [overdue]", "\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(2, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
+}
+
+TEST_F(IntegrationTest, shouldAddTasksInFutureDate)
+{
+    std::vector<std::string> scenario = {"add", "test 1", "1", "in 01:02:03",
+                                         "add", "test 2", "2", "in 01:02",
+                                         "show", "quit"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(2, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+
+    time_t rawtime;
+    time(&rawtime);
+    struct tm * timeinfo = localtime(&rawtime);
+    timeinfo->tm_mday++;
+    timeinfo->tm_hour+=2;
+    timeinfo->tm_min+=3;
+    time_t date = mktime(timeinfo);
+    EXPECT_EQ(out[6] + "\n", std::string("1 – test 1, Priority: Low, Due: ") + asctime(localtime(&date)));
+
+    struct tm * timeinfo2 = localtime(&rawtime);
+    timeinfo->tm_hour+=1;
+    timeinfo->tm_min+=2;
+    date = mktime(timeinfo);
+    EXPECT_EQ(out[8] + "\n", std::string("2 – test 2, Priority: Medium, Due: ") + asctime(localtime(&date)));
 }

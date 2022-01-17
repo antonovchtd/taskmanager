@@ -3,6 +3,7 @@
 //
 
 #include "model/TaskManager.h"
+#include "utilities/TaskEntityUtils.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -28,18 +29,6 @@ TEST_F(TaskManagerTest, shouldCreateWithSpecificIDgenerator)
     auto gen = std::make_shared<IDGenerator>(start_number);
     TaskManager tm{gen};
     EXPECT_EQ(tm.gen()->state(), start_number);
-}
-
-TEST_F(TaskManagerTest, shouldCreateWithSpecificIDgeneratorAndContainer)
-{
-    int start_number = 42;
-    auto gen = std::make_shared<IDGenerator>(start_number);
-    Container con;
-    con[gen->genID()] = std::make_pair(Core::Task(), Node());
-    TaskManager tm{gen, con};
-    EXPECT_EQ(tm.gen()->state(), start_number+1);
-    EXPECT_EQ(tm.size(), 1);
-    EXPECT_EQ(con, tm.getTasks());
 }
 
 TEST_F(TaskManagerTest, shouldAddTask)
@@ -112,53 +101,6 @@ TEST_F(TaskManagerTest, shouldAddSubtask)
     EXPECT_EQ(id, tm.getTasks()[1].parent());
 }
 
-TEST_F(TaskManagerTest, shouldChangeParent)
-{
-    TaskManager tm;
-    Core::Task t;
-    t.set_title("TestTitle");
-    t.set_priority(Core::Task::Priority::Task_Priority_NONE);
-    t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
-    t.set_is_complete(false);
-    Core::TaskID id = *tm.Add(t).id;
-    t.set_title("TestTitle 2");
-    Core::TaskID id2 = *tm.Add(t).id;
-    t.set_title("SubTask");
-    Core::TaskID id_ch = *tm.AddSubtask(t, id).id;
-    ASSERT_EQ(3, tm.size());
-    tm[id_ch].second.SetParent(id2);
-    tm[id].second.RemoveChild(id_ch);
-    tm[id2].second.AddChild(id_ch);
-    EXPECT_EQ(id2, tm[id_ch].second.parent());
-    auto children = tm[id].second.children();
-    EXPECT_TRUE(children.empty());
-    auto children2 = tm[id2].second.children();
-    EXPECT_EQ(1, children2.size());
-    auto it = std::find(children2.begin(), children2.end(), id_ch);
-    EXPECT_NE(it, children2.end());
-}
-
-TEST_F(TaskManagerTest, shouldRemoveAllChildren)
-{
-    TaskManager tm;
-    Core::Task t;
-    t.set_title("TestTitle");
-    t.set_priority(Core::Task::Priority::Task_Priority_NONE);
-    t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
-    t.set_is_complete(false);
-    Core::TaskID id = *tm.Add(t).id;
-    t.set_title("Subtask");
-    tm.AddSubtask(t, id);
-    t.set_title("SubTask 2");
-    tm.AddSubtask(t, id);
-    ASSERT_EQ(3, tm.size());
-    tm[id].second.RemoveChildren();
-    auto children = tm[id].second.children();
-    EXPECT_TRUE(children.empty());
-}
-
 TEST_F(TaskManagerTest, shouldEdit)
 {
     TaskManager tm;
@@ -171,7 +113,7 @@ TEST_F(TaskManagerTest, shouldEdit)
     Core::TaskID id = *tm.Add(t).id;
     t.set_title("Edited");
     tm.Edit(id, t);
-    EXPECT_EQ(t, tm[id].first);
+    EXPECT_EQ(t, tm.getTasks()[0].data());
 }
 
 TEST_F(TaskManagerTest, shouldFailToEditWrongID)
@@ -255,9 +197,10 @@ TEST_F(TaskManagerTest, shouldCompleteTaskWithSubtasks)
     Core::TaskID id = *tm.Add(t).id;
     tm.AddSubtask(t, id);
     tm.Complete(id);
-    EXPECT_TRUE(tm[id].first.is_complete());
-    auto ch_id = tm[id].second.children()[0];
-    EXPECT_TRUE(tm[ch_id].first.is_complete());
+    auto tasks = tm.getTasks();
+    EXPECT_TRUE(tasks[0].data().is_complete());
+    EXPECT_TRUE(tasks[1].data().is_complete());
+    EXPECT_EQ(tasks[1].parent(), id);
 }
 
 TEST_F(TaskManagerTest, shouldFailToCompleteTaskWithWrongID)
@@ -286,8 +229,25 @@ TEST_F(TaskManagerTest, shouldUncompleteTask)
     t.set_label("label");
     t.set_is_complete(true);
     Core::TaskID id = *tm.Add(t).id;
+    tm.AddSubtask(t, id);
     tm.Uncomplete(id);
-    EXPECT_FALSE(tm[id].first.is_complete());
+    auto tasks = tm.getTasks();
+    ASSERT_EQ(2, tasks.size());
+    EXPECT_FALSE(tasks[0].data().is_complete());
+    EXPECT_FALSE(tasks[1].data().is_complete());
+}
+
+TEST_F(TaskManagerTest, shouldFailToUncompleteTaskWithWrongID)
+{
+    TaskManager tm;
+    Core::Task t;
+    t.set_title("TestTitle");
+    t.set_is_complete(true);
+    Core::TaskID id = *tm.Add(t).id;
+    id.set_value(2);
+    ActionResult result = tm.Uncomplete(id);
+    EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
+    EXPECT_EQ(*result.id, id);
 }
 
 TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
@@ -306,7 +266,7 @@ TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
     ASSERT_EQ(2, tm.size());
     tm.Delete(id2, false);
     ASSERT_EQ(1, tm.size());
-    EXPECT_TRUE(tm[id1].second.children().empty());
+    EXPECT_EQ(tm.getTasks()[0].id(), id1);
 }
 
 TEST_F(TaskManagerTest, shouldAddLabel){
@@ -321,7 +281,7 @@ TEST_F(TaskManagerTest, shouldAddLabel){
     Core::TaskID id = *tm.Add(t).id;
     std::string label = "testing";
     tm.AddLabel(id, label);
-    EXPECT_EQ(label, tm[id].first.label());
+    EXPECT_EQ(label, tm.getTasks()[0].data().label());
 }
 
 TEST_F(TaskManagerTest, shouldFailToAddLabelWithWrongID){
@@ -352,19 +312,25 @@ TEST_F(TaskManagerTest, shouldReturnTasks){
     t.set_is_complete(false);
     Core::TaskID id1 = *tm.Add(t).id;
 
-    t.set_title("TestTitle");
+    t.set_title("SubTask 1");
     t.set_due_date(time(nullptr) + 10);
     Core::TaskID id2 = *tm.AddSubtask(t, id1).id;
 
     t.set_title("SubTask 2");
     t.set_due_date(time(nullptr) + 5);
-    Core::TaskID id3 = *tm.AddSubtask(t, id1).id;
+    Core::TaskID id3 = *tm.AddSubtask(t, id2).id;
 
     auto tasks = tm.getTasks();
     ASSERT_EQ(3, tasks.size());
-//    EXPECT_EQ(tm[id1].first, tasks.at(id1).first);
-//    EXPECT_EQ(tm[id2].first, tasks.at(id2).first);
-//    EXPECT_EQ(tm[id3].first, tasks.at(id3).first);
+    EXPECT_EQ("TestTitle", tasks[0].data().title());
+    EXPECT_EQ(id1, tasks[0].id());
+    EXPECT_FALSE(tasks[0].has_parent());
+    EXPECT_EQ("SubTask 1", tasks[1].data().title());
+    EXPECT_EQ(id2, tasks[1].id());
+    EXPECT_EQ(id1, tasks[1].parent());
+    EXPECT_EQ("SubTask 2", tasks[2].data().title());
+    EXPECT_EQ(id3, tasks[2].id());
+    EXPECT_EQ(id2, tasks[2].parent());
 }
 
 TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificID){
@@ -378,7 +344,7 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificID){
     t.set_is_complete(false);
     Core::TaskID id1 = *tm.Add(t).id;
 
-    t.set_title("TestTitle");
+    t.set_title("SubTask 1");
     t.set_due_date(time(nullptr) + 10);
     Core::TaskID id2 = *tm.AddSubtask(t, id1).id;
 
@@ -388,8 +354,12 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificID){
 
     auto tasks = tm.getTasks(id2);
     ASSERT_EQ(2, tasks.size());
-//    EXPECT_EQ(tm[id2].first, tasks.at(id2).first);
-//    EXPECT_EQ(tm[id3].first, tasks.at(id3).first);
+    EXPECT_EQ("SubTask 1", tasks[0].data().title());
+    EXPECT_EQ(id2, tasks[0].id());
+    EXPECT_FALSE(tasks[0].has_parent());
+    EXPECT_EQ("SubTask 2", tasks[1].data().title());
+    EXPECT_EQ(id3, tasks[1].id());
+    EXPECT_EQ(id2, tasks[1].parent());
 }
 
 TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
@@ -403,42 +373,20 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
     t.set_is_complete(false);
     Core::TaskID id1 = *tm.Add(t).id;
 
-    t.set_title("TestTitle");
+    t.set_title("SubTask 1");
     t.set_due_date(time(nullptr) + 10);
     Core::TaskID id2 = *tm.AddSubtask(t, id1).id;
 
     t.set_title("SubTask 2");
     t.set_due_date(time(nullptr) + 5);
-    Core::TaskID id3 = *tm.AddSubtask(t, id1).id;
+    Core::TaskID id3 = *tm.AddSubtask(t, id2).id;
 
     std::string label = "testing";
     tm.AddLabel(id2, label);
     auto tasks = tm.getTasks(label);
     ASSERT_EQ(1, tasks.size());
-//    EXPECT_EQ(tm[id2].first, tasks.at(id2).first);
-}
-
-TEST_F(TaskManagerTest, shouldExportTasks)
-{
-    int start_number = 42;
-    auto gen = std::make_shared<IDGenerator>(start_number);
-    Container con;
-    Core::Task parent, child;
-    parent.set_title("parent title");
-    child.set_title("child title");
-    auto parent_id = gen->genID();
-    con[parent_id] = std::make_pair(parent, Node());
-    auto child_id = gen->genID();
-    con[child_id] = std::make_pair(child, Node(parent_id));
-    TaskManager tm{gen, con};
-    auto vec = tm.getTasks();
-    EXPECT_EQ(vec[0].id(), parent_id);
-    EXPECT_EQ(vec[0].data(), parent);
-    EXPECT_FALSE(vec[0].has_parent());
-    EXPECT_EQ(vec[1].id(), child_id);
-    EXPECT_EQ(vec[1].data(), child);
-    ASSERT_TRUE(vec[1].has_parent());
-    EXPECT_EQ(vec[1].parent(), parent_id);
+    EXPECT_EQ(id2, tasks[0].id());
+    EXPECT_EQ("SubTask 1", tasks[0].data().title());
 }
 
 TEST_F(TaskManagerTest, shouldReplaceTasks)
@@ -464,8 +412,8 @@ TEST_F(TaskManagerTest, shouldReplaceTasks)
     vec.push_back(te2);
     TaskManager tm;
     tm.Replace(vec);
-    ASSERT_EQ(tm.size(), vec.size());
-    EXPECT_EQ(tm[*id].first, *parent);
-    EXPECT_EQ(tm[*child_id].first, *child);
-    EXPECT_EQ(tm[*child_id].second.parent(), *parent_id);
+    auto tasks = tm.getTasks();
+    ASSERT_EQ(tasks.size(), vec.size());
+    for (int i = 0; i<tasks.size(); ++i)
+        EXPECT_EQ(tasks[i], vec[i]);
 }
