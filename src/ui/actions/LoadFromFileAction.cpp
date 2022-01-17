@@ -10,6 +10,8 @@ LoadFromFileAction::LoadFromFileAction(const std::string &filename) : filename_{
 }
 
 ActionResult LoadFromFileAction::execute(const std::shared_ptr<ModelInterface> &model) {
+    if (filename_.empty())
+        return {ActionResult::Status::TAKES_ARG, std::nullopt};
     persister_ = std::unique_ptr<Persister>(new FilePersistence{filename_});
     std::vector<Core::TaskEntity> data;
     if (persister_->load(data)) {

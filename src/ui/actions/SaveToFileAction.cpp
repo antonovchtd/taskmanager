@@ -9,6 +9,8 @@ SaveToFileAction::SaveToFileAction(const std::string &filename) : filename_{file
 }
 
 ActionResult SaveToFileAction::execute(const std::shared_ptr<ModelInterface> &model) {
+    if (filename_.empty())
+        return {ActionResult::Status::TAKES_ARG, std::nullopt};
     persister_ = std::unique_ptr<Persister>(new FilePersistence{filename_});
     if (persister_->save(model->getTasks()))
         return {ActionResult::Status::SUCCESS, std::nullopt};
