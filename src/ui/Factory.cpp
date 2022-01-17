@@ -18,7 +18,6 @@
 #include "ui/steps/ConfirmDeleteStep.h"
 #include "ui/steps/LabelStep.h"
 #include "Machine.h"
-#include "Context.h"
 
 Factory::Factory() :
         reader_(std::shared_ptr<AbstractReader>(new ConsoleReader)),
