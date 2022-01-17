@@ -28,12 +28,10 @@
                         (sub)tasks with this label. When an ID is given, shows that task and
                         its subtasks.
 
-    save [<filename>]   saves current state of the program to the file given by the filename. If
-                        none is provided, uses a default, hardcoded one.
+    save <filename>     saves current state of the program to the file given by the filename.
 
-    load [<filename>]   loads current state of the program from the file given by the filename,
-                        overwriting the current state (tasks). If none is provided,
-                        uses a default, hardcoded one.
+    load <filename>     loads current state of the program from the file given by the filename,
+                        overwriting the current state (tasks).
 
     help                shows this help.
 
