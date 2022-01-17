@@ -40,7 +40,7 @@ public:
         task_.set_title("test");
         task_.set_priority(Core::Task::Priority::Task_Priority_HIGH);
         task_.set_due_date(time(nullptr));
-        task_.set_label("label");
+        task_.add_labels("label");
         task_.set_is_complete(false);
         AddTaskAction act{task_};
         ActionResult result = act.execute(tm_);
@@ -253,7 +253,8 @@ TEST_F(ActionTest, shouldLabelTask)
     ActionResult result_label = act.execute(tm_);
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(id_, *result_label.id);
-    EXPECT_EQ(label, tm_->getTasks()[0].data().label());
+    EXPECT_EQ("label", tm_->getTasks()[0].data().labels()[0]);
+    EXPECT_EQ(label, tm_->getTasks()[0].data().labels()[1]);
 }
 
 TEST_F(ActionTest, shouldNotLabelTaskWithInvalidID)
@@ -266,7 +267,7 @@ TEST_F(ActionTest, shouldNotLabelTaskWithInvalidID)
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(result_label.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_EQ(new_id, result_label.id);
-    EXPECT_EQ("label", tm_->getTasks()[0].data().label());
+    EXPECT_EQ("label", tm_->getTasks()[0].data().labels()[0]);
 }
 
 TEST_F(ActionTest, shouldDoNothing)

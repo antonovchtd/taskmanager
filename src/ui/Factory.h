@@ -34,7 +34,9 @@ public:
         UNCOMPLETE,
         DELETE,
         CONFIRMDELETE,
-        LABEL
+        LABEL,
+        UNLABEL,
+        UNLABELALL
     };
 
 public:

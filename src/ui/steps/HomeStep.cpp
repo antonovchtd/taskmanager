@@ -16,7 +16,8 @@ std::unique_ptr<Action> HomeStep::genAction(Context &) {
 
     if (command_ == "edit" || command_ == "subtask" ||
         command_ == "delete" || command_ == "complete" ||
-        command_ == "uncomplete" || command_ == "label") {
+        command_ == "uncomplete" || command_ == "label" ||
+        command_ == "unlabel" || command_ == "UNLABEL") {
         return std::unique_ptr<Action>(new ValidateIDAction(arg));
     } else if (command_ == "show") {
         return std::unique_ptr<Action>(new GetTasksToShowAction(arg));
