@@ -22,17 +22,11 @@ find_package(Threads REQUIRED)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-file(GLOB_RECURSE PROTO_SOURCES CONFIGURE_DEPENDS src/model/*.proto)
+file(GLOB_RECURSE PROTO_SOURCES CONFIGURE_DEPENDS proto/*.proto)
 message("PROTO_SOURCES ${PROTO_SOURCES}")
 
-set(PROTO_DIR src/model)
+set(PROTO_DIR proto/)
 set(GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
-
-#include_directories(${Protobuf_INCLUDE_DIRS})
-#include_directories(${CMAKE_CURRENT_BINARY_DIR})
-#
-#protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS src/model/Task.proto)
-#message("${PROTO_HDRS}")
 
 macro(compile_proto_file filename)
     get_filename_component(dirname ${filename} PATH)
