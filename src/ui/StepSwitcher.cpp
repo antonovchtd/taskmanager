@@ -62,6 +62,10 @@ std::shared_ptr<Step> StepSwitcher::nextStep(const UnlabelStep &, const std::sha
     return factory->lazyInitStep(Factory::State::HOME);
 }
 
+std::shared_ptr<Step> StepSwitcher::nextStep(const LabelsStep &, const std::shared_ptr<Factory> &factory) {
+    return factory->lazyInitStep(Factory::State::HOME);
+}
+
 std::shared_ptr<Step> StepSwitcher::nextStep(const UnlabelAllStep &, const std::shared_ptr<Factory> &factory) {
     return factory->lazyInitStep(Factory::State::HOME);
 }

@@ -36,7 +36,8 @@ public:
         CONFIRMDELETE,
         LABEL,
         UNLABEL,
-        UNLABELALL
+        UNLABELALL,
+        LABELS
     };
 
 public:

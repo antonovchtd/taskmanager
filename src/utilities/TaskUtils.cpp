@@ -37,9 +37,7 @@ std::string to_string(const Core::Task &t) {
     os << ", Due: " << str_time;
 
     if (!t.labels().empty()) {
-        os << " L:";
-        for (const auto &label : t.labels())
-            os << " " << label;
+        os << ", has " << t.labels().size() << " label(s)";
     }
 
     if (dd < time(nullptr)) {

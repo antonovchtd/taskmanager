@@ -3,6 +3,7 @@
 //
 
 #include "persistence/FilePersistence.h"
+#include "utilities/TaskEntityUtils.h"
 #include "ui/Context.h"
 #include "ui/actions/Action.h"
 #include "ui/actions/AddTaskAction.h"
@@ -18,6 +19,9 @@
 #include "ui/actions/LabelTaskAction.h"
 #include "ui/actions/LoadFromFileAction.h"
 #include "ui/actions/SaveToFileAction.h"
+#include "ui/actions/UnlabelTaskAction.h"
+#include "ui/actions/UnlabelAllTasksAction.h"
+#include "ui/actions/GetTasksToShowLabelsAction.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -47,6 +51,12 @@ public:
         id_ = *result.id;
     }
 
+};
+
+class MockPersister : public FilePersistence {
+public:
+    MOCK_METHOD(bool, save, (const std::vector<Core::TaskEntity> &vec), (override));
+    MOCK_METHOD(bool, load, (std::vector<Core::TaskEntity> &vec), (override));
 };
 
 TEST_F(ActionTest, shouldAddTask)
@@ -279,9 +289,64 @@ TEST_F(ActionTest, shouldDoNothing)
     EXPECT_EQ(std::nullopt, result.id);
 
 }
-class MockPersister : public FilePersistence {
-public:
-    MOCK_METHOD(bool, save, (const std::vector<Core::TaskEntity> &vec), (override));
-    MOCK_METHOD(bool, load, (std::vector<Core::TaskEntity> &vec), (override));
-};
 
+TEST_F(ActionTest, shouldClearAllLabelsOfTask)
+{
+    LabelTaskAction label_action(id_, "mylabel");
+    LabelTaskAction label_action2(id_, "mylabel2");
+    label_action.execute(tm_);
+    label_action2.execute(tm_);
+
+    UnlabelAllTasksAction act{id_};
+    ActionResult result = act.execute(tm_);
+    ASSERT_EQ(1, tm_->size());
+    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
+    EXPECT_EQ(id_, *result.id);
+    auto tasks = tm_->getTasks(id_);
+    EXPECT_TRUE(tasks[0].data().labels().empty());
+}
+
+TEST_F(ActionTest, shouldClearOneLabelOfTask)
+{
+    LabelTaskAction label_action(id_, "mylabel");
+    LabelTaskAction label_action2(id_, "mylabel2");
+    label_action.execute(tm_);
+    label_action2.execute(tm_);
+
+    UnlabelTaskAction act{id_, "mylabel2"};
+    ActionResult result = act.execute(tm_);
+    ASSERT_EQ(1, tm_->size());
+    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
+    EXPECT_EQ(id_, *result.id);
+    auto tasks = tm_->getTasks(id_);
+    EXPECT_EQ(2, tasks[0].data().labels().size());
+    EXPECT_EQ("mylabel", tasks[0].data().labels()[1]);
+}
+
+TEST_F(ActionTest, shouldGetTaskToShowItsLabels)
+{
+    GetTasksToShowLabelsAction act{std::to_string(id_.value())};
+    ActionResult result = act.execute(tm_);
+    ASSERT_EQ(1, tm_->size());
+    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
+    auto tasks = tm_->getTasks(id_);
+    EXPECT_EQ(1, result.tasks.size());
+    EXPECT_EQ(tasks[0], result.tasks[0]);
+}
+
+TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidID)
+{
+    GetTasksToShowLabelsAction act{std::to_string(id_.value()+1)};
+    ActionResult result = act.execute(tm_);
+    ASSERT_EQ(1, tm_->size());
+    EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
+}
+
+TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidArg)
+{
+    GetTasksToShowLabelsAction act{"bad"};
+    ActionResult result = act.execute(tm_);
+    ASSERT_EQ(1, tm_->size());
+    EXPECT_EQ(result.status, ActionResult::Status::TAKES_ID);
+    EXPECT_EQ(std::nullopt, result.id);
+}

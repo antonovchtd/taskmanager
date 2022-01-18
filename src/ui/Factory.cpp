@@ -19,6 +19,7 @@
 #include "ui/steps/LabelStep.h"
 #include "ui/steps/UnlabelStep.h"
 #include "ui/steps/UnlabelAllStep.h"
+#include "ui/steps/LabelsStep.h"
 #include "Machine.h"
 
 Factory::Factory() :
@@ -75,6 +76,8 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
         return lazyInitStep(Factory::State::UNLABEL);
     } else if (command == "UNLABEL") {
         return lazyInitStep(Factory::State::UNLABELALL);
+    } else if (command == "labels") {
+        return lazyInitStep(Factory::State::LABELS);
     } else if (command == "save") {
         return lazyInitStep(Factory::State::HOME);
     } else if (command == "load") {
@@ -120,6 +123,8 @@ std::shared_ptr<Step> Factory::getNewStep(const State &s) {
             return std::shared_ptr<Step>{new LabelStep(reader(), printer())};
         case State::UNLABEL:
             return std::shared_ptr<Step>{new UnlabelStep(reader(), printer())};
+        case State::LABELS:
+            return std::shared_ptr<Step>{new LabelsStep(reader(), printer())};
         case State::UNLABELALL:
             return std::shared_ptr<Step>{new UnlabelAllStep(reader(), printer())};
     }
