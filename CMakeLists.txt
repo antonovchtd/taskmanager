@@ -56,7 +56,7 @@ endforeach(proto_file)
 include_directories(${GENERATED_DIR})
 
 
-SET_SOURCE_FILES_PROPERTIES(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
+SET_SOURCE_FILES_PROPERTIES(${spine_generated_files} PROPERTIES GENERATED TRUE)
 
 
 set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
@@ -73,9 +73,9 @@ file(GLOB_RECURSE IO src/io/*)
 file(GLOB_RECURSE PER src/persistence/*)
 file(GLOB_RECURSE TEST test/*)
 add_executable(taskmanager src/main.cpp ${Model} ${Utils} ${UI} ${IO} ${PER}
-        ${CMAKE_CURRENT_BINARY_DIR}/Task.pb.h ${CMAKE_CURRENT_BINARY_DIR}/Task.pb.cc)
+        ${spine_generated_files})
 add_executable(test_taskmanager ${Model} ${Utils} ${UI} ${IO} ${PER} ${TEST}
-        ${CMAKE_CURRENT_BINARY_DIR}/Task.pb.h ${CMAKE_CURRENT_BINARY_DIR}/Task.pb.cc)
+        ${spine_generated_files})
 target_link_libraries(test_taskmanager GTest::GTest GTest::Main GTest::gmock GTest::gmock_main)
 target_link_libraries(test_taskmanager ${Boost_LIBRARIES})
 target_link_libraries(taskmanager protobuf::libprotobuf gRPC::grpc++ gRPC::grpc++_reflection)
