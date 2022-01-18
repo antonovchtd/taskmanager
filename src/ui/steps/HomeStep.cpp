@@ -22,7 +22,7 @@ std::unique_ptr<Action> HomeStep::genAction(Context &) {
     } else if (command_ == "show") {
         return std::unique_ptr<Action>(new GetTasksToShowAction(arg));
     } else if (command_ == "labels") {
-        return std::unique_ptr<Action>(new GetTasksToShowLabelsAction(arg));
+        return std::unique_ptr<Action>(new GetTaskToShowLabelsAction(arg));
     } else if (command_ == "save") {
         return std::unique_ptr<Action>(new SaveToFileAction(arg));
     } else if (command_ == "load") {

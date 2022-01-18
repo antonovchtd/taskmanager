@@ -7,7 +7,7 @@
 
 std::unique_ptr<Action> UnlabelStep::genAction(Context &context) {
     std::string label = readLabel();
-    return std::unique_ptr<Action>(new UnlabelTaskAction(*context.id(), label));
+    return std::unique_ptr<Action>(new ClearLabelOfTaskAction(*context.id(), label));
 }
 
 std::shared_ptr<Step> UnlabelStep::genNextStep(const ActionResult &result, const std::shared_ptr<Factory> &factory) {

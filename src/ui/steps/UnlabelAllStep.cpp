@@ -6,7 +6,7 @@
 #include "ui/Context.h"
 
 std::unique_ptr<Action> UnlabelAllStep::genAction(Context &context) {
-    return std::unique_ptr<Action>(new UnlabelAllTasksAction(*context.id()));
+    return std::unique_ptr<Action>(new ClearAllLabelsOfTaskAction(*context.id()));
 }
 
 std::shared_ptr<Step> UnlabelAllStep::genNextStep(const ActionResult &result, const std::shared_ptr<Factory> &factory) {

@@ -19,9 +19,9 @@
 #include "ui/actions/LabelTaskAction.h"
 #include "ui/actions/LoadFromFileAction.h"
 #include "ui/actions/SaveToFileAction.h"
-#include "ui/actions/UnlabelTaskAction.h"
-#include "ui/actions/UnlabelAllTasksAction.h"
-#include "ui/actions/GetTasksToShowLabelsAction.h"
+#include "ui/actions/ClearLabelOfTaskAction.h"
+#include "ui/actions/ClearAllLabelsOfTaskAction.h"
+#include "ui/actions/GetTaskToShowLabelsAction.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -297,7 +297,7 @@ TEST_F(ActionTest, shouldClearAllLabelsOfTask)
     label_action.execute(tm_);
     label_action2.execute(tm_);
 
-    UnlabelAllTasksAction act{id_};
+    ClearAllLabelsOfTaskAction act{id_};
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
@@ -313,7 +313,7 @@ TEST_F(ActionTest, shouldClearOneLabelOfTask)
     label_action.execute(tm_);
     label_action2.execute(tm_);
 
-    UnlabelTaskAction act{id_, "mylabel2"};
+    ClearLabelOfTaskAction act{id_, "mylabel2"};
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
@@ -325,7 +325,7 @@ TEST_F(ActionTest, shouldClearOneLabelOfTask)
 
 TEST_F(ActionTest, shouldGetTaskToShowItsLabels)
 {
-    GetTasksToShowLabelsAction act{std::to_string(id_.value())};
+    GetTaskToShowLabelsAction act{std::to_string(id_.value())};
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
@@ -336,7 +336,7 @@ TEST_F(ActionTest, shouldGetTaskToShowItsLabels)
 
 TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidID)
 {
-    GetTasksToShowLabelsAction act{std::to_string(id_.value()+1)};
+    GetTaskToShowLabelsAction act{std::to_string(id_.value() + 1)};
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
@@ -344,7 +344,7 @@ TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidID)
 
 TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidArg)
 {
-    GetTasksToShowLabelsAction act{"bad"};
+    GetTaskToShowLabelsAction act{"bad"};
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(result.status, ActionResult::Status::TAKES_ID);

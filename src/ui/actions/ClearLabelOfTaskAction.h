@@ -7,9 +7,9 @@
 
 #include "Action.h"
 
-class UnlabelTaskAction : public Action {
+class ClearLabelOfTaskAction : public Action {
 public:
-    UnlabelTaskAction(const Core::TaskID &, const std::string &label);
+    ClearLabelOfTaskAction(const Core::TaskID &, const std::string &label);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;

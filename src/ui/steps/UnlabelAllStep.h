@@ -8,7 +8,7 @@
 
 #include "Step.h"
 #include "utilities/StepUtils.h"
-#include "ui/actions/UnlabelAllTasksAction.h"
+#include "ui/actions/ClearAllLabelsOfTaskAction.h"
 
 class UnlabelAllStep : public Step {
 public:

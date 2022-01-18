@@ -7,9 +7,9 @@
 
 #include "Action.h"
 
-class GetTasksToShowLabelsAction : public Action {
+class GetTaskToShowLabelsAction : public Action {
 public:
-    explicit GetTasksToShowLabelsAction(const std::string &arg);
+    explicit GetTaskToShowLabelsAction(const std::string &arg);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;

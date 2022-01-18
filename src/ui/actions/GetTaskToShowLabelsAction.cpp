@@ -2,12 +2,12 @@
 // Created by Anton Ovcharenko on 18.01.2022.
 //
 
-#include "GetTasksToShowLabelsAction.h"
+#include "GetTaskToShowLabelsAction.h"
 
-GetTasksToShowLabelsAction::GetTasksToShowLabelsAction(const std::string &arg) : arg_{arg} {
+GetTaskToShowLabelsAction::GetTaskToShowLabelsAction(const std::string &arg) : arg_{arg} {
 }
 
-ActionResult GetTasksToShowLabelsAction::execute(const std::shared_ptr<ModelInterface> &model) {
+ActionResult GetTaskToShowLabelsAction::execute(const std::shared_ptr<ModelInterface> &model) {
     std::optional<Core::TaskID> id{Core::TaskID()};
     try {
         id->set_value(std::stoi(arg_));
