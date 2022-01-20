@@ -147,6 +147,27 @@ ActionResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &la
     return {ActionResult::Status::SUCCESS, id};
 }
 
+ActionResult TaskManager::ClearLabel(const Core::TaskID &id, const std::string &label) {
+    try {
+        auto labels = tasks_.at(id).first.mutable_labels();
+        auto it = find(labels->begin(), labels->end(), label);
+        if (it != labels->end())
+            tasks_.at(id).first.mutable_labels()->erase(it);
+    } catch (const std::out_of_range &) {
+        return {ActionResult::Status::ID_NOT_FOUND, id};
+    }
+    return {ActionResult::Status::SUCCESS, id};
+}
+
+ActionResult TaskManager::ClearLabels(const Core::TaskID &id) {
+    try {
+        tasks_.at(id).first.clear_labels();
+    } catch (const std::out_of_range &) {
+        return {ActionResult::Status::ID_NOT_FOUND, id};
+    }
+    return {ActionResult::Status::SUCCESS, id};
+}
+
 void TaskManager::Replace(const std::vector<Core::TaskEntity> &vec) {
     tasks_.clear();
     Core::TaskID max_id;
