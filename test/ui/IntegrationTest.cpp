@@ -5,6 +5,7 @@
 #include <numeric>
 
 #include "ui/Machine.h"
+#include "utilities/TaskUtils.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -202,21 +203,22 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
     m.run();
     ASSERT_EQ(3, tm->size());
 
+    auto tasks = tm->getTasks();
     // check labels
     Core::TaskID id;
     id.set_value(1);
     ASSERT_TRUE(tm->Validate(id));
-    EXPECT_EQ("", tm->getTasks()[0].data().label());
+    EXPECT_EQ(0, tasks[0].data().labels().size());
 
     Core::TaskID id2;
     id2.set_value(2);
     ASSERT_TRUE(tm->Validate(id2));
-    EXPECT_EQ("l2", tm->getTasks()[1].data().label());
+    EXPECT_EQ("l2", tm->getTasks()[1].data().labels()[0]);
 
     Core::TaskID id3;
     id3.set_value(3);
     ASSERT_TRUE(tm->Validate(id3));
-    EXPECT_EQ("l3", tm->getTasks()[2].data().label());
+    EXPECT_EQ("l3", tm->getTasks()[2].data().labels()[0]);
 
     // check parents
     EXPECT_FALSE(tm->getTasks()[0].has_parent());
@@ -519,4 +521,34 @@ TEST_F(IntegrationTest, shouldAddTasksInFutureDate)
     timeinfo->tm_min+=2;
     date = mktime(timeinfo);
     EXPECT_EQ(out[8] + "\n", std::string("2 – test 2, Priority: Medium, Due: ") + asctime(localtime(&date)));
+}
+
+TEST_F(IntegrationTest, shouldAddMultipleLabels)
+{
+    std::vector<std::string> scenario = {"add", "test", "1", "21/12/25",
+                                         "label 1", "l1", "label 1", "l2", "label 1", "l3", "show",
+                                         "quit"};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                                 "Added Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 3 label(s)", "\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(1, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
 }

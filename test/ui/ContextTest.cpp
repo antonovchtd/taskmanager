@@ -27,7 +27,7 @@ TEST_F(ContextTest, shouldSetTasks)
     Core::Task t;
     t.set_title("test");
     t.set_priority(Core::Task_Priority_NONE);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
@@ -44,7 +44,7 @@ TEST_F(ContextTest, shouldSetData){
     Core::Task t;
     t.set_title("test");
     t.set_priority(Core::Task_Priority_NONE);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
     Context c;
@@ -52,7 +52,7 @@ TEST_F(ContextTest, shouldSetData){
     EXPECT_EQ(t.title(), c.task().title());
     EXPECT_EQ(t.priority(), c.task().priority());
     EXPECT_EQ(t.due_date(), c.task().due_date());
-    EXPECT_EQ(t.label(), c.task().label());
+    EXPECT_EQ(t.labels()[0], c.task().labels()[0]);
     EXPECT_EQ(t.is_complete(), c.task().is_complete());
 }
 

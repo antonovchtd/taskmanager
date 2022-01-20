@@ -48,11 +48,14 @@ std::vector<Core::TaskEntity> TaskManager::getTasks() const {
 std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) const {
     std::vector<Core::TaskEntity> tasks;
     for (const auto &kv : tasks_) {
-        if (kv.second.first.label() == label) {
-            Core::TaskEntity te;
-            te.set_allocated_id(new Core::TaskID(kv.first));
-            te.set_allocated_data(new Core::Task(kv.second.first));
-            tasks.push_back(te);
+        for (const auto &task_label : kv.second.first.labels()) {
+            if (task_label == label) {
+                Core::TaskEntity te;
+                te.set_allocated_id(new Core::TaskID(kv.first));
+                te.set_allocated_data(new Core::Task(kv.second.first));
+                tasks.push_back(te);
+                break;
+            }
         }
     }
     return tasks;
@@ -134,9 +137,10 @@ size_t TaskManager::size() const {
 }
 
 ActionResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &label) {
-    Core::Task t;
     try {
-        tasks_.at(id).first.set_label(label);
+        auto labels = tasks_.at(id).first.labels();
+        if (find(labels.begin(), labels.end(), label) == labels.end())
+            tasks_.at(id).first.add_labels(label);
     } catch (const std::out_of_range &) {
         return {ActionResult::Status::ID_NOT_FOUND, id};
     }
