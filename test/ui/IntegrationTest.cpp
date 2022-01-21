@@ -426,7 +426,7 @@ TEST_F(IntegrationTest, shouldEditTask)
     std::vector<std::string> expected_outputs = {"[Add Task]\n",
                                   "Added Task", " (ID: 1)\n",
                                   "1 – Test Task, Priority: Low, Due: Tue Dec 21 00:00:00 2021 [overdue]", "\n",
-                                  "This function requires an argument.\n",
+                                  "This function requires an ID argument.\n",
                                   "[Edit Task]\n",
                                   "Edited Task", " (ID: 1)\n",
                                   "1 – edited, Priority: Medium, Due: Tue Dec 21 00:00:00 2021 [overdue]", "\n"};

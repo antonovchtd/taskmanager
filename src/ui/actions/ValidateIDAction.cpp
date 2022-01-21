@@ -5,21 +5,17 @@
 #include "ValidateIDAction.h"
 #include "ui/Context.h"
 
-ValidateIDAction::ValidateIDAction(const std::string &arg) : arg_{arg} {
+ValidateIDAction::ValidateIDAction(const std::optional<Core::TaskID> &id) : id_{id} {
 }
 
 ActionResult ValidateIDAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    Core::TaskID id;
-    if (arg_.empty())
-        return {ActionResult::Status::TAKES_ARG, std::nullopt};
-    try {
-        id.set_value(std::stoi(arg_));
-        auto result = model->Validate(id);
+    if (id_) {
+        auto result = model->Validate(*id_);
         if (result)
-            return {result.status, model->getTasks(id)};
+            return {result.status, model->getTasks(*id_)};
         else
-            return {result.status, id};
-    } catch (const std::invalid_argument &) {
+            return {result.status, id_};
+    } else {
         return {ActionResult::Status::TAKES_ID, std::nullopt};
     }
 }
