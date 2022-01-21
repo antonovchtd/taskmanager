@@ -631,7 +631,7 @@ TEST_F(IntegrationTest, shouldAddAndShowMultipleLabels)
                                                  "Added label to Task", " (ID: 1)\n",
                                                  "Added label to Task", " (ID: 1)\n",
                                                  "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 3 label(s)", "\n",
-                                                 "l1 ", "l2 ", "l3 ", "\n"};
+                                                 "l1, l2, l3\n"};
 
     auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
                              std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));

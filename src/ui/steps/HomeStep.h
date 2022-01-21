@@ -7,7 +7,7 @@
 
 #include <sstream>
 
-#include "Step.h"
+#include "IOStep.h"
 #include "utilities/StepUtils.h"
 #include "ui/actions/ValidateIDAction.h"
 #include "ui/actions/ValidateNoArgAction.h"
@@ -16,9 +16,9 @@
 #include "ui/actions/SaveToFileAction.h"
 #include "ui/actions/GetTaskToShowLabelsAction.h"
 
-class HomeStep : public Step {
+class HomeStep : public IOStep {
 public:
-    using Step::Step;
+    using IOStep::IOStep;
     std::unique_ptr<Action> genAction(Context &) override;
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 

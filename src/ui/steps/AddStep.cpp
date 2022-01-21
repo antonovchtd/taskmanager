@@ -7,7 +7,7 @@
 AddStep::AddStep(std::shared_ptr<AbstractReader> reader,
                  std::shared_ptr<AbstractPrinter> printer,
                  std::shared_ptr<Machine> submachine) :
-         Step(reader, printer) {
+        IOStep(reader, printer) {
     submachine_ = submachine;
 }
 

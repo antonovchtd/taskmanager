@@ -5,12 +5,12 @@
 #ifndef TASKMANAGER_SRC_UI_STEPS_EDITSTEP_H_
 #define TASKMANAGER_SRC_UI_STEPS_EDITSTEP_H_
 
-#include "Step.h"
+#include "IOStep.h"
 #include "utilities/StepUtils.h"
 #include "ui/Machine.h"
 #include "ui/actions/EditTaskAction.h"
 
-class EditStep : public Step {
+class EditStep : public IOStep {
 public:
     EditStep(std::shared_ptr<AbstractReader> reader,
             std::shared_ptr<AbstractPrinter> printer,
