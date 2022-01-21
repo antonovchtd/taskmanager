@@ -6,11 +6,20 @@
 #include "ui/Context.h"
 
 std::unique_ptr<Action> ShowAllLabelsStep::genAction(Context &context) {
-    auto labels = context.tasks()[0].data().labels();
-    for (auto it = labels.begin(); it != labels.end(); ++it)
-        printer()->print(*it + " ");
-    if (!labels.empty())
-        printer()->print("\n");
+    std::ostringstream os;
+    if (!context.tasks().empty()) {
+        auto labels = context.tasks()[0].data().labels();
+        for (int i = 0; i < labels.size(); ++i) {
+            os << labels[i];
+            if (i < labels.size()-1)
+                os << ", ";
+        }
+
+        if (!labels.empty())
+            os << "\n";
+
+        printer()->print(os.str());
+    }
     return std::unique_ptr<Action>(new DoNothingAction);
 }
 
