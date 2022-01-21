@@ -25,6 +25,9 @@ void updateContext(Context &context, const ActionResult &result) {
                 context.setID(result.id);
             break;
         case ActionResult::kEntity:
+            context.setTasks(std::vector<Core::TaskEntity>{result.entity});
+            break;
+        case ActionResult::kVector:
             context.setTasks(result.tasks);
             if (!result.tasks.empty()) {
                 context.setTask(result.tasks[0].data());
