@@ -40,6 +40,15 @@ public:
     void Replace(const std::vector<Core::TaskEntity> &) override;
 
 private:
+    void AddChild(const Core::TaskID &parent, const Core::TaskID &child);
+    void RemoveChild(const Core::TaskID &parent, const Core::TaskID &child);
+
+private:
+    std::optional<Core::Task> GetTask(const Core::TaskID &id) const;
+    std::vector<Core::TaskID> ChildrenOf(const Core::TaskID &parent) const;
+    std::optional<Core::TaskID> ParentOf(const Core::TaskID &id) const;
+
+private:
     std::map<Core::TaskID, std::pair<Core::Task, Node>> tasks_;
     std::shared_ptr<IDGenerator> gen_;
 };
