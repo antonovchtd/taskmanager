@@ -442,7 +442,7 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificID){
     t.set_due_date(time(nullptr) + 5);
     Core::TaskID id3 = *tm.AddSubtask(t, id2).id;
 
-    auto tasks = tm.getTasks(id2);
+    auto tasks = tm.getTaskWithSubtasks(id2);
     ASSERT_EQ(2, tasks.size());
     EXPECT_EQ("SubTask 1", tasks[0].data().title());
     EXPECT_EQ(id2, tasks[0].id());

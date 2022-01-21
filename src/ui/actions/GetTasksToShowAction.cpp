@@ -18,7 +18,7 @@ ActionResult GetTasksToShowAction::execute(const std::shared_ptr<ModelInterface>
     if (!id_ && arg_.empty())
         tasks = model->getTasks();
     else if (id_)
-        tasks = model->getTasks(*id_);
+        tasks = model->getTaskWithSubtasks(*id_);
     else
         tasks = model->getTasks(arg_);
 

@@ -20,7 +20,7 @@ class ModelInterface {
 public:
     virtual std::vector<Core::TaskEntity> getTasks() const = 0;
     virtual std::vector<Core::TaskEntity> getTasks(const std::string &label) const = 0;
-    virtual std::vector<Core::TaskEntity> getTasks(const Core::TaskID &id) const = 0;
+    virtual std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const = 0;
     virtual std::shared_ptr<IDGenerator> gen() const = 0;
     virtual size_t size() const = 0;
 

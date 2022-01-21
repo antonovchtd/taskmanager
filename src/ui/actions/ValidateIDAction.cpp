@@ -12,7 +12,7 @@ ActionResult ValidateIDAction::execute(const std::shared_ptr<ModelInterface> &mo
     if (id_) {
         auto result = model->Validate(*id_);
         if (result)
-            return {result.status, model->getTasks(*id_)};
+            return {result.status, model->getTaskWithSubtasks(*id_)};
         else
             return {result.status, id_};
     } else {

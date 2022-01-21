@@ -662,7 +662,7 @@ private:
 //    auto next_step = step->execute(c, f);
 //    EXPECT_EQ(next_step, f->lazyInitStep(Factory::State::HOME));
 //
-//    EXPECT_TRUE(tm->getTasks().empty());
+//    EXPECT_TRUE(tm->getTaskWithSubtasks().empty());
 //
 //    auto messages = mp->messages();
 //    EXPECT_EQ(messages[0], "Deleted Task");

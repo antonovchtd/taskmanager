@@ -15,6 +15,6 @@ ActionResult GetTaskToShowLabelsAction::execute(const std::shared_ptr<ModelInter
         return {ActionResult::Status::TAKES_ID, id_};
     }
 
-    std::vector<Core::TaskEntity> tasks = model->getTasks(*id_);
+    std::vector<Core::TaskEntity> tasks = model->getTaskWithSubtasks(*id_);
     return {ActionResult::Status::SUCCESS, tasks[0]};
 }

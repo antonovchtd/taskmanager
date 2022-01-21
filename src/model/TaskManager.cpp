@@ -97,7 +97,7 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) co
     return tasks;
 }
 
-std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::TaskID &id) const {
+std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskID &id) const {
     std::vector<Core::TaskEntity> tasks;
     Core::TaskEntity te;
     te.set_allocated_id(new Core::TaskID(id));
@@ -107,7 +107,7 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::TaskID &id) cons
     // not including parent, but will include children
     tasks.push_back(te);
     for (const auto &ch_id : ChildrenOf(id)) {
-        auto ch_tasks = getTasks(ch_id);
+        auto ch_tasks = getTaskWithSubtasks(ch_id);
         for (auto &ch_task : ch_tasks) {
             ch_task.set_allocated_parent(new Core::TaskID(*ParentOf(ch_task.id())));
         }
