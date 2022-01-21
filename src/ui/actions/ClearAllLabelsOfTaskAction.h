@@ -9,7 +9,7 @@
 
 class ClearAllLabelsOfTaskAction : public Action {
 public:
-    ClearAllLabelsOfTaskAction(const Core::TaskID &);
+    explicit ClearAllLabelsOfTaskAction(const Core::TaskID &);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
