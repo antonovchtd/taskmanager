@@ -314,7 +314,7 @@ TEST_F(TaskManagerTest, shouldAddMultipleLabelsClearOne){
     tm.AddLabel(id, label2);
     tm.ClearLabel(id, label);
     auto tasks = tm.getTasks();
-    EXPECT_EQ(1, tasks[0].data().labels().size());
+    ASSERT_EQ(1, tasks[0].data().labels().size());
     EXPECT_EQ(label2, tasks[0].data().labels()[0]);
 }
 
@@ -333,7 +333,7 @@ TEST_F(TaskManagerTest, shouldFailToClearLabelInvalidID){
     id2.set_value(id.value()+1);
     ActionResult result = tm.ClearLabel(id2, label);
     auto tasks = tm.getTasks();
-    EXPECT_EQ(1, tasks[0].data().labels().size());
+    ASSERT_EQ(1, tasks[0].data().labels().size());
     EXPECT_EQ(label, tasks[0].data().labels()[0]);
     EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_EQ(*result.id, id2);
@@ -354,7 +354,7 @@ TEST_F(TaskManagerTest, shouldFailToClearAllLabelsInvalidID){
     id2.set_value(id.value()+1);
     ActionResult result = tm.ClearLabels(id2);
     auto tasks = tm.getTasks();
-    EXPECT_EQ(1, tasks[0].data().labels().size());
+    ASSERT_EQ(1, tasks[0].data().labels().size());
     EXPECT_EQ(label, tasks[0].data().labels()[0]);
     EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_EQ(*result.id, id2);
