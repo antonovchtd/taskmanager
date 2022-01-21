@@ -48,14 +48,12 @@ std::vector<Core::TaskEntity> TaskManager::getTasks() const {
 std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) const {
     std::vector<Core::TaskEntity> tasks;
     for (const auto &kv : tasks_) {
-        for (const auto &task_label : kv.second.first.labels()) {
-            if (task_label == label) {
-                Core::TaskEntity te;
-                te.set_allocated_id(new Core::TaskID(kv.first));
-                te.set_allocated_data(new Core::Task(kv.second.first));
-                tasks.push_back(te);
-                break;
-            }
+        auto labels = kv.second.first.labels();
+        if (std::find(labels.begin(), labels.end(), label) != labels.end()) {
+            Core::TaskEntity te;
+            te.set_allocated_id(new Core::TaskID(kv.first));
+            te.set_allocated_data(new Core::Task(kv.second.first));
+            tasks.push_back(te);
         }
     }
     return tasks;
