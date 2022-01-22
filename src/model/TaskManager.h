@@ -20,7 +20,7 @@ public:
 public:
     std::vector<Core::TaskEntity> getTasks() const override;
     std::vector<Core::TaskEntity> getTasks(const std::string &label) const override;
-    std::vector<Core::TaskEntity> getTasks(const Core::TaskID &id) const override;
+    std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const override;
     std::shared_ptr<IDGenerator> gen() const override;
     size_t size() const override;
 
@@ -33,9 +33,20 @@ public:
     ActionResult Delete(const Core::TaskID &id, bool deleteChildren) override;
     ActionResult Validate(const Core::TaskID &id) const override;
     ActionResult AddLabel(const Core::TaskID &, const std::string &) override;
+    ActionResult ClearLabel(const Core::TaskID &, const std::string &) override;
+    ActionResult ClearLabels(const Core::TaskID &) override;
 
 public:
     void Replace(const std::vector<Core::TaskEntity> &) override;
+
+private:
+    void AddChild(const Core::TaskID &parent, const Core::TaskID &child);
+    void RemoveChild(const Core::TaskID &parent, const Core::TaskID &child);
+
+private:
+    std::optional<Core::Task> GetTask(const Core::TaskID &id) const;
+    std::vector<Core::TaskID> ChildrenOf(const Core::TaskID &parent) const;
+    std::optional<Core::TaskID> ParentOf(const Core::TaskID &id) const;
 
 private:
     std::map<Core::TaskID, std::pair<Core::Task, Node>> tasks_;
