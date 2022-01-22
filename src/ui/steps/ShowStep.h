@@ -5,16 +5,16 @@
 #ifndef TASKMANAGER_SRC_UI_STEPS_SHOWSTEP_H_
 #define TASKMANAGER_SRC_UI_STEPS_SHOWSTEP_H_
 
-#include "Step.h"
+#include "IOStep.h"
 #include "utilities/StepUtils.h"
 #include "utilities/TaskUtils.h"
 #include "utilities/TaskIDUtils.h"
 #include "ui/actions/GetTasksToShowAction.h"
 #include "ui/actions/DoNothingAction.h"
 
-class ShowStep : public Step {
+class ShowStep : public IOStep {
 public:
-    using Step::Step;
+    using IOStep::IOStep;
     std::unique_ptr<Action> genAction(Context &) override;
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 
