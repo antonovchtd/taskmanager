@@ -48,7 +48,7 @@ std::optional<Core::TaskID> TaskManager::ParentOf(const Core::TaskID &id) const 
 
 ActionResult TaskManager::Add(const Core::Task &t) {
     Core::TaskID id = gen_->genID();
-    if (Validate(id))
+    if (IsPresent(id))
         return {ActionResult::Status::DUPLICATE_ID, id};
 
     tasks_.insert(std::make_pair(id, std::make_pair(t, Node())));
@@ -57,9 +57,9 @@ ActionResult TaskManager::Add(const Core::Task &t) {
 
 ActionResult TaskManager::AddSubtask(const Core::Task &t, const Core::TaskID &parent) {
     Core::TaskID id = gen_->genID();
-    if (Validate(id))
+    if (IsPresent(id))
         return {ActionResult::Status::DUPLICATE_ID, id};
-    if (!Validate(parent))
+    if (!IsPresent(parent))
         return {ActionResult::Status::PARENT_ID_NOT_FOUND, parent};
 
     tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
@@ -111,11 +111,11 @@ std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskI
 }
 
 ActionResult TaskManager::Delete(const Core::TaskID &id, bool deleteChildren) {
-    if (Validate(id)) {
+    if (IsPresent(id)) {
         if (!ChildrenOf(id).empty() && !deleteChildren)
             return {ActionResult::Status::HAS_CHILDREN, id};
         std::optional<Core::TaskID> ancestor = ParentOf(id);
-        if (ancestor && Validate(*ancestor))
+        if (ancestor && IsPresent(*ancestor))
             RemoveChild(*ancestor, id);
         for (auto const &ch: ChildrenOf(id))
             Delete(ch, true);
@@ -161,7 +161,7 @@ ActionResult TaskManager::Uncomplete(const Core::TaskID &id) {
     return {ActionResult::Status::SUCCESS, id};
 }
 
-ActionResult TaskManager::Validate(const Core::TaskID &id) const{
+ActionResult TaskManager::IsPresent(const Core::TaskID &id) const{
     if (tasks_.find(id) != tasks_.end())
         return {ActionResult::Status::SUCCESS, id};
     else

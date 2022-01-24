@@ -11,7 +11,7 @@ ActionResult GetTasksToShowAction::execute(const std::shared_ptr<ModelInterface>
     std::optional<Core::TaskID> id{Core::TaskID()};
     try {
         id->set_value(std::stoi(arg_));
-        if (!model->Validate(*id))
+        if (!model->IsPresent(*id))
             return {ActionResult::Status::ID_NOT_FOUND, id};
     } catch (const std::invalid_argument &) {
         id = std::nullopt;
@@ -21,7 +21,7 @@ ActionResult GetTasksToShowAction::execute(const std::shared_ptr<ModelInterface>
     if (arg_.empty())
         tasks = model->getTasks();
     else if (id)
-        tasks = model->getTasks(*id);
+        tasks = model->getTaskWithSubtasks(*id);
     else
         tasks = model->getTasks(arg_);
 
