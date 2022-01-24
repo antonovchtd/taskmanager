@@ -4,10 +4,9 @@
 
 #include "EditStep.h"
 
-EditStep::EditStep(const std::shared_ptr<AbstractReader> &reader,
-                   const std::shared_ptr<AbstractPrinter> &printer,
+EditStep::EditStep(const std::shared_ptr<AbstractPrinter> &printer,
                    const std::shared_ptr<Machine> &submachine) :
-        IOStep(reader, printer) {
+        PrinterStep(printer) {
     submachine_ = submachine;
 }
 

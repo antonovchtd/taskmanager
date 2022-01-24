@@ -5,9 +5,8 @@
 #include "UncompleteStep.h"
 #include "ui/Context.h"
 
-UncompleteStep::UncompleteStep(const std::shared_ptr<AbstractReader> &reader,
-                               const std::shared_ptr<AbstractPrinter> &printer) :
-        IOStep(reader, printer) {
+UncompleteStep::UncompleteStep(const std::shared_ptr<AbstractPrinter> &printer) :
+                PrinterStep(printer) {
 }
 
 std::unique_ptr<Action> UncompleteStep::genAction(Context &context) {

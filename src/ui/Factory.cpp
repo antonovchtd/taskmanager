@@ -91,23 +91,23 @@ std::shared_ptr<Step> Factory::getNewStep(const State &s) {
         case State::HELP:
             return std::shared_ptr<HelpStep>{new HelpStep(reader(), printer())};
         case State::ADD:
-            return std::shared_ptr<AddStep>{new AddStep(reader(), printer(), createMachine(State::READTASK))};
+            return std::shared_ptr<AddStep>{new AddStep(printer(), createMachine(State::READTASK))};
         case State::SUBTASK:
-            return std::shared_ptr<SubtaskStep>{new SubtaskStep(reader(), printer(), createMachine(State::READTASK))};
+            return std::shared_ptr<SubtaskStep>{new SubtaskStep(printer(), createMachine(State::READTASK))};
         case State::READTASK:
             return std::shared_ptr<ReadTaskDataStep>{new ReadTaskDataStep(reader(), printer())};
         case State::EDIT:
-            return std::shared_ptr<EditStep>{new EditStep(reader(), printer(), createMachine(State::READTASK))};
+            return std::shared_ptr<EditStep>{new EditStep(printer(), createMachine(State::READTASK))};
         case State::QUIT:
-            return std::shared_ptr<QuitStep>{new QuitStep(reader(), printer())};
+            return std::shared_ptr<QuitStep>{new QuitStep(printer())};
         case State::SHOW:
-            return std::shared_ptr<ShowStep>{new ShowStep(reader(), printer())};
+            return std::shared_ptr<ShowStep>{new ShowStep(printer())};
         case State::COMPLETE:
-            return std::shared_ptr<CompleteStep>{new CompleteStep(reader(), printer())};
+            return std::shared_ptr<CompleteStep>{new CompleteStep(printer())};
         case State::UNCOMPLETE:
-            return std::shared_ptr<UncompleteStep>{new UncompleteStep(reader(), printer())};
+            return std::shared_ptr<UncompleteStep>{new UncompleteStep(printer())};
         case State::DELETE:
-            return std::shared_ptr<DeleteStep>{new DeleteStep(reader(), printer())};
+            return std::shared_ptr<DeleteStep>{new DeleteStep(printer())};
         case State::CONFIRMDELETE:
             return std::shared_ptr<ConfirmDeleteStep>{new ConfirmDeleteStep(reader(), printer())};
         case State::LABEL:

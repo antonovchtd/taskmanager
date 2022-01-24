@@ -5,9 +5,8 @@
 #include "ShowStep.h"
 #include "ui/Context.h"
 
-ShowStep::ShowStep(const std::shared_ptr<AbstractReader> &reader,
-                   const std::shared_ptr<AbstractPrinter> &printer) :
-        IOStep(reader, printer) {
+ShowStep::ShowStep(const std::shared_ptr<AbstractPrinter> &printer) :
+        PrinterStep(printer) {
 }
 
 std::unique_ptr<Action> ShowStep::genAction(Context &context) {

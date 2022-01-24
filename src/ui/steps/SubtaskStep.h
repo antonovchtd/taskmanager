@@ -5,15 +5,14 @@
 #ifndef TASKMANAGER_SRC_UI_STEPS_SUBTASKSTEP_H_
 #define TASKMANAGER_SRC_UI_STEPS_SUBTASKSTEP_H_
 
-#include "IOStep.h"
+#include "PrinterStep.h"
 #include "utilities/StepUtils.h"
 #include "ui/Machine.h"
 #include "ui/actions/AddSubtaskAction.h"
 
-class SubtaskStep : public IOStep {
+class SubtaskStep : public PrinterStep {
 public:
-    SubtaskStep(const std::shared_ptr<AbstractReader> &reader,
-                const std::shared_ptr<AbstractPrinter> &printer,
+    SubtaskStep(const std::shared_ptr<AbstractPrinter> &printer,
                 const std::shared_ptr<Machine> &submachine);
 
 public:

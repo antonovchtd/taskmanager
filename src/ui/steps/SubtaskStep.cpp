@@ -4,10 +4,9 @@
 
 #include "SubtaskStep.h"
 
-SubtaskStep::SubtaskStep(const std::shared_ptr<AbstractReader> &reader,
-                         const std::shared_ptr<AbstractPrinter> &printer,
+SubtaskStep::SubtaskStep(const std::shared_ptr<AbstractPrinter> &printer,
                          const std::shared_ptr<Machine> &submachine) :
-        IOStep(reader, printer) {
+             PrinterStep(printer) {
     submachine_ = submachine;
 }
 
