@@ -296,7 +296,7 @@ TEST_F(ActionTest, shouldClearAllLabelsOfTask)
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     EXPECT_EQ(id_, *result.id);
-    auto tasks = tm_->getTasks(id_);
+    auto tasks = tm_->getTaskWithSubtasks(id_);
     EXPECT_TRUE(tasks[0].data().labels().empty());
 }
 
@@ -312,7 +312,7 @@ TEST_F(ActionTest, shouldClearOneLabelOfTask)
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     EXPECT_EQ(id_, *result.id);
-    auto tasks = tm_->getTasks(id_);
+    auto tasks = tm_->getTaskWithSubtasks(id_);
     EXPECT_EQ(2, tasks[0].data().labels().size());
     EXPECT_EQ("mylabel", tasks[0].data().labels()[1]);
 }
@@ -323,7 +323,7 @@ TEST_F(ActionTest, shouldGetTaskToShowItsLabels)
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    auto tasks = tm_->getTasks(id_);
+    auto tasks = tm_->getTaskWithSubtasks(id_);
     EXPECT_EQ(1, result.tasks.size());
     EXPECT_EQ(tasks[0], result.tasks[0]);
 }
