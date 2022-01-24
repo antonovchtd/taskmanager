@@ -5,6 +5,10 @@
 #include "ShowAllLabelsStep.h"
 #include "ui/Context.h"
 
+ShowAllLabelsStep::ShowAllLabelsStep(const std::shared_ptr<AbstractPrinter> &printer) :
+        PrinterStep(printer) {
+}
+
 std::unique_ptr<Action> ShowAllLabelsStep::genAction(Context &context) {
     std::ostringstream os;
     if (!context.tasks().empty()) {

@@ -7,14 +7,13 @@
 
 #include <sstream>
 
-#include "IOStep.h"
+#include "PrinterStep.h"
 #include "utilities/StepUtils.h"
 #include "ui/actions/DoNothingAction.h"
 
-class HelpStep : public IOStep {
+class HelpStep : public PrinterStep {
 public:
-    HelpStep(const std::shared_ptr<AbstractReader> &reader,
-             const std::shared_ptr<AbstractPrinter> &printer);
+    HelpStep(const std::shared_ptr<AbstractPrinter> &printer);
     std::unique_ptr<Action> genAction(Context &) override;
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 

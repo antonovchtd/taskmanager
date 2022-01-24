@@ -5,6 +5,10 @@
 #include "ClearAllLabelsStep.h"
 #include "ui/Context.h"
 
+ClearAllLabelsStep::ClearAllLabelsStep(const std::shared_ptr<AbstractPrinter> &printer) :
+        PrinterStep(printer) {
+}
+
 std::unique_ptr<Action> ClearAllLabelsStep::genAction(Context &context) {
     return std::unique_ptr<Action>(new ClearAllLabelsOfTaskAction(*context.id()));
 }

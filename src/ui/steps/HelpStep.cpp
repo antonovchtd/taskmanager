@@ -4,9 +4,7 @@
 
 #include "HelpStep.h"
 
-HelpStep::HelpStep(const std::shared_ptr<AbstractReader> &reader,
-                   const std::shared_ptr<AbstractPrinter> &printer) :
-                   IOStep(reader, printer) {
+HelpStep::HelpStep(const std::shared_ptr<AbstractPrinter> &printer) : PrinterStep(printer) {
 }
 
 std::unique_ptr<Action> HelpStep::genAction(Context &) {
