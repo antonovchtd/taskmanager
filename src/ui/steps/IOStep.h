@@ -11,7 +11,7 @@
 
 class IOStep : public Step {
 public:
-    IOStep(std::shared_ptr<AbstractReader> reader, std::shared_ptr<AbstractPrinter> printer);
+    IOStep(const std::shared_ptr<AbstractReader> &reader, const std::shared_ptr<AbstractPrinter> &printer);
 
 public:
     ~IOStep() override = default;

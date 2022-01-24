@@ -12,9 +12,9 @@
 
 class AddStep : public IOStep {
 public:
-    AddStep(std::shared_ptr<AbstractReader> reader,
-            std::shared_ptr<AbstractPrinter> printer,
-            std::shared_ptr<Machine> submachine);
+    AddStep(const std::shared_ptr<AbstractReader> &reader,
+            const std::shared_ptr<AbstractPrinter> &printer,
+            const std::shared_ptr<Machine> &submachine);
 
 public:
     std::unique_ptr<Action> genAction(Context &) override;
