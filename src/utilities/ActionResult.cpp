@@ -23,7 +23,6 @@ ActionResult::~ActionResult() {
                 id->Core::TaskID::~TaskID();
             break;
         case kEntity:
-            entity.Core::TaskEntity::~TaskEntity();
             break;
         case kVector:
             break;
