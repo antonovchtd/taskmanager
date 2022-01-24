@@ -7,6 +7,7 @@
 
 #include "utilities/TaskIDUtils.h"
 #include "utilities/TaskUtils.h"
+#include "utilities/TaskEntityUtils.h"
 #include "utilities/NodeUtils.h"
 #include "ModelInterface.h"
 #include "IDGenerator.h"

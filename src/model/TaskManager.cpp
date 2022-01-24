@@ -70,13 +70,11 @@ ActionResult TaskManager::AddSubtask(const Core::Task &t, const Core::TaskID &pa
 std::vector<Core::TaskEntity> TaskManager::getTasks() const {
     std::vector<Core::TaskEntity> vec;
     for (const auto &kv : tasks_) {
-        Core::TaskEntity te;
-        te.mutable_id()->CopyFrom(kv.first);
-        te.mutable_data()->CopyFrom(kv.second.first);
         if (kv.second.second.parent()) {
-            te.mutable_parent()->CopyFrom(*kv.second.second.parent());
+            vec.emplace_back(Core::createTaskEntity(kv.first, kv.second.first, *kv.second.second.parent()));
+        } else {
+            vec.emplace_back(Core::createTaskEntity(kv.first, kv.second.first));
         }
-        vec.push_back(te);
     }
     return vec;
 }
@@ -86,10 +84,7 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) co
     for (const auto &kv : tasks_) {
         for (const auto &task_label : kv.second.first.labels()) {
             if (task_label == label) {
-                Core::TaskEntity te;
-                te.mutable_id()->CopyFrom(kv.first);
-                te.mutable_data()->CopyFrom(kv.second.first);
-                tasks.push_back(te);
+                tasks.emplace_back(Core::createTaskEntity(kv.first, kv.second.first));
                 break;
             }
         }
@@ -99,13 +94,12 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) co
 
 std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskID &id) const {
     std::vector<Core::TaskEntity> tasks;
-    Core::TaskEntity te;
-    te.mutable_id()->CopyFrom(id);
     std::optional<Core::Task> task = GetTask(id);
     if (task)
-        te.mutable_data()->CopyFrom(*task);
+        tasks.emplace_back(Core::createTaskEntity(id, *task));
+    else
+        return tasks;
     // not including parent, but will include children
-    tasks.push_back(te);
     for (const auto &ch_id : ChildrenOf(id)) {
         auto ch_tasks = getTaskWithSubtasks(ch_id);
         for (auto &ch_task : ch_tasks) {
