@@ -56,7 +56,7 @@ public:
 TEST_F(ActionTest, shouldAddTask)
 {
     ASSERT_EQ(1, tm_->size());
-    EXPECT_TRUE(tm_->Validate(id_));
+    EXPECT_TRUE(tm_->IsPresent(id_));
 }
 
 TEST_F(ActionTest, shouldAddSubtask)
@@ -67,7 +67,7 @@ TEST_F(ActionTest, shouldAddSubtask)
     AddSubtaskAction subact{id_, t};
     ActionResult result_subtask = subact.execute(tm_);
     ASSERT_EQ(2, tm_->size());
-    EXPECT_TRUE(tm_->Validate(*result_subtask.id));
+    EXPECT_TRUE(tm_->IsPresent(*result_subtask.id));
     EXPECT_NE(id_, *result_subtask.id);
 
     auto tasks = tm_->getTasks();
@@ -137,7 +137,7 @@ TEST_F(ActionTest, shouldEditTask)
     ActionResult result_edit = act.execute(tm_);
 
     ASSERT_EQ(1, tm_->size());
-    EXPECT_TRUE(tm_->Validate(id_));
+    EXPECT_TRUE(tm_->IsPresent(id_));
     EXPECT_EQ(*result_edit.id, id_);
 
     auto tasks = tm_->getTasks();

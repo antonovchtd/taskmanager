@@ -10,6 +10,11 @@
 
 namespace Core {
 bool operator==(const Core::TaskEntity &lhs, const Core::TaskEntity &rhs);
+Core::TaskEntity createTaskEntity(const Core::TaskID &id,
+                                  const Core::Task &task,
+                                  const Core::TaskID &parent_it);
+Core::TaskEntity createTaskEntity(const Core::TaskID &id,
+                                  const Core::Task &task);
 }
 
 

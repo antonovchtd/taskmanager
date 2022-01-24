@@ -20,7 +20,7 @@ class ModelInterface {
 public:
     virtual std::vector<Core::TaskEntity> getTasks() const = 0;
     virtual std::vector<Core::TaskEntity> getTasks(const std::string &label) const = 0;
-    virtual std::vector<Core::TaskEntity> getTasks(const Core::TaskID &id) const = 0;
+    virtual std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const = 0;
     virtual std::shared_ptr<IDGenerator> gen() const = 0;
     virtual size_t size() const = 0;
 
@@ -31,7 +31,7 @@ public:
     virtual ActionResult Complete(const Core::TaskID &) = 0;
     virtual ActionResult Uncomplete(const Core::TaskID &) = 0;
     virtual ActionResult Delete(const Core::TaskID &, bool deleteChildren) = 0;
-    virtual ActionResult Validate(const Core::TaskID &) const = 0;
+    virtual ActionResult IsPresent(const Core::TaskID &) const = 0;
     virtual ActionResult AddLabel(const Core::TaskID &, const std::string &label) = 0;
     virtual ActionResult ClearLabel(const Core::TaskID &, const std::string &label) = 0;
     virtual ActionResult ClearLabels(const Core::TaskID &) = 0;

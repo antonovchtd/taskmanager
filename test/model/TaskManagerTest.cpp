@@ -42,7 +42,7 @@ TEST_F(TaskManagerTest, shouldAddTask)
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     ASSERT_EQ(1, tm.size());
-    EXPECT_TRUE(tm.Validate(id));
+    EXPECT_TRUE(tm.IsPresent(id));
 }
 
 TEST_F(TaskManagerTest, shouldFailToAddTaskWithDuplicateID)
@@ -96,8 +96,8 @@ TEST_F(TaskManagerTest, shouldAddSubtask)
     t.set_title("SubTask");
     Core::TaskID id_ch = *tm.AddSubtask(t, id).id;
     ASSERT_EQ(2, tm.size());
-    EXPECT_TRUE(tm.Validate(id));
-    EXPECT_TRUE(tm.Validate(id_ch));
+    EXPECT_TRUE(tm.IsPresent(id));
+    EXPECT_TRUE(tm.IsPresent(id_ch));
     EXPECT_EQ(id, tm.getTasks()[1].parent());
 }
 
@@ -144,7 +144,7 @@ TEST_F(TaskManagerTest, shouldDeleteTask)
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     tm.Delete(id, false);
-    EXPECT_FALSE(tm.Validate(id));
+    EXPECT_FALSE(tm.IsPresent(id));
 }
 
 TEST_F(TaskManagerTest, shouldFailToDeleteTaskWithWrongID)
@@ -442,7 +442,7 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificID){
     t.set_due_date(time(nullptr) + 5);
     Core::TaskID id3 = *tm.AddSubtask(t, id2).id;
 
-    auto tasks = tm.getTasks(id2);
+    auto tasks = tm.getTaskWithSubtasks(id2);
     ASSERT_EQ(2, tasks.size());
     EXPECT_EQ("SubTask 1", tasks[0].data().title());
     EXPECT_EQ(id2, tasks[0].id());
