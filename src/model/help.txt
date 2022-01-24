@@ -23,6 +23,11 @@
     label <id>          prompts the user to enter a label to be assigned to the task with ID
                         <id>.
 
+    unlabel <id>        prompts the user to enter a label to be removed from the task with ID
+                        <id>.
+
+    UNLABEL <id>        clears all labels for the task with ID <id>.
+
     show [<label>]      when used with no argument, displays all tasks and their subtasks in a
          [<id>]         hierarchy, along with their IDs. When a label is given, shows only
                         (sub)tasks with this label. When an ID is given, shows that task and

@@ -38,7 +38,7 @@ TEST_F(TaskManagerTest, shouldAddTask)
     t.set_title("TestTitle");
     t.set_priority(Core::Task::Priority::Task_Priority_NONE);
     t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     ASSERT_EQ(1, tm.size());
@@ -90,7 +90,7 @@ TEST_F(TaskManagerTest, shouldAddSubtask)
     t.set_title("TestTitle");
     t.set_priority(Core::Task::Priority::Task_Priority_NONE);
     t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     t.set_title("SubTask");
@@ -108,7 +108,7 @@ TEST_F(TaskManagerTest, shouldEdit)
     t.set_title("TestTitle");
     t.set_priority(Core::Task::Priority::Task_Priority_NONE);
     t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     t.set_title("Edited");
@@ -123,7 +123,7 @@ TEST_F(TaskManagerTest, shouldFailToEditWrongID)
     t.set_title("TestTitle");
     t.set_priority(Core::Task::Priority::Task_Priority_NONE);
     t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     t.set_title("Edited");
@@ -140,7 +140,7 @@ TEST_F(TaskManagerTest, shouldDeleteTask)
     t.set_title("TestTitle");
     t.set_priority(Core::Task::Priority::Task_Priority_NONE);
     t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     tm.Delete(id, false);
@@ -154,7 +154,7 @@ TEST_F(TaskManagerTest, shouldFailToDeleteTaskWithWrongID)
     t.set_title("TestTitle");
     t.set_priority(Core::Task::Priority::Task_Priority_NONE);
     t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     id.set_value(id.value()+1);
@@ -210,7 +210,7 @@ TEST_F(TaskManagerTest, shouldFailToCompleteTaskWithWrongID)
     t.set_title("TestTitle");
     t.set_priority(Core::Task::Priority::Task_Priority_NONE);
     t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     id.set_value(id.value()+1);
@@ -226,7 +226,7 @@ TEST_F(TaskManagerTest, shouldUncompleteTask)
     t.set_title("TestTitle");
     t.set_priority(Core::Task::Priority::Task_Priority_NONE);
     t.set_due_date(time(nullptr) + 10);
-    t.set_label("label");
+    t.add_labels("label");
     t.set_is_complete(true);
     Core::TaskID id = *tm.Add(t).id;
     tm.AddSubtask(t, id);
@@ -258,7 +258,6 @@ TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
     t.set_title("Task");
     t.set_priority(p);
     t.set_due_date(time(nullptr));
-    t.set_label("");
     t.set_is_complete(false);
     Core::TaskID id1 = *tm.Add(t).id;
     t.set_title("Subtask");
@@ -276,12 +275,106 @@ TEST_F(TaskManagerTest, shouldAddLabel){
     t.set_title("Task");
     t.set_priority(p);
     t.set_due_date(time(nullptr));
-    t.set_label("");
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     std::string label = "testing";
     tm.AddLabel(id, label);
-    EXPECT_EQ(label, tm.getTasks()[0].data().label());
+    EXPECT_EQ(label, tm.getTasks()[0].data().labels()[0]);
+}
+
+TEST_F(TaskManagerTest, shouldAddMultipleLabels){
+    TaskManager tm;
+    Core::Task::Priority p = Core::Task::Priority::Task_Priority_NONE;
+    Core::Task t;
+    t.set_title("Task");
+    t.set_priority(p);
+    t.set_due_date(time(nullptr));
+    t.set_is_complete(false);
+    Core::TaskID id = *tm.Add(t).id;
+    std::string label = "testing";
+    std::string label2 = "testing2";
+    tm.AddLabel(id, label);
+    tm.AddLabel(id, label2);
+    EXPECT_EQ(label, tm.getTasks()[0].data().labels()[0]);
+    EXPECT_EQ(label2, tm.getTasks()[0].data().labels()[1]);
+}
+
+TEST_F(TaskManagerTest, shouldAddMultipleLabelsClearOne){
+    TaskManager tm;
+    Core::Task::Priority p = Core::Task::Priority::Task_Priority_NONE;
+    Core::Task t;
+    t.set_title("Task");
+    t.set_priority(p);
+    t.set_due_date(time(nullptr));
+    t.set_is_complete(false);
+    Core::TaskID id = *tm.Add(t).id;
+    std::string label = "testing";
+    std::string label2 = "testing2";
+    tm.AddLabel(id, label);
+    tm.AddLabel(id, label2);
+    tm.ClearLabel(id, label);
+    auto tasks = tm.getTasks();
+    ASSERT_EQ(1, tasks[0].data().labels().size());
+    EXPECT_EQ(label2, tasks[0].data().labels()[0]);
+}
+
+TEST_F(TaskManagerTest, shouldFailToClearLabelInvalidID){
+    TaskManager tm;
+    Core::Task::Priority p = Core::Task::Priority::Task_Priority_NONE;
+    Core::Task t;
+    t.set_title("Task");
+    t.set_priority(p);
+    t.set_due_date(time(nullptr));
+    t.set_is_complete(false);
+    Core::TaskID id = *tm.Add(t).id;
+    std::string label = "testing";
+    tm.AddLabel(id, label);
+    Core::TaskID id2;
+    id2.set_value(id.value()+1);
+    ActionResult result = tm.ClearLabel(id2, label);
+    auto tasks = tm.getTasks();
+    ASSERT_EQ(1, tasks[0].data().labels().size());
+    EXPECT_EQ(label, tasks[0].data().labels()[0]);
+    EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
+    EXPECT_EQ(*result.id, id2);
+}
+
+TEST_F(TaskManagerTest, shouldFailToClearAllLabelsInvalidID){
+    TaskManager tm;
+    Core::Task::Priority p = Core::Task::Priority::Task_Priority_NONE;
+    Core::Task t;
+    t.set_title("Task");
+    t.set_priority(p);
+    t.set_due_date(time(nullptr));
+    t.set_is_complete(false);
+    Core::TaskID id = *tm.Add(t).id;
+    std::string label = "testing";
+    tm.AddLabel(id, label);
+    Core::TaskID id2;
+    id2.set_value(id.value()+1);
+    ActionResult result = tm.ClearLabels(id2);
+    auto tasks = tm.getTasks();
+    ASSERT_EQ(1, tasks[0].data().labels().size());
+    EXPECT_EQ(label, tasks[0].data().labels()[0]);
+    EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
+    EXPECT_EQ(*result.id, id2);
+}
+
+TEST_F(TaskManagerTest, shouldAddMultipleLabelsClearAll){
+    TaskManager tm;
+    Core::Task::Priority p = Core::Task::Priority::Task_Priority_NONE;
+    Core::Task t;
+    t.set_title("Task");
+    t.set_priority(p);
+    t.set_due_date(time(nullptr));
+    t.set_is_complete(false);
+    Core::TaskID id = *tm.Add(t).id;
+    std::string label = "testing";
+    std::string label2 = "testing2";
+    tm.AddLabel(id, label);
+    tm.AddLabel(id, label2);
+    tm.ClearLabels(id);
+    EXPECT_TRUE(tm.getTasks()[0].data().labels().empty());
 }
 
 TEST_F(TaskManagerTest, shouldFailToAddLabelWithWrongID){
@@ -291,7 +384,6 @@ TEST_F(TaskManagerTest, shouldFailToAddLabelWithWrongID){
     t.set_title("Task");
     t.set_priority(p);
     t.set_due_date(time(nullptr));
-    t.set_label("");
     t.set_is_complete(false);
     Core::TaskID id = *tm.Add(t).id;
     std::string label = "testing";
@@ -308,7 +400,6 @@ TEST_F(TaskManagerTest, shouldReturnTasks){
     t.set_title("TestTitle");
     t.set_priority(p);
     t.set_due_date(time(nullptr));
-    t.set_label("");
     t.set_is_complete(false);
     Core::TaskID id1 = *tm.Add(t).id;
 
@@ -340,7 +431,6 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificID){
     t.set_title("TestTitle");
     t.set_priority(p);
     t.set_due_date(time(nullptr));
-    t.set_label("");
     t.set_is_complete(false);
     Core::TaskID id1 = *tm.Add(t).id;
 
@@ -369,7 +459,6 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
     t.set_title("TestTitle");
     t.set_priority(p);
     t.set_due_date(time(nullptr));
-    t.set_label("");
     t.set_is_complete(false);
     Core::TaskID id1 = *tm.Add(t).id;
 
