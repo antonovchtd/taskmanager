@@ -14,9 +14,9 @@ ActionResult ValidateIDAction::execute(const std::shared_ptr<ModelInterface> &mo
         return {ActionResult::Status::TAKES_ARG, std::nullopt};
     try {
         id.set_value(std::stoi(arg_));
-        auto result = model->Validate(id);
+        auto result = model->IsPresent(id);
         if (result)
-            return {result.status, model->getTasks(id)};
+            return {result.status, model->getTaskWithSubtasks(id)};
         else
             return {result.status, id};
     } catch (const std::invalid_argument &) {

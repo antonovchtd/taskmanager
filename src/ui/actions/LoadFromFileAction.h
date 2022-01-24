@@ -10,7 +10,7 @@
 
 class LoadFromFileAction : public Action {
 public:
-    LoadFromFileAction(const std::string &filename);
+    explicit LoadFromFileAction(const std::string &filename);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;

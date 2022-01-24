@@ -23,6 +23,9 @@ class DeleteStep;
 class DeleteStep;
 class ConfirmDeleteStep;
 class LabelStep;
+class ClearLabelStep;
+class ClearAllLabelsStep;
+class ShowAllLabelsStep;
 
 class StepSwitcher {
 public:
@@ -39,6 +42,9 @@ public:
     static std::shared_ptr<Step> nextStep(const DeleteStep &, const std::shared_ptr<Factory> &);
     static std::shared_ptr<Step> nextStep(const ConfirmDeleteStep &, const std::shared_ptr<Factory> &);
     static std::shared_ptr<Step> nextStep(const LabelStep &, const std::shared_ptr<Factory> &);
+    static std::shared_ptr<Step> nextStep(const ClearLabelStep &, const std::shared_ptr<Factory> &);
+    static std::shared_ptr<Step> nextStep(const ClearAllLabelsStep &, const std::shared_ptr<Factory> &);
+    static std::shared_ptr<Step> nextStep(const ShowAllLabelsStep &, const std::shared_ptr<Factory> &);
 };
 
 #endif //TASKMANAGER_SRC_UI_STEPSWITCHER_H_

@@ -5,6 +5,7 @@
 #include <numeric>
 
 #include "ui/Machine.h"
+#include "utilities/TaskUtils.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -94,17 +95,17 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(tm->Validate(id));
+    ASSERT_TRUE(tm->IsPresent(id));
     EXPECT_EQ(tm->getTasks()[0].id(), id);
     EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
 
     id.set_value(2);
-    ASSERT_TRUE(tm->Validate(id));
+    ASSERT_TRUE(tm->IsPresent(id));
     EXPECT_EQ(tm->getTasks()[1].id(), id);
     EXPECT_FALSE(tm->getTasks()[1].data().is_complete());
 
     id.set_value(3);
-    EXPECT_FALSE(tm->Validate(id));
+    EXPECT_FALSE(tm->IsPresent(id));
 
     EXPECT_EQ(4, tm->gen()->state());
 }
@@ -143,19 +144,19 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
     // check completeness
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(tm->Validate(id));
+    ASSERT_TRUE(tm->IsPresent(id));
     EXPECT_EQ(tm->getTasks()[0].id(), id);
     EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
 
     Core::TaskID id2;
     id2.set_value(2);
-    ASSERT_TRUE(tm->Validate(id2));
+    ASSERT_TRUE(tm->IsPresent(id2));
     EXPECT_EQ(tm->getTasks()[1].id(), id2);
     EXPECT_TRUE(tm->getTasks()[1].data().is_complete());
 
     Core::TaskID id3;
     id3.set_value(3);
-    ASSERT_TRUE(tm->Validate(id3));
+    ASSERT_TRUE(tm->IsPresent(id3));
     EXPECT_EQ(tm->getTasks()[2].id(), id3);
     EXPECT_TRUE(tm->getTasks()[2].data().is_complete());
 
@@ -202,20 +203,21 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
     m.run();
     ASSERT_EQ(3, tm->size());
 
+    auto tasks = tm->getTasks();
     // check labels
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(tm->Validate(id));
+    ASSERT_TRUE(tm->IsPresent(id));
     EXPECT_EQ("", tm->getTasks()[0].data().label());
 
     Core::TaskID id2;
     id2.set_value(2);
-    ASSERT_TRUE(tm->Validate(id2));
+    ASSERT_TRUE(tm->IsPresent(id2));
     EXPECT_EQ("l2", tm->getTasks()[1].data().label());
 
     Core::TaskID id3;
     id3.set_value(3);
-    ASSERT_TRUE(tm->Validate(id3));
+    ASSERT_TRUE(tm->IsPresent(id3));
     EXPECT_EQ("l3", tm->getTasks()[2].data().label());
 
     // check parents
@@ -259,11 +261,11 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
 
     Core::TaskID id;
     id.set_value(1);
-    EXPECT_FALSE(tm->Validate(id));
+    EXPECT_FALSE(tm->IsPresent(id));
     id.set_value(2);
-    EXPECT_TRUE(tm->Validate(id));
+    EXPECT_TRUE(tm->IsPresent(id));
     id.set_value(3);
-    EXPECT_FALSE(tm->Validate(id));
+    EXPECT_FALSE(tm->IsPresent(id));
 
     for (int i = 0; i <  prompts.size(); ++i) {
         EXPECT_EQ(prompts[i], prompts_expected[i]);
@@ -311,7 +313,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
 
     Core::TaskID id;
     id.set_value(1);
-    EXPECT_TRUE(tm->Validate(id));
+    EXPECT_TRUE(tm->IsPresent(id));
 
     for (int i = 0; i <  prompts.size(); ++i) {
         EXPECT_EQ(prompts[i], prompts_expected[i]);
@@ -392,17 +394,17 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
     id2.set_value(2);
     id3.set_value(3);
 
-    ASSERT_TRUE(tm->Validate(id1));
+    ASSERT_TRUE(tm->IsPresent(id1));
     EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
     EXPECT_EQ(tm->getTasks()[0].data().title(), "Task 1");
     EXPECT_FALSE(tm->getTasks()[0].has_parent());
 
-    ASSERT_TRUE(tm->Validate(id2));
+    ASSERT_TRUE(tm->IsPresent(id2));
     EXPECT_TRUE(tm->getTasks()[1].data().is_complete());
     EXPECT_EQ(tm->getTasks()[1].data().title(), "Subtask 2");
     EXPECT_EQ(id1, tm->getTasks()[1].parent());
 
-    ASSERT_TRUE(tm->Validate(id3));
+    ASSERT_TRUE(tm->IsPresent(id3));
     EXPECT_TRUE(tm->getTasks()[2].data().is_complete());
     EXPECT_EQ(tm->getTasks()[2].data().title(), "Subtask 3");
     EXPECT_EQ(id2, tm->getTasks()[2].parent());
@@ -519,4 +521,131 @@ TEST_F(IntegrationTest, shouldAddTasksInFutureDate)
     timeinfo->tm_min+=2;
     date = mktime(timeinfo);
     EXPECT_EQ(out[8] + "\n", std::string("2 – test 2, Priority: Medium, Due: ") + asctime(localtime(&date)));
+}
+
+TEST_F(IntegrationTest, shouldAddMultipleLabels)
+{
+    std::vector<std::string> scenario = {"add", "test", "1", "21/12/25",
+                                         "label 1", "l1", "label 1", "l2", "label 1", "l3", "show",
+                                         "quit"};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                                 "Added Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 3 label(s)", "\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(1, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
+}
+
+
+TEST_F(IntegrationTest, shouldClearSomeLabels)
+{
+    std::vector<std::string> scenario = {"add", "test", "1", "21/12/25",
+                                         "label 1", "l1", "label 1", "l2", "label 1", "l3", "show",
+                                         "unlabel 1", "", "l1", "unlabel 1", "l3", "show", "quit"};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                                 "Added Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 3 label(s)", "\n",
+                                                 "Removed label from task", " (ID: 1)\n",
+                                                 "Removed label from task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 1 label(s)", "\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(1, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
+}
+
+TEST_F(IntegrationTest, shouldClearAllLabels)
+{
+    std::vector<std::string> scenario = {"add", "test", "1", "21/12/25",
+                                         "label 1", "l1", "label 1", "l2", "label 1", "l3", "show",
+                                         "UNLABEL 1", "show", "quit"};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                                 "Added Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 3 label(s)", "\n",
+                                                 "Removed all labels of the task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025", "\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(1, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
+}
+
+TEST_F(IntegrationTest, shouldAddAndShowMultipleLabels)
+{
+    std::vector<std::string> scenario = {"add", "test", "1", "21/12/25",
+                                         "label 1", "l1", "label 1", "l2", "label 1", "l3", "show",
+                                         "labels 1", "quit"};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                                 "Added Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 3 label(s)", "\n",
+                                                 "l1, l2, l3\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(1, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
 }

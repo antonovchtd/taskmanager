@@ -9,7 +9,7 @@
 
 class AddSubtaskAction : public Action {
 public:
-    AddSubtaskAction(const Core::TaskID &, const Core::Task &);
+    explicit AddSubtaskAction(const Core::TaskID &, const Core::Task &);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
