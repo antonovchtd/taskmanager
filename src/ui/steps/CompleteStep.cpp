@@ -5,6 +5,11 @@
 #include "CompleteStep.h"
 #include "ui/Context.h"
 
+CompleteStep::CompleteStep(const std::shared_ptr<AbstractReader> &reader,
+                 const std::shared_ptr<AbstractPrinter> &printer) :
+        IOStep(reader, printer) {
+}
+
 std::unique_ptr<Action> CompleteStep::genAction(Context &context) {
     return std::unique_ptr<Action>(new CompleteTaskAction(*context.id()));
 }

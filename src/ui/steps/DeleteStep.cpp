@@ -5,6 +5,11 @@
 #include "DeleteStep.h"
 #include "ui/Context.h"
 
+DeleteStep::DeleteStep(const std::shared_ptr<AbstractReader> &reader,
+                       const std::shared_ptr<AbstractPrinter> &printer) :
+                       IOStep(reader, printer) {
+}
+
 std::unique_ptr<Action> DeleteStep::genAction(Context &context) {
     return std::unique_ptr<Action>(new DeleteTaskAction(*context.id()));
 }

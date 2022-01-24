@@ -11,7 +11,8 @@
 
 class LabelStep : public IOStep {
 public:
-    using IOStep::IOStep;
+    LabelStep(const std::shared_ptr<AbstractReader> &reader,
+              const std::shared_ptr<AbstractPrinter> &printer);
     std::unique_ptr<Action> genAction(Context &) override;
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 

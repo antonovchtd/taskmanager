@@ -5,6 +5,11 @@
 #include "ReadTaskDataStep.h"
 #include "ui/Context.h"
 
+ReadTaskDataStep::ReadTaskDataStep(const std::shared_ptr<AbstractReader> &reader,
+                                   const std::shared_ptr<AbstractPrinter> &printer) :
+        IOStep(reader, printer) {
+}
+
 std::unique_ptr<Action> ReadTaskDataStep::genAction(Context &context) {
     readTitle(context);
     readPriority(context);
