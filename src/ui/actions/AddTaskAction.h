@@ -9,7 +9,7 @@
 
 class AddTaskAction : public Action {
 public:
-    AddTaskAction(const Core::Task &);
+    explicit AddTaskAction(const Core::Task &);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;

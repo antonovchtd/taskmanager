@@ -9,7 +9,7 @@
 
 class LabelTaskAction : public Action {
 public:
-    LabelTaskAction(const Core::TaskID &, const std::string &label);
+    explicit LabelTaskAction(const Core::TaskID &, const std::string &label);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
