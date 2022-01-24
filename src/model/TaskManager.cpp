@@ -10,16 +10,16 @@ TaskManager::TaskManager() : gen_(std::shared_ptr<IDGenerator>(new IDGenerator))
 TaskManager::TaskManager(const std::shared_ptr<IDGenerator> &generator) : gen_(generator) {
 }
 
-void TaskManager::AddChild(const Core::TaskID &parent, const Core::TaskID &child) {
-    auto it = tasks_.find(parent);
+void TaskManager::AddChild(const Core::TaskID &parent_id, const Core::TaskID &child_id) {
+    auto it = tasks_.find(parent_id);
     if (it != tasks_.end())
-        it->second.second.AddChild(child);
+        it->second.second.AddChild(child_id);
 }
 
-void TaskManager::RemoveChild(const Core::TaskID &parent, const Core::TaskID &child) {
-    auto it = tasks_.find(parent);
+void TaskManager::RemoveChild(const Core::TaskID &parent_id, const Core::TaskID &child_id) {
+    auto it = tasks_.find(parent_id);
     if (it != tasks_.end())
-        it->second.second.RemoveChild(child);
+        it->second.second.RemoveChild(child_id);
 }
 
 std::optional<Core::Task> TaskManager::GetTask(const Core::TaskID &id) const {
@@ -30,8 +30,8 @@ std::optional<Core::Task> TaskManager::GetTask(const Core::TaskID &id) const {
         return std::nullopt;
 }
 
-std::vector<Core::TaskID> TaskManager::ChildrenOf(const Core::TaskID &parent) const {
-    auto it = tasks_.find(parent);
+std::vector<Core::TaskID> TaskManager::ChildrenOf(const Core::TaskID &parent_id) const {
+    auto it = tasks_.find(parent_id);
     if (it != tasks_.end())
         return it->second.second.children();
     else

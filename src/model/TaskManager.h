@@ -40,7 +40,7 @@ public:
     void Replace(const std::vector<Core::TaskEntity> &) override;
 
 private:
-    void AddChild(const Core::TaskID &parent, const Core::TaskID &child);
+    void AddChild(const Core::TaskID &parent_id, const Core::TaskID &child_id);
     void RemoveChild(const Core::TaskID &parent, const Core::TaskID &child);
 
 private:
