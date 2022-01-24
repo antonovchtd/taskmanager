@@ -17,6 +17,9 @@
 #include "ui/steps/DeleteStep.h"
 #include "ui/steps/ConfirmDeleteStep.h"
 #include "ui/steps/LabelStep.h"
+#include "ui/steps/ClearAllLabelsStep.h"
+#include "ui/steps/ClearLabelStep.h"
+#include "ui/steps/ShowAllLabelsStep.h"
 #include "Machine.h"
 
 Factory::Factory() :
@@ -69,6 +72,12 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
         return lazyInitStep(Factory::State::CONFIRMDELETE);
     } else if (command == "label") {
         return lazyInitStep(Factory::State::LABEL);
+    } else if (command == "unlabel") {
+        return lazyInitStep(Factory::State::UNLABEL);
+    } else if (command == "UNLABEL") {
+        return lazyInitStep(Factory::State::UNLABELALL);
+    } else if (command == "labels") {
+        return lazyInitStep(Factory::State::LABELS);
     } else if (command == "save") {
         return lazyInitStep(Factory::State::HOME);
     } else if (command == "load") {
@@ -112,6 +121,12 @@ std::shared_ptr<Step> Factory::getNewStep(const State &s) {
             return std::shared_ptr<Step>{new ConfirmDeleteStep(reader(), printer())};
         case State::LABEL:
             return std::shared_ptr<Step>{new LabelStep(reader(), printer())};
+        case State::UNLABEL:
+            return std::shared_ptr<Step>{new ClearLabelStep(reader(), printer())};
+        case State::LABELS:
+            return std::shared_ptr<Step>{new ShowAllLabelsStep(reader(), printer())};
+        case State::UNLABELALL:
+            return std::shared_ptr<Step>{new ClearAllLabelsStep(reader(), printer())};
     }
 }
 

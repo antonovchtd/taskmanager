@@ -8,8 +8,21 @@ bool Core::operator==(const Core::Task &lhs, const Core::Task &rhs) {
     return rhs.title() == lhs.title() &&
            rhs.priority() == lhs.priority() &&
            rhs.is_complete() == lhs.is_complete() &&
-           rhs.label() == lhs.label() &&
+           rhs.labels() == lhs.labels() &&
            rhs.due_date() == lhs.due_date();
+}
+
+bool Core::operator==(const repStr &lhs, const repStr &rhs) {
+    if (lhs.size() != rhs.size())
+        return false;
+
+    for (int i = 0; i < lhs.size(); ++i) {
+        if (lhs.at(i) != rhs.at(i))
+            return false;
+    }
+
+    return true;
+
 }
 
 std::string to_string(const Core::Task &t) {
@@ -23,8 +36,8 @@ std::string to_string(const Core::Task &t) {
     str_time.pop_back();
     os << ", Due: " << str_time;
 
-    if (!t.label().empty()) {
-        os << " L: " << t.label();
+    if (!t.labels().empty()) {
+        os << ", has " << t.labels().size() << " label(s)";
     }
 
     if (dd < time(nullptr)) {
@@ -47,7 +60,7 @@ Core::Task Core::createTask(const std::string &title,
     t.set_title(title);
     t.set_priority(priority);
     t.set_due_date(due_date);
-    t.set_label(label);
+    t.add_labels(label);
     t.set_is_complete(is_complete);
     return t;
 }

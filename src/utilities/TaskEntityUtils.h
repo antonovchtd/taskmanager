@@ -6,6 +6,7 @@
 #define TASKMANAGER_SRC_UTILITIES_TASKENTITYUTILS_H_
 
 #include "Task.pb.h"
+#include "TaskUtils.h"
 
 namespace Core {
 bool operator==(const Core::TaskEntity &lhs, const Core::TaskEntity &rhs);
