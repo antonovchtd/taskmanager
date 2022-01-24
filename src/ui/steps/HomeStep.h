@@ -14,6 +14,7 @@
 #include "ui/actions/GetTasksToShowAction.h"
 #include "ui/actions/LoadFromFileAction.h"
 #include "ui/actions/SaveToFileAction.h"
+#include "ui/actions/GetTaskToShowLabelsAction.h"
 
 class HomeStep : public Step {
 public:

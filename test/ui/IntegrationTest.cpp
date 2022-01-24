@@ -552,3 +552,100 @@ TEST_F(IntegrationTest, shouldAddMultipleLabels)
         EXPECT_EQ(out[i], expected_outputs[i]);
     }
 }
+
+
+TEST_F(IntegrationTest, shouldClearSomeLabels)
+{
+    std::vector<std::string> scenario = {"add", "test", "1", "21/12/25",
+                                         "label 1", "l1", "label 1", "l2", "label 1", "l3", "show",
+                                         "unlabel 1", "", "l1", "unlabel 1", "l3", "show", "quit"};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                                 "Added Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 3 label(s)", "\n",
+                                                 "Removed label from task", " (ID: 1)\n",
+                                                 "Removed label from task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 1 label(s)", "\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(1, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
+}
+
+TEST_F(IntegrationTest, shouldClearAllLabels)
+{
+    std::vector<std::string> scenario = {"add", "test", "1", "21/12/25",
+                                         "label 1", "l1", "label 1", "l2", "label 1", "l3", "show",
+                                         "UNLABEL 1", "show", "quit"};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                                 "Added Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 3 label(s)", "\n",
+                                                 "Removed all labels of the task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025", "\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(1, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
+}
+
+TEST_F(IntegrationTest, shouldAddAndShowMultipleLabels)
+{
+    std::vector<std::string> scenario = {"add", "test", "1", "21/12/25",
+                                         "label 1", "l1", "label 1", "l2", "label 1", "l3", "show",
+                                         "labels 1", "quit"};
+
+    std::vector<std::string> expected_outputs = {"[Add Task]\n",
+                                                 "Added Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "Added label to Task", " (ID: 1)\n",
+                                                 "1 – test, Priority: Low, Due: Sun Dec 21 00:00:00 2025, has 3 label(s)", "\n",
+                                                 "l1, l2, l3\n"};
+
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(new MockReaderToVector{scenario}),
+                             std::shared_ptr<AbstractPrinter>(new MockPrinterToVector));
+
+    auto tm = std::make_shared<TaskManager>();
+    Machine m(tm, f, Factory::State::HOME);
+    m.run();
+
+    ASSERT_EQ(1, tm->size());
+
+    auto mp = *std::dynamic_pointer_cast<MockPrinterToVector>(f->printer());
+    auto out = mp.messages();
+    ASSERT_EQ(out.size(), expected_outputs.size());
+    for (int i = 0; i <  out.size(); ++i) {
+        EXPECT_EQ(out[i], expected_outputs[i]);
+    }
+}
