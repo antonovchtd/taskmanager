@@ -71,10 +71,10 @@ std::vector<Core::TaskEntity> TaskManager::getTasks() const {
     std::vector<Core::TaskEntity> vec;
     for (const auto &kv : tasks_) {
         Core::TaskEntity te;
-        te.set_allocated_id(new Core::TaskID(kv.first));
-        te.set_allocated_data(new Core::Task(kv.second.first));
+        te.mutable_id()->CopyFrom(kv.first);
+        te.mutable_data()->CopyFrom(kv.second.first);
         if (kv.second.second.parent()) {
-            te.set_allocated_parent(new Core::TaskID(*kv.second.second.parent()));
+            te.mutable_parent()->CopyFrom(*kv.second.second.parent());
         }
         vec.push_back(te);
     }
@@ -87,8 +87,8 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) co
         for (const auto &task_label : kv.second.first.labels()) {
             if (task_label == label) {
                 Core::TaskEntity te;
-                te.set_allocated_id(new Core::TaskID(kv.first));
-                te.set_allocated_data(new Core::Task(kv.second.first));
+                te.mutable_id()->CopyFrom(kv.first);
+                te.mutable_data()->CopyFrom(kv.second.first);
                 tasks.push_back(te);
                 break;
             }
@@ -100,16 +100,16 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) co
 std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskID &id) const {
     std::vector<Core::TaskEntity> tasks;
     Core::TaskEntity te;
-    te.set_allocated_id(new Core::TaskID(id));
+    te.mutable_id()->CopyFrom(id);
     std::optional<Core::Task> task = GetTask(id);
     if (task)
-        te.set_allocated_data(new Core::Task(*task));
+        te.mutable_data()->CopyFrom(*task);
     // not including parent, but will include children
     tasks.push_back(te);
     for (const auto &ch_id : ChildrenOf(id)) {
         auto ch_tasks = getTaskWithSubtasks(ch_id);
         for (auto &ch_task : ch_tasks) {
-            ch_task.set_allocated_parent(new Core::TaskID(*ParentOf(ch_task.id())));
+            ch_task.mutable_parent()->CopyFrom(*ParentOf(ch_task.id()));
         }
         tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
     }
