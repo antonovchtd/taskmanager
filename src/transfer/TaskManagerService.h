@@ -11,10 +11,11 @@
 
 class TaskManagerService final : public Transfer::TaskManager::Service {
 public:
+    explicit TaskManagerService(const std::shared_ptr<ModelInterface> &model);
     grpc::Status Add(grpc::ServerContext* context, const Core::Task* task,
                      Transfer::ActionResult* result) override;
 private:
-    std::unique_ptr<ModelInterface> model_;
+    std::shared_ptr<ModelInterface> model_;
 };
 
 

@@ -4,6 +4,10 @@
 
 #include "TaskManagerService.h"
 
+TaskManagerService::TaskManagerService(const std::shared_ptr<ModelInterface> &model) :
+                    model_{model} {
+}
+
 Transfer::ActionResult ActionResultTransformer(const ActionResult &old_result) {
     Transfer::ActionResult new_result;
     switch (old_result.status) {
