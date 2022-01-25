@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "Task.proto";
+
+package Transfer;
+
+service TaskManager {
+  rpc Add (Core.Task) returns (ActionResult) {}
+}
+
+message ActionResult {
+  enum Status {
+    SUCCESS = 0;
+    ID_NOT_FOUND = 1;
+  }
+  Status status = 1;
+  Core.TaskID id = 2;
+  Core.TaskEntity task = 3;
+  repeated Core.TaskEntity tasks = 4;
+}
