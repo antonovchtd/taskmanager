@@ -5,13 +5,13 @@
 #ifndef TASKMANAGER_SRC_UI_STEPS_DELETESTEP_H_
 #define TASKMANAGER_SRC_UI_STEPS_DELETESTEP_H_
 
-#include "Step.h"
+#include "PrinterStep.h"
 #include "utilities/StepUtils.h"
 #include "ui/actions/DeleteTaskAction.h"
 
-class DeleteStep : public Step {
+class DeleteStep : public PrinterStep {
 public:
-    using Step::Step;
+    DeleteStep(const std::shared_ptr<AbstractPrinter> &printer);
     std::unique_ptr<Action> genAction(Context &) override;
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 };

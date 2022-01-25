@@ -5,6 +5,10 @@
 #include "ShowStep.h"
 #include "ui/Context.h"
 
+ShowStep::ShowStep(const std::shared_ptr<AbstractPrinter> &printer) :
+        PrinterStep(printer) {
+}
+
 std::unique_ptr<Action> ShowStep::genAction(Context &context) {
     auto tasks = context.tasks();
     for (const auto &te: tasks) {

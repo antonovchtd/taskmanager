@@ -4,6 +4,9 @@
 
 #include "HelpStep.h"
 
+HelpStep::HelpStep(const std::shared_ptr<AbstractPrinter> &printer) : PrinterStep(printer) {
+}
+
 std::unique_ptr<Action> HelpStep::genAction(Context &) {
     std::string filename{"../src/model/help.txt"};
     std::ifstream file(filename);

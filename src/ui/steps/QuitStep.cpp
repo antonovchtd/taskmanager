@@ -4,6 +4,10 @@
 
 #include "QuitStep.h"
 
+QuitStep::QuitStep(const std::shared_ptr<AbstractPrinter> &printer) :
+        PrinterStep(printer) {
+}
+
 std::unique_ptr<Action> QuitStep::genAction(Context &context) {
     return std::unique_ptr<Action>(new DoNothingAction);
 }
