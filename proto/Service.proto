@@ -5,7 +5,35 @@ import "Task.proto";
 package Transfer;
 
 service TaskManager {
+  rpc getTasks (EmptyMessage) returns (ManyTaskEntities) {}
+  rpc getTasksByLabel (Core.Label) returns (ManyTaskEntities) {}
+  rpc getTaskWithSubtasks (Core.TaskID) returns (ManyTaskEntities) {}
+
   rpc Add (Core.Task) returns (ActionResult) {}
+  rpc AddSubtask (Core.TaskEntity) returns (ActionResult) {}
+  rpc Edit (Core.TaskEntity) returns (ActionResult) {}
+  rpc Complete (Core.TaskID) returns (ActionResult) {}
+  rpc Uncomplete (Core.TaskID) returns (ActionResult) {}
+  rpc Delete (Core.TaskID) returns (ActionResult) {}
+  rpc IsPresent (Core.TaskID) returns (ActionResult) {}
+  rpc AddLabel (IDWithLabel) returns (ActionResult) {}
+  rpc ClearLabel (IDWithLabel) returns (ActionResult) {}
+  rpc ClearLabels (Core.TaskID) returns (ActionResult) {}
+
+  rpc Replace (ManyTaskEntities) returns (EmptyMessage) {}
+}
+
+message IDWithLabel {
+  Core.TaskID id = 1;
+  Core.Label label = 2;
+}
+
+message EmptyMessage {
+
+}
+
+message ManyTaskEntities {
+  repeated Core.TaskEntity tasks = 1;
 }
 
 message ActionResult {

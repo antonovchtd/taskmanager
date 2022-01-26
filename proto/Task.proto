@@ -27,3 +27,7 @@ message TaskEntity {
   Task data = 2;
   TaskID parent = 3;
 }
+
+message Label {
+  string label = 1;
+}
