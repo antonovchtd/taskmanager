@@ -22,8 +22,8 @@ public:
     std::vector<Core::TaskEntity> getTasks() const override;
     std::vector<Core::TaskEntity> getTasks(const std::string &label) const override;
     std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const override;
-    std::shared_ptr<IDGenerator> gen() const;
-    size_t size() const;
+    std::shared_ptr<IDGenerator> gen() const override;
+    size_t size() const override;
 
 public:
     ActionResult Add(const Core::Task &) override;
