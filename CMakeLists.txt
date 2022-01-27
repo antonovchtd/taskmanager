@@ -39,7 +39,7 @@ macro(compile_proto_file filename)
             COMMAND ${_PROTOBUF_PROTOC} ${PROTO_DIR}/${basename}.proto
             --proto_path=${GENERATED_DIR}
             --cpp_out=${GENERATED_DIR}
-            --grpc_out=${GENERATED_DIR}
+            --grpc_out=generate_mock_code=true:${GENERATED_DIR}
             --plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN_EXECUTABLE}
             -I ${PROTO_DIR}
             VERBATIM
