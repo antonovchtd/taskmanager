@@ -12,8 +12,8 @@
 
 class TaskManagerClient : public ModelInterface {
 public:
-    TaskManagerClient(std::shared_ptr<grpc::Channel> channel)
-            : stub_(Transfer::TaskManager::NewStub(channel)) {}
+    explicit TaskManagerClient(const std::shared_ptr<grpc::Channel> &channel);
+    explicit TaskManagerClient(std::unique_ptr<Transfer::TaskManager::StubInterface> stub);
 
 public:
     std::vector<Core::TaskEntity> getTasks() const override;
@@ -36,7 +36,7 @@ public:
     void Replace(const std::vector<Core::TaskEntity> &) override;
 
 private:
-    std::unique_ptr<Transfer::TaskManager::Stub> stub_;
+    std::unique_ptr<Transfer::TaskManager::StubInterface> stub_;
 };
 
 

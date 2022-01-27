@@ -4,6 +4,14 @@
 
 #include "TaskManagerClient.h"
 
+TaskManagerClient::TaskManagerClient(const std::shared_ptr<grpc::Channel> &channel) :
+                                stub_(Transfer::TaskManager::NewStub(channel)) {
+}
+
+TaskManagerClient::TaskManagerClient(std::unique_ptr<Transfer::TaskManager::StubInterface> stub) :
+                    stub_(std::move(stub)) {
+}
+
 std::vector<Core::TaskEntity> ManyTaskEntitiesTransformer(const Transfer::ManyTaskEntities &mte) {
     return std::vector<Core::TaskEntity>(mte.tasks().begin(), mte.tasks().end());
 }
