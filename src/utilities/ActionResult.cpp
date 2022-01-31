@@ -8,9 +8,12 @@ ActionResult::ActionResult(Status s, const std::optional<Core::TaskID> &tid) :
               status{s}, id{tid}, type_id{kID} {
 }
 
-ActionResult::ActionResult(Status s, const std::vector<Core::TaskEntity> &vec) :
-              status{s}, tasks{vec}, type_id{kEntity} {
+ActionResult::ActionResult(Status s, const Core::TaskEntity &te) :
+              status{s}, entity{te}, type_id{kEntity} {
+}
 
+ActionResult::ActionResult(Status s, const std::vector<Core::TaskEntity> &vec) :
+              status{s}, tasks{vec}, type_id{kVector} {
 }
 
 ActionResult::~ActionResult() {
@@ -20,6 +23,8 @@ ActionResult::~ActionResult() {
                 id->Core::TaskID::~TaskID();
             break;
         case kEntity:
+            break;
+        case kVector:
             break;
     }
 }

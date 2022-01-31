@@ -26,6 +26,7 @@ struct ActionResult {
 
 public:
     ActionResult(Status, const std::optional<Core::TaskID> &);
+    ActionResult(Status, const Core::TaskEntity &);
     ActionResult(Status, const std::vector<Core::TaskEntity> &);
 
 public:
@@ -36,9 +37,10 @@ public:
     Status status;
     union {
         std::optional<Core::TaskID> id;
+        Core::TaskEntity entity;
         std::vector<Core::TaskEntity> tasks;
     };
-    enum {kID, kEntity} type_id;
+    enum {kID, kEntity, kVector} type_id;
 
 public:
     ~ActionResult();
