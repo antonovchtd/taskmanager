@@ -27,9 +27,11 @@ std::unique_ptr<Action> HomeStep::genAction(Context &) {
         return std::unique_ptr<Action>(new ValidateIDAction(id));
     } else if (command_ == "show") {
         if (id)
-            return std::unique_ptr<Action>(new GetAllTasksToShowAction(id));
+            return std::unique_ptr<Action>(new GetTaskToShowByIDAction(*id));
+        else if (arg.empty())
+            return std::unique_ptr<Action>(new GetAllTasksToShowAction());
         else
-            return std::unique_ptr<Action>(new GetAllTasksToShowAction(arg));
+            return std::unique_ptr<Action>(new GetTasksToShowByLabelAction(arg));
     } else if (command_ == "labels") {
         return std::unique_ptr<Action>(new GetTaskToShowLabelsAction(id));
     } else if (command_ == "save") {
