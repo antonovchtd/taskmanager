@@ -10,7 +10,7 @@
 
 class PrinterStep : public Step {
 public:
-    PrinterStep(const std::shared_ptr<AbstractPrinter> &printer);
+    explicit PrinterStep(const std::shared_ptr<AbstractPrinter> &printer);
 
 public:
     ~PrinterStep() override = default;

@@ -13,7 +13,7 @@
 
 class HelpStep : public PrinterStep {
 public:
-    HelpStep(const std::shared_ptr<AbstractPrinter> &printer);
+    explicit HelpStep(const std::shared_ptr<AbstractPrinter> &printer);
     std::unique_ptr<Action> genAction(Context &) override;
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 

@@ -11,7 +11,7 @@
 
 class DeleteStep : public PrinterStep {
 public:
-    DeleteStep(const std::shared_ptr<AbstractPrinter> &printer);
+    explicit DeleteStep(const std::shared_ptr<AbstractPrinter> &printer);
     std::unique_ptr<Action> genAction(Context &) override;
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 };

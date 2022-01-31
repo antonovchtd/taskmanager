@@ -14,7 +14,7 @@
 
 class ShowStep : public PrinterStep {
 public:
-    ShowStep(const std::shared_ptr<AbstractPrinter> &printer);
+    explicit ShowStep(const std::shared_ptr<AbstractPrinter> &printer);
     std::unique_ptr<Action> genAction(Context &) override;
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 
