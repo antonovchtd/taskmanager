@@ -13,3 +13,20 @@ bool Core::operator==(const Core::TaskEntity &lhs, const Core::TaskEntity &rhs) 
            lhs.data().labels() == rhs.data().labels() &&
            lhs.parent().value() == rhs.parent().value();
 }
+
+Core::TaskEntity  Core::createTaskEntity(const Core::TaskID &id,
+                                        const Core::Task &task,
+                                        const Core::TaskID &parent_id) {
+    Core::TaskEntity te;
+    te.mutable_id()->CopyFrom(id);
+    te.mutable_data()->CopyFrom(task);
+    te.mutable_parent()->CopyFrom(parent_id);
+    return te;
+}
+Core::TaskEntity  Core::createTaskEntity(const Core::TaskID &id,
+                                         const Core::Task &task) {
+    Core::TaskEntity te;
+    te.mutable_id()->CopyFrom(id);
+    te.mutable_data()->CopyFrom(task);
+    return te;
+}

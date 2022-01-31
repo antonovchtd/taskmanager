@@ -6,13 +6,13 @@
 #define TASKMANAGER_SRC_UI_STEPS_CLEARALLLABELSSTEP_H_
 
 
-#include "Step.h"
+#include "PrinterStep.h"
 #include "utilities/StepUtils.h"
 #include "ui/actions/ClearAllLabelsOfTaskAction.h"
 
-class ClearAllLabelsStep : public Step {
+class ClearAllLabelsStep : public PrinterStep {
 public:
-    using Step::Step;
+    ClearAllLabelsStep(const std::shared_ptr<AbstractPrinter> &printer);
     std::unique_ptr<Action> genAction(Context &) override;
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 };

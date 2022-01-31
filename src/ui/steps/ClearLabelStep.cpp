@@ -5,6 +5,11 @@
 #include "ClearLabelStep.h"
 #include "ui/Context.h"
 
+ClearLabelStep::ClearLabelStep(const std::shared_ptr<AbstractReader> &reader,
+                               const std::shared_ptr<AbstractPrinter> &printer) :
+                               IOStep(reader, printer) {
+}
+
 std::unique_ptr<Action> ClearLabelStep::genAction(Context &context) {
     std::string label = readLabel();
     return std::unique_ptr<Action>(new ClearLabelOfTaskAction(*context.id(), label));

@@ -27,9 +27,9 @@ bool FilePersistence::load(std::vector<Core::TaskEntity> &vec) {
     std::ifstream file(filename_, std::ios::binary);
     google::protobuf::io::IstreamInputStream iis{&file};
     if (file.is_open()) {
-        Core::TaskEntity te;
         bool clean_eof = false;
         while (true) {
+            Core::TaskEntity te;
             google::protobuf::util::ParseDelimitedFromZeroCopyStream(&te, &iis, &clean_eof);
             if (!clean_eof)
                 vec.push_back(te);

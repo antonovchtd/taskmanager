@@ -9,7 +9,7 @@
 
 class ValidateIDAction : public Action {
 public:
-    ValidateIDAction(const std::string &arg);
+    explicit ValidateIDAction(const std::string &arg);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;

@@ -4,6 +4,11 @@
 
 #include "HomeStep.h"
 
+HomeStep::HomeStep(const std::shared_ptr<AbstractReader> &reader,
+                   const std::shared_ptr<AbstractPrinter> &printer) :
+        IOStep(reader, printer) {
+}
+
 std::string HomeStep::command() const {
     return command_;
 }

@@ -10,7 +10,7 @@
 
 class SaveToFileAction : public Action {
 public:
-    SaveToFileAction(const std::string &filename);
+    explicit SaveToFileAction(const std::string &filename);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
