@@ -35,7 +35,7 @@ public:
     ActionResult IsPresent(const Core::TaskID &id) const override;
     ActionResult AddLabel(const Core::TaskID &, const std::string &) override;
     ActionResult RemoveLabel(const Core::TaskID &, const std::string &) override;
-    ActionResult ClearLabels(const Core::TaskID &) override;
+    ActionResult RemoveAllLabels(const Core::TaskID &) override;
 
 public:
     void Replace(const std::vector<Core::TaskEntity> &) override;

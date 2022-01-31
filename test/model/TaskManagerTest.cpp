@@ -352,7 +352,7 @@ TEST_F(TaskManagerTest, shouldFailToClearAllLabelsInvalidID){
     tm.AddLabel(id, label);
     Core::TaskID id2;
     id2.set_value(id.value()+1);
-    ActionResult result = tm.ClearLabels(id2);
+    ActionResult result = tm.RemoveAllLabels(id2);
     auto tasks = tm.getTasks();
     ASSERT_EQ(1, tasks[0].data().labels().size());
     EXPECT_EQ(label, tasks[0].data().labels()[0]);
@@ -373,7 +373,7 @@ TEST_F(TaskManagerTest, shouldAddMultipleLabelsClearAll){
     std::string label2 = "testing2";
     tm.AddLabel(id, label);
     tm.AddLabel(id, label2);
-    tm.ClearLabels(id);
+    tm.RemoveAllLabels(id);
     EXPECT_TRUE(tm.getTasks()[0].data().labels().empty());
 }
 

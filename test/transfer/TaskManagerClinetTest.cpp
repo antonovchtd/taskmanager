@@ -317,7 +317,7 @@ TEST_F(TaskManagerClientTest, shouldSendRemoveAllLabelsRequest)
                     }));
 
     TaskManagerClient client{std::move(stub)};
-    ActionResult result = client.ClearLabels(id_);
+    ActionResult result = client.RemoveAllLabels(id_);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);

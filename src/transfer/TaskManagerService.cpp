@@ -123,7 +123,7 @@ grpc::Status TaskManagerService::ClearLabel(grpc::ServerContext *context,
 grpc::Status TaskManagerService::ClearLabels(grpc::ServerContext* context,
                                              const Core::TaskID* id,
                                              Transfer::ActionResult* result) {
-    *result = ActionResultTransformer(model_->ClearLabels(*id));
+    *result = ActionResultTransformer(model_->RemoveAllLabels(*id));
     return grpc::Status::OK;
 }
 

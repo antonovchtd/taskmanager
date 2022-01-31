@@ -197,7 +197,7 @@ ActionResult TaskManager::RemoveLabel(const Core::TaskID &id, const std::string 
     return {ActionResult::Status::SUCCESS, id};
 }
 
-ActionResult TaskManager::ClearLabels(const Core::TaskID &id) {
+ActionResult TaskManager::RemoveAllLabels(const Core::TaskID &id) {
     auto it = tasks_.find(id);
     if (it != tasks_.end()) {
         it->second.first.clear_labels();

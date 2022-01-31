@@ -150,7 +150,7 @@ ActionResult TaskManagerClient::RemoveLabel(const Core::TaskID &id, const std::s
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::ClearLabels(const Core::TaskID &request) {
+ActionResult TaskManagerClient::RemoveAllLabels(const Core::TaskID &request) {
     Transfer::ActionResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->ClearLabels(&context, request, &reply);
