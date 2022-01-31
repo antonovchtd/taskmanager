@@ -150,7 +150,7 @@ TEST_F(ActionTest, shouldGetTasksToShowWithNoArg)
     GetTasksToShowAction act{""};
     ActionResult result = act.execute(tm_);
 
-    ASSERT_EQ(result.type_id, ActionResult::kEntity);
+    ASSERT_EQ(result.type_id, ActionResult::kVector);
     ASSERT_EQ(1, result.tasks.size());
     EXPECT_EQ(task_, result.tasks[0].data());
 }
@@ -160,7 +160,7 @@ TEST_F(ActionTest, shouldGetTasksToShowWithLabelArg)
     GetTasksToShowAction act{"label"};
     ActionResult result = act.execute(tm_);
 
-    ASSERT_EQ(result.type_id, ActionResult::kEntity);
+    ASSERT_EQ(result.type_id, ActionResult::kVector);
     ASSERT_EQ(1, result.tasks.size());
     EXPECT_EQ(task_, result.tasks[0].data());
 }
@@ -170,7 +170,7 @@ TEST_F(ActionTest, shouldGetTasksToShowWithIDArg)
     GetTasksToShowAction act{std::to_string(id_.value())};
     ActionResult result = act.execute(tm_);
 
-    ASSERT_EQ(result.type_id, ActionResult::kEntity);
+    ASSERT_EQ(result.type_id, ActionResult::kVector);
     ASSERT_EQ(1, result.tasks.size());
     EXPECT_EQ(task_, result.tasks[0].data());
 }
@@ -324,8 +324,8 @@ TEST_F(ActionTest, shouldGetTaskToShowItsLabels)
     ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     auto tasks = tm_->getTaskWithSubtasks(id_);
-    EXPECT_EQ(1, result.tasks.size());
-    EXPECT_EQ(tasks[0], result.tasks[0]);
+    EXPECT_EQ(ActionResult::kEntity, result.type_id);
+    EXPECT_EQ(tasks[0], result.entity);
 }
 
 TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidID)
