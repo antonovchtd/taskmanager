@@ -27,6 +27,9 @@ public:
     std::string command() const;
 
 private:
+    std::optional<Core::TaskID> stringToID(const std::string &arg) const;
+
+private:
     std::string command_;
 };
 

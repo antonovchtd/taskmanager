@@ -76,7 +76,7 @@ TEST_F(ActionTest, shouldAddSubtask)
 
 TEST_F(ActionTest, shouldExecuteValidateIDValidID)
 {
-    ValidateIDAction act{std::to_string(id_.value())};
+    ValidateIDAction act{id_};
     ActionResult result_validate = act.execute(tm_);
     ASSERT_EQ(result_validate.status, ActionResult::Status::SUCCESS);
     EXPECT_TRUE(result_validate);
@@ -85,7 +85,9 @@ TEST_F(ActionTest, shouldExecuteValidateIDValidID)
 
 TEST_F(ActionTest, shouldExecuteValidateIDInvalidID)
 {
-    ValidateIDAction act{std::to_string(id_.value()) + "0"};
+    Core::TaskID new_id;
+    new_id.set_value(id_.value()*10);
+    ValidateIDAction act{new_id};
     ActionResult result_validate = act.execute(tm_);
     EXPECT_EQ(result_validate.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_FALSE(result_validate);
@@ -94,16 +96,7 @@ TEST_F(ActionTest, shouldExecuteValidateIDInvalidID)
 
 TEST_F(ActionTest, shouldExecuteValidateIDNoID)
 {
-    ValidateIDAction act{""};
-    ActionResult result_validate = act.execute(tm_);
-    EXPECT_EQ(result_validate.status, ActionResult::Status::TAKES_ARG);
-    EXPECT_FALSE(result_validate);
-    EXPECT_FALSE(result_validate.id.has_value());
-}
-
-TEST_F(ActionTest, shouldExecuteValidateIDBadString)
-{
-    ValidateIDAction act{"bad"};
+    ValidateIDAction act{std::nullopt};
     ActionResult result_validate = act.execute(tm_);
     EXPECT_EQ(result_validate.status, ActionResult::Status::TAKES_ID);
     EXPECT_FALSE(result_validate);
@@ -167,7 +160,7 @@ TEST_F(ActionTest, shouldGetTasksToShowWithLabelArg)
 
 TEST_F(ActionTest, shouldGetTasksToShowWithIDArg)
 {
-    GetTasksToShowAction act{std::to_string(id_.value())};
+    GetTasksToShowAction act{id_};
     ActionResult result = act.execute(tm_);
 
     ASSERT_EQ(result.type_id, ActionResult::kVector);
@@ -177,7 +170,9 @@ TEST_F(ActionTest, shouldGetTasksToShowWithIDArg)
 
 TEST_F(ActionTest, shouldFailToGetTasksToShowWithInvalidID)
 {
-    GetTasksToShowAction act{std::to_string(id_.value()) + "0"};
+    Core::TaskID new_id;
+    new_id.set_value(id_.value()*10);
+    GetTasksToShowAction act{new_id};
     ActionResult result = act.execute(tm_);
 
     ASSERT_EQ(result.type_id, ActionResult::kID);
@@ -319,7 +314,7 @@ TEST_F(ActionTest, shouldClearOneLabelOfTask)
 
 TEST_F(ActionTest, shouldGetTaskToShowItsLabels)
 {
-    GetTaskToShowLabelsAction act{std::to_string(id_.value())};
+    GetTaskToShowLabelsAction act{id_};
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
@@ -330,7 +325,9 @@ TEST_F(ActionTest, shouldGetTaskToShowItsLabels)
 
 TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidID)
 {
-    GetTaskToShowLabelsAction act{std::to_string(id_.value() + 1)};
+    Core::TaskID new_id;
+    new_id.set_value(id_.value()+1);
+    GetTaskToShowLabelsAction act{new_id};
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
@@ -338,7 +335,7 @@ TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidID)
 
 TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidArg)
 {
-    GetTaskToShowLabelsAction act{"bad"};
+    GetTaskToShowLabelsAction act{std::nullopt};
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::TAKES_ID);
