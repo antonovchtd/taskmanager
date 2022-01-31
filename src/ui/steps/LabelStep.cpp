@@ -5,6 +5,11 @@
 #include "LabelStep.h"
 #include "ui/Context.h"
 
+LabelStep::LabelStep(const std::shared_ptr<AbstractReader> &reader,
+                     const std::shared_ptr<AbstractPrinter> &printer) :
+        IOStep(reader, printer) {
+}
+
 std::unique_ptr<Action> LabelStep::genAction(Context &context) {
     std::string label = readLabel();
     return std::unique_ptr<Action>(new LabelTaskAction(*context.id(), label));

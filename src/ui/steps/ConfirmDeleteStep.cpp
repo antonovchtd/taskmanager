@@ -5,6 +5,11 @@
 #include "ConfirmDeleteStep.h"
 #include "ui/Context.h"
 
+ConfirmDeleteStep::ConfirmDeleteStep(const std::shared_ptr<AbstractReader> &reader,
+                                     const std::shared_ptr<AbstractPrinter> &printer) :
+                                     IOStep(reader, printer) {
+}
+
 std::unique_ptr<Action> ConfirmDeleteStep::genAction(Context &) {
     return std::unique_ptr<Action>(new DoNothingAction);
 }

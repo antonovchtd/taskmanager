@@ -4,11 +4,10 @@
 
 #include "AddStep.h"
 
-AddStep::AddStep(std::shared_ptr<AbstractReader> reader,
-                 std::shared_ptr<AbstractPrinter> printer,
-                 std::shared_ptr<Machine> submachine) :
-         Step(reader, printer) {
-    submachine_ = submachine;
+AddStep::AddStep(const std::shared_ptr<AbstractPrinter> &printer,
+                 const std::shared_ptr<Machine> &submachine) :
+         PrinterStep(printer), submachine_{submachine} {
+
 }
 
 
