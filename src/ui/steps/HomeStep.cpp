@@ -24,22 +24,22 @@ std::unique_ptr<Action> HomeStep::genAction(Context &) {
         command_ == "delete" || command_ == "complete" ||
         command_ == "uncomplete" || command_ == "label" ||
         command_ == "unlabel" || command_ == "UNLABEL") {
-        return std::unique_ptr<Action>(new ValidateIDAction(id));
+        return std::make_unique<ValidateIDAction>(id);
     } else if (command_ == "show") {
         if (id)
-            return std::unique_ptr<Action>(new GetTaskToShowByIDAction(*id));
+            return std::make_unique<GetTaskToShowByIDAction>(*id);
         else if (arg.empty())
-            return std::unique_ptr<Action>(new GetAllTasksToShowAction());
+            return std::make_unique<GetAllTasksToShowAction>();
         else
-            return std::unique_ptr<Action>(new GetTasksToShowByLabelAction(arg));
+            return std::make_unique<GetTasksToShowByLabelAction>(arg);
     } else if (command_ == "labels") {
-        return std::unique_ptr<Action>(new GetTaskToShowLabelsAction(id));
+        return std::make_unique<GetTaskToShowLabelsAction>(id);
     } else if (command_ == "save") {
-        return std::unique_ptr<Action>(new SaveToFileAction(arg));
+        return std::make_unique<SaveToFileAction>(arg);
     } else if (command_ == "load") {
-        return std::unique_ptr<Action>(new LoadFromFileAction(arg));
+        return std::make_unique<LoadFromFileAction>(arg);
     } else {
-        return std::unique_ptr<Action>(new ValidateNoArgAction(arg));
+        return std::make_unique<ValidateNoArgAction>(arg);
     }
 }
 
