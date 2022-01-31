@@ -298,7 +298,7 @@ TEST_F(TaskManagerClientTest, shouldSendRemoveLabelRequest)
                     }));
 
     TaskManagerClient client{std::move(stub)};
-    ActionResult result = client.ClearLabel(id_, label);
+    ActionResult result = client.RemoveLabel(id_, label);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);

@@ -139,7 +139,7 @@ ActionResult TaskManagerClient::AddLabel(const Core::TaskID &id, const std::stri
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::ClearLabel(const Core::TaskID &id, const std::string &label) {
+ActionResult TaskManagerClient::RemoveLabel(const Core::TaskID &id, const std::string &label) {
     Transfer::IDWithLabel request;
     request.mutable_id()->CopyFrom(id);
     request.mutable_label()->set_label(label);

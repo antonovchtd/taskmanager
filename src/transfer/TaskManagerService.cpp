@@ -116,7 +116,7 @@ grpc::Status TaskManagerService::AddLabel(grpc::ServerContext *context,
 grpc::Status TaskManagerService::ClearLabel(grpc::ServerContext *context,
                                             const Transfer::IDWithLabel *msg,
                                             Transfer::ActionResult *result) {
-    *result = ActionResultTransformer(model_->ClearLabel(msg->id(), msg->label().label()));
+    *result = ActionResultTransformer(model_->RemoveLabel(msg->id(), msg->label().label()));
     return grpc::Status::OK;
 }
 

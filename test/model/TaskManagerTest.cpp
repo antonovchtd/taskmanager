@@ -312,7 +312,7 @@ TEST_F(TaskManagerTest, shouldAddMultipleLabelsClearOne){
     std::string label2 = "testing2";
     tm.AddLabel(id, label);
     tm.AddLabel(id, label2);
-    tm.ClearLabel(id, label);
+    tm.RemoveLabel(id, label);
     auto tasks = tm.getTasks();
     ASSERT_EQ(1, tasks[0].data().labels().size());
     EXPECT_EQ(label2, tasks[0].data().labels()[0]);
@@ -331,7 +331,7 @@ TEST_F(TaskManagerTest, shouldFailToClearLabelInvalidID){
     tm.AddLabel(id, label);
     Core::TaskID id2;
     id2.set_value(id.value()+1);
-    ActionResult result = tm.ClearLabel(id2, label);
+    ActionResult result = tm.RemoveLabel(id2, label);
     auto tasks = tm.getTasks();
     ASSERT_EQ(1, tasks[0].data().labels().size());
     EXPECT_EQ(label, tasks[0].data().labels()[0]);

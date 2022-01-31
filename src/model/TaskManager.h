@@ -34,7 +34,7 @@ public:
     ActionResult Delete(const Core::TaskID &id, bool deleteChildren) override;
     ActionResult IsPresent(const Core::TaskID &id) const override;
     ActionResult AddLabel(const Core::TaskID &, const std::string &) override;
-    ActionResult ClearLabel(const Core::TaskID &, const std::string &) override;
+    ActionResult RemoveLabel(const Core::TaskID &, const std::string &) override;
     ActionResult ClearLabels(const Core::TaskID &) override;
 
 public:

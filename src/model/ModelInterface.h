@@ -31,8 +31,8 @@ public:
     virtual ActionResult Delete(const Core::TaskID &, bool deleteChildren) = 0;
     virtual ActionResult IsPresent(const Core::TaskID &) const = 0;
     virtual ActionResult AddLabel(const Core::TaskID &, const std::string &label) = 0;
-    virtual ActionResult ClearLabel(const Core::TaskID &, const std::string &label) = 0;
-    virtual ActionResult ClearLabels(const Core::TaskID &) = 0;
+    virtual ActionResult RemoveLabel(const Core::TaskID &id, const std::string &label) = 0;
+    virtual ActionResult ClearLabels(const Core::TaskID &id) = 0;
 
 public:
     virtual void Replace(const std::vector<Core::TaskEntity> &) = 0;
