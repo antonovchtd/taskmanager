@@ -2,13 +2,13 @@
 // Created by Anton Ovcharenko on 26.01.2022.
 //
 
-#include "TaskManagerClient.h"
+#include "TaskManagerGRPCClient.h"
 
-TaskManagerClient::TaskManagerClient(const std::shared_ptr<grpc::Channel> &channel) :
+TaskManagerGRPCClient::TaskManagerGRPCClient(const std::shared_ptr<grpc::Channel> &channel) :
                                 stub_(Transfer::TaskManager::NewStub(channel)) {
 }
 
-TaskManagerClient::TaskManagerClient(std::unique_ptr<Transfer::TaskManager::StubInterface> stub) :
+TaskManagerGRPCClient::TaskManagerGRPCClient(std::unique_ptr<Transfer::TaskManager::StubInterface> stub) :
                     stub_(std::move(stub)) {
 }
 
@@ -16,7 +16,7 @@ std::vector<Core::TaskEntity> ManyTaskEntitiesTransformer(const Transfer::ManyTa
     return std::vector<Core::TaskEntity>(mte.tasks().begin(), mte.tasks().end());
 }
 
-std::vector<Core::TaskEntity> TaskManagerClient::getTasks() const {
+std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks() const {
     Transfer::EmptyMessage request;
     Transfer::ManyTaskEntities reply;
     grpc::ClientContext context;
@@ -25,7 +25,7 @@ std::vector<Core::TaskEntity> TaskManagerClient::getTasks() const {
     return ManyTaskEntitiesTransformer(reply);
 }
 
-std::vector<Core::TaskEntity> TaskManagerClient::getTasks(const std::string &label) const {
+std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks(const std::string &label) const {
     Core::Label request;
     request.set_label(label);
     Transfer::ManyTaskEntities reply;
@@ -35,7 +35,7 @@ std::vector<Core::TaskEntity> TaskManagerClient::getTasks(const std::string &lab
     return ManyTaskEntitiesTransformer(reply);
 }
 
-std::vector<Core::TaskEntity> TaskManagerClient::getTaskWithSubtasks(const Core::TaskID &request) const {
+std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTaskWithSubtasks(const Core::TaskID &request) const {
     Transfer::ManyTaskEntities reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->getTaskWithSubtasks(&context, request, &reply);
@@ -66,7 +66,7 @@ ActionResult ActionResultTransformer(const Transfer::ActionResult &old_result) {
     }
 }
 
-ActionResult TaskManagerClient::Add(const Core::Task& request) {
+ActionResult TaskManagerGRPCClient::Add(const Core::Task& request) {
     Transfer::ActionResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Add(&context, request, &reply);
@@ -74,7 +74,7 @@ ActionResult TaskManagerClient::Add(const Core::Task& request) {
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::AddSubtask(const Core::Task& task, const Core::TaskID &id) {
+ActionResult TaskManagerGRPCClient::AddSubtask(const Core::Task& task, const Core::TaskID &id) {
     Core::TaskEntity request;
     request.mutable_id()->CopyFrom(id);
     request.mutable_data()->CopyFrom(task);
@@ -85,7 +85,7 @@ ActionResult TaskManagerClient::AddSubtask(const Core::Task& task, const Core::T
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::Edit(const Core::TaskID &id, const Core::Task& task) {
+ActionResult TaskManagerGRPCClient::Edit(const Core::TaskID &id, const Core::Task& task) {
     Core::TaskEntity request;
     request.mutable_id()->CopyFrom(id);
     request.mutable_data()->CopyFrom(task);
@@ -96,7 +96,7 @@ ActionResult TaskManagerClient::Edit(const Core::TaskID &id, const Core::Task& t
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::Complete(const Core::TaskID &request) {
+ActionResult TaskManagerGRPCClient::Complete(const Core::TaskID &request) {
     Transfer::ActionResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Complete(&context, request, &reply);
@@ -104,7 +104,7 @@ ActionResult TaskManagerClient::Complete(const Core::TaskID &request) {
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::Uncomplete(const Core::TaskID &request) {
+ActionResult TaskManagerGRPCClient::Uncomplete(const Core::TaskID &request) {
     Transfer::ActionResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Uncomplete(&context, request, &reply);
@@ -112,7 +112,7 @@ ActionResult TaskManagerClient::Uncomplete(const Core::TaskID &request) {
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::Delete(const Core::TaskID &request, bool deleteChildren) {
+ActionResult TaskManagerGRPCClient::Delete(const Core::TaskID &request, bool deleteChildren) {
     Transfer::ActionResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Delete(&context, request, &reply);
@@ -120,7 +120,7 @@ ActionResult TaskManagerClient::Delete(const Core::TaskID &request, bool deleteC
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::IsPresent(const Core::TaskID &request) const {
+ActionResult TaskManagerGRPCClient::IsPresent(const Core::TaskID &request) const {
     Transfer::ActionResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->IsPresent(&context, request, &reply);
@@ -128,7 +128,7 @@ ActionResult TaskManagerClient::IsPresent(const Core::TaskID &request) const {
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::AddLabel(const Core::TaskID &id, const std::string &label) {
+ActionResult TaskManagerGRPCClient::AddLabel(const Core::TaskID &id, const std::string &label) {
     Transfer::IDWithLabel request;
     request.mutable_id()->CopyFrom(id);
     request.mutable_label()->set_label(label);
@@ -139,7 +139,7 @@ ActionResult TaskManagerClient::AddLabel(const Core::TaskID &id, const std::stri
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::RemoveLabel(const Core::TaskID &id, const std::string &label) {
+ActionResult TaskManagerGRPCClient::RemoveLabel(const Core::TaskID &id, const std::string &label) {
     Transfer::IDWithLabel request;
     request.mutable_id()->CopyFrom(id);
     request.mutable_label()->set_label(label);
@@ -150,7 +150,7 @@ ActionResult TaskManagerClient::RemoveLabel(const Core::TaskID &id, const std::s
     return ActionResultTransformer(reply);
 }
 
-ActionResult TaskManagerClient::RemoveAllLabels(const Core::TaskID &request) {
+ActionResult TaskManagerGRPCClient::RemoveAllLabels(const Core::TaskID &request) {
     Transfer::ActionResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->ClearLabels(&context, request, &reply);
@@ -158,7 +158,7 @@ ActionResult TaskManagerClient::RemoveAllLabels(const Core::TaskID &request) {
     return ActionResultTransformer(reply);
 }
 
-void TaskManagerClient::Replace(const std::vector<Core::TaskEntity> &vec) {
+void TaskManagerGRPCClient::Replace(const std::vector<Core::TaskEntity> &vec) {
     Transfer::ManyTaskEntities request;
     request.mutable_tasks()->Add(vec.begin(), vec.end());
     Transfer::EmptyMessage reply;

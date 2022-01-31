@@ -10,10 +10,10 @@
 
 #include "model/ModelInterface.h"
 
-class TaskManagerClient : public ModelInterface {
+class TaskManagerGRPCClient : public ModelInterface {
 public:
-    explicit TaskManagerClient(const std::shared_ptr<grpc::Channel> &channel);
-    explicit TaskManagerClient(std::unique_ptr<Transfer::TaskManager::StubInterface> stub);
+    explicit TaskManagerGRPCClient(const std::shared_ptr<grpc::Channel> &channel);
+    explicit TaskManagerGRPCClient(std::unique_ptr<Transfer::TaskManager::StubInterface> stub);
 
 public:
     std::vector<Core::TaskEntity> getTasks() const override;
