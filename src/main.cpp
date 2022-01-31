@@ -15,11 +15,14 @@
  */
 
 #include "ui/Machine.h"
+#include "transfer/TaskManagerClient.h"
 
 int main() {
 
-    auto tm = std::make_shared<TaskManager>();
-    Machine m{tm};
+    std::string target_str = "localhost:50051";
+    auto model = std::make_shared<TaskManagerClient>(
+            grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
+    Machine m{model};
     m.run();
     return 0;
 }

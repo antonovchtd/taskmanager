@@ -39,7 +39,7 @@ macro(compile_proto_file filename)
             COMMAND ${_PROTOBUF_PROTOC} ${PROTO_DIR}/${basename}.proto
             --proto_path=${GENERATED_DIR}
             --cpp_out=${GENERATED_DIR}
-            --grpc_out=${GENERATED_DIR}
+            --grpc_out=generate_mock_code=true:${GENERATED_DIR}
             --plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN_EXECUTABLE}
             -I ${PROTO_DIR}
             VERBATIM
@@ -68,17 +68,20 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 include_directories(src/)
 file(GLOB_RECURSE UI src/ui/*)
 file(GLOB_RECURSE Model src/model/*)
+file(GLOB_RECURSE Trans src/transfer/*)
 file(GLOB_RECURSE Utils src/utilities/*)
 file(GLOB_RECURSE IO src/io/*)
 file(GLOB_RECURSE PER src/persistence/*)
 file(GLOB_RECURSE TEST test/*)
-add_executable(taskmanager src/main.cpp ${Model} ${Utils} ${UI} ${IO} ${PER}
+add_executable(taskmanager src/main.cpp ${Model} ${Trans} ${Utils} ${UI} ${IO} ${PER}
         ${spine_generated_files})
-add_executable(test_taskmanager ${Model} ${Utils} ${UI} ${IO} ${PER} ${TEST}
+add_executable(server_taskmanager src/server.cpp ${Model} ${Trans} ${Utils} ${PER} ${spine_generated_files})
+add_executable(test_taskmanager ${Model} ${Trans} ${Utils} ${UI} ${IO} ${PER} ${TEST}
         ${spine_generated_files})
 target_link_libraries(test_taskmanager GTest::GTest GTest::Main GTest::gmock GTest::gmock_main)
 target_link_libraries(test_taskmanager ${Boost_LIBRARIES})
 target_link_libraries(taskmanager protobuf::libprotobuf gRPC::grpc++ gRPC::grpc++_reflection)
+target_link_libraries(server_taskmanager protobuf::libprotobuf gRPC::grpc++ gRPC::grpc++_reflection)
 target_link_libraries(test_taskmanager protobuf::libprotobuf gRPC::grpc++ gRPC::grpc++_reflection)
 # target_link_libraries(taskmanager ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY})
 gtest_discover_tests(test_taskmanager)

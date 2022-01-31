@@ -90,7 +90,7 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
 }
 
 std::shared_ptr<Machine> Factory::createMachine(const State &state) {
-    return std::make_shared<Machine>(std::shared_ptr<ModelInterface>(std::make_shared<TaskManager>()), shared_from_this(), state);
+    return std::make_shared<Machine>(nullptr, shared_from_this(), state);
 }
 
 std::shared_ptr<Step> Factory::getNewStep(const State &s) {
