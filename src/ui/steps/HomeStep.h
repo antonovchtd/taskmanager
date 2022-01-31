@@ -11,7 +11,7 @@
 #include "utilities/StepUtils.h"
 #include "ui/actions/ValidateIDAction.h"
 #include "ui/actions/ValidateNoArgAction.h"
-#include "ui/actions/GetTasksToShowAction.h"
+#include "ui/actions/GetAllTasksToShowAction.h"
 #include "ui/actions/LoadFromFileAction.h"
 #include "ui/actions/SaveToFileAction.h"
 #include "ui/actions/GetTaskToShowLabelsAction.h"

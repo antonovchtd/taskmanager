@@ -11,7 +11,7 @@
 #include "ui/actions/ValidateIDAction.h"
 #include "ui/actions/ValidateNoArgAction.h"
 #include "ui/actions/EditTaskAction.h"
-#include "ui/actions/GetTasksToShowAction.h"
+#include "ui/actions/GetAllTasksToShowAction.h"
 #include "ui/actions/CompleteTaskAction.h"
 #include "ui/actions/UncompleteTaskAction.h"
 #include "ui/actions/DeleteTaskAction.h"
@@ -140,7 +140,7 @@ TEST_F(ActionTest, shouldEditTask)
 
 TEST_F(ActionTest, shouldGetTasksToShowWithNoArg)
 {
-    GetTasksToShowAction act{""};
+    GetAllTasksToShowAction act{""};
     ActionResult result = act.execute(tm_);
 
     ASSERT_EQ(result.type_id, ActionResult::kVector);
@@ -150,7 +150,7 @@ TEST_F(ActionTest, shouldGetTasksToShowWithNoArg)
 
 TEST_F(ActionTest, shouldGetTasksToShowWithLabelArg)
 {
-    GetTasksToShowAction act{"label"};
+    GetAllTasksToShowAction act{"label"};
     ActionResult result = act.execute(tm_);
 
     ASSERT_EQ(result.type_id, ActionResult::kVector);
@@ -160,7 +160,7 @@ TEST_F(ActionTest, shouldGetTasksToShowWithLabelArg)
 
 TEST_F(ActionTest, shouldGetTasksToShowWithIDArg)
 {
-    GetTasksToShowAction act{id_};
+    GetAllTasksToShowAction act{id_};
     ActionResult result = act.execute(tm_);
 
     ASSERT_EQ(result.type_id, ActionResult::kVector);
@@ -172,7 +172,7 @@ TEST_F(ActionTest, shouldFailToGetTasksToShowWithInvalidID)
 {
     Core::TaskID new_id;
     new_id.set_value(id_.value()*10);
-    GetTasksToShowAction act{new_id};
+    GetAllTasksToShowAction act{new_id};
     ActionResult result = act.execute(tm_);
 
     ASSERT_EQ(result.type_id, ActionResult::kID);
