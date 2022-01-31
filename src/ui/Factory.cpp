@@ -23,8 +23,8 @@
 #include "Machine.h"
 
 Factory::Factory() :
-        reader_(std::shared_ptr<AbstractReader>(new ConsoleReader)),
-        printer_(std::shared_ptr<AbstractPrinter>(new ConsolePrinter)) {
+        reader_(std::shared_ptr<AbstractReader>(std::make_shared<ConsoleReader>())),
+        printer_(std::shared_ptr<AbstractPrinter>(std::make_shared<ConsolePrinter>())) {
 
 }
 
@@ -90,43 +90,43 @@ std::shared_ptr<Step> Factory::createStep(const std::string &command) {
 }
 
 std::shared_ptr<Machine> Factory::createMachine(const State &state) {
-    return std::make_shared<Machine>(nullptr,shared_from_this(), state);
+    return std::make_shared<Machine>(nullptr, shared_from_this(), state);
 }
 
 std::shared_ptr<Step> Factory::getNewStep(const State &s) {
     switch (s) {
         case State::HOME:
-            return std::shared_ptr<Step>{new HomeStep(reader(), printer())};
+            return std::make_shared<HomeStep>(reader(), printer());
         case State::HELP:
-            return std::shared_ptr<Step>{new HelpStep(printer())};
+            return std::make_shared<HelpStep>(printer());
         case State::ADD:
-            return std::shared_ptr<Step>{new AddStep(printer(), createMachine(State::READTASK))};
+            return std::make_shared<AddStep>(printer(), createMachine(State::READTASK));
         case State::SUBTASK:
-            return std::shared_ptr<Step>{new SubtaskStep(printer(), createMachine(State::READTASK))};
+            return std::make_shared<SubtaskStep>(printer(), createMachine(State::READTASK));
         case State::READTASK:
-            return std::shared_ptr<Step>{new ReadTaskDataStep(reader(), printer())};
+            return std::make_shared<ReadTaskDataStep>(reader(), printer());
         case State::EDIT:
-            return std::shared_ptr<Step>{new EditStep(printer(), createMachine(State::READTASK))};
+            return std::make_shared<EditStep>(printer(), createMachine(State::READTASK));
         case State::QUIT:
-            return std::shared_ptr<Step>{new QuitStep(printer())};
+            return std::make_shared<QuitStep>(printer());
         case State::SHOW:
-            return std::shared_ptr<Step>{new ShowStep(printer())};
+            return std::make_shared<ShowStep>(printer());
         case State::COMPLETE:
-            return std::shared_ptr<Step>{new CompleteStep(printer())};
+            return std::make_shared<CompleteStep>(printer());
         case State::UNCOMPLETE:
-            return std::shared_ptr<Step>{new UncompleteStep(printer())};
+            return std::make_shared<UncompleteStep>(printer());
         case State::DELETE:
-            return std::shared_ptr<Step>{new DeleteStep(printer())};
+            return std::make_shared<DeleteStep>(printer());
         case State::CONFIRMDELETE:
-            return std::shared_ptr<Step>{new ConfirmDeleteStep(reader(), printer())};
+            return std::make_shared<ConfirmDeleteStep>(reader(), printer());
         case State::LABEL:
-            return std::shared_ptr<Step>{new LabelStep(reader(), printer())};
+            return std::make_shared<LabelStep>(reader(), printer());
         case State::UNLABEL:
-            return std::shared_ptr<Step>{new ClearLabelStep(reader(), printer())};
+            return std::make_shared<ClearLabelStep>(reader(), printer());
         case State::LABELS:
-            return std::shared_ptr<Step>{new ShowAllLabelsStep(printer())};
+            return std::make_shared<ShowAllLabelsStep>(printer());
         case State::UNLABELALL:
-            return std::shared_ptr<Step>{new ClearAllLabelsStep(printer())};
+            return std::make_shared<ClearAllLabelsStep>(printer());
     }
 }
 

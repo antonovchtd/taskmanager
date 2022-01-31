@@ -6,8 +6,8 @@
 
 AddStep::AddStep(const std::shared_ptr<AbstractPrinter> &printer,
                  const std::shared_ptr<Machine> &submachine) :
-         PrinterStep(printer) {
-    submachine_ = submachine;
+         PrinterStep(printer), submachine_{submachine} {
+
 }
 
 

@@ -55,7 +55,7 @@ public:
 
 TEST_F(ActionTest, shouldAddTask)
 {
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_TRUE(tm_->IsPresent(id_));
 }
 
@@ -66,7 +66,7 @@ TEST_F(ActionTest, shouldAddSubtask)
     t.set_priority(Core::Task::Priority::Task_Priority_MEDIUM);
     AddSubtaskAction subact{id_, t};
     ActionResult result_subtask = subact.execute(tm_);
-    ASSERT_EQ(2, tm_->size());
+    ASSERT_EQ(2, tm_->getTasks().size());
     EXPECT_TRUE(tm_->IsPresent(*result_subtask.id));
     EXPECT_NE(id_, *result_subtask.id);
 
@@ -136,7 +136,7 @@ TEST_F(ActionTest, shouldEditTask)
     EditTaskAction act{id_, t};
     ActionResult result_edit = act.execute(tm_);
 
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_TRUE(tm_->IsPresent(id_));
     EXPECT_EQ(*result_edit.id, id_);
 
@@ -189,7 +189,7 @@ TEST_F(ActionTest, shouldCompleteTaskWithValidID)
 {
     CompleteTaskAction act{id_};
     ActionResult result_complete = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result_complete.status, ActionResult::Status::SUCCESS);
     EXPECT_TRUE(tm_->getTasks()[0].data().is_complete());
 }
@@ -200,7 +200,7 @@ TEST_F(ActionTest, shouldNotCompleteTaskWithInvalidID)
     id2.set_value(id_.value()+1);
     CompleteTaskAction act{id2};
     ActionResult result_complete = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result_complete.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_FALSE(tm_->getTasks()[0].data().is_complete());
 }
@@ -212,7 +212,7 @@ TEST_F(ActionTest, shouldUncompleteTaskWithValidID)
 
     UncompleteTaskAction act2{id_};
     ActionResult result_uncomplete = act2.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result_uncomplete.status, ActionResult::Status::SUCCESS);
     ASSERT_FALSE(tm_->getTasks()[0].data().is_complete());
 }
@@ -221,7 +221,7 @@ TEST_F(ActionTest, shouldDeleteTaskValidIDNoSubtasks)
 {
     DeleteTaskAction act{id_};
     ActionResult result_delete = act.execute(tm_);
-    EXPECT_EQ(0, tm_->size());
+    EXPECT_EQ(0, tm_->getTasks().size());
     EXPECT_EQ(result_delete.status, ActionResult::Status::SUCCESS);
     EXPECT_EQ(*result_delete.id, id_);
 }
@@ -232,7 +232,7 @@ TEST_F(ActionTest, shouldFailToDeleteTaskWithInvalidID)
     id2.set_value(id_.value()+1);
     DeleteTaskAction act{id2};
     ActionResult result_delete = act.execute(tm_);
-    EXPECT_EQ(1, tm_->size());
+    EXPECT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result_delete.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_EQ(*result_delete.id, id2);
 }
@@ -241,11 +241,11 @@ TEST_F(ActionTest, shouldDeleteTaskValidIDWithSubtasks)
 {
     AddSubtaskAction add{id_, task_};
     add.execute(tm_);
-    ASSERT_EQ(2, tm_->size());
+    ASSERT_EQ(2, tm_->getTasks().size());
 
     DeleteTaskAction act{id_};
     ActionResult result_delete = act.execute(tm_);
-    ASSERT_EQ(0, tm_->size());
+    ASSERT_EQ(0, tm_->getTasks().size());
     EXPECT_EQ(result_delete.status, ActionResult::Status::SUCCESS);
     EXPECT_EQ(*result_delete.id, id_);
 }
@@ -255,7 +255,7 @@ TEST_F(ActionTest, shouldLabelTask)
     std::string label = "custom";
     LabelTaskAction act{id_, label};
     ActionResult result_label = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(id_, *result_label.id);
     EXPECT_EQ("label", tm_->getTasks()[0].data().labels()[0]);
     EXPECT_EQ(label, tm_->getTasks()[0].data().labels()[1]);
@@ -268,7 +268,7 @@ TEST_F(ActionTest, shouldNotLabelTaskWithInvalidID)
     std::string label = "custom";
     LabelTaskAction act{new_id, label};
     ActionResult result_label = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result_label.status, ActionResult::Status::ID_NOT_FOUND);
     EXPECT_EQ(new_id, result_label.id);
     EXPECT_EQ("label", tm_->getTasks()[0].data().labels()[0]);
@@ -278,7 +278,7 @@ TEST_F(ActionTest, shouldDoNothing)
 {
     DoNothingAction act;
     ActionResult result = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     EXPECT_EQ(std::nullopt, result.id);
 
@@ -293,7 +293,7 @@ TEST_F(ActionTest, shouldClearAllLabelsOfTask)
 
     ClearAllLabelsOfTaskAction act{id_};
     ActionResult result = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     EXPECT_EQ(id_, *result.id);
     auto tasks = tm_->getTaskWithSubtasks(id_);
@@ -309,7 +309,7 @@ TEST_F(ActionTest, shouldClearOneLabelOfTask)
 
     ClearLabelOfTaskAction act{id_, "mylabel2"};
     ActionResult result = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     EXPECT_EQ(id_, *result.id);
     auto tasks = tm_->getTaskWithSubtasks(id_);
@@ -321,7 +321,7 @@ TEST_F(ActionTest, shouldGetTaskToShowItsLabels)
 {
     GetTaskToShowLabelsAction act{std::to_string(id_.value())};
     ActionResult result = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     auto tasks = tm_->getTaskWithSubtasks(id_);
     EXPECT_EQ(1, result.tasks.size());
@@ -332,7 +332,7 @@ TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidID)
 {
     GetTaskToShowLabelsAction act{std::to_string(id_.value() + 1)};
     ActionResult result = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::ID_NOT_FOUND);
 }
 
@@ -340,7 +340,7 @@ TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidArg)
 {
     GetTaskToShowLabelsAction act{"bad"};
     ActionResult result = act.execute(tm_);
-    ASSERT_EQ(1, tm_->size());
+    ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_EQ(result.status, ActionResult::Status::TAKES_ID);
     EXPECT_EQ(std::nullopt, result.id);
 }
