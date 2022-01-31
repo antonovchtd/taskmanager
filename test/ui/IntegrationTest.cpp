@@ -62,11 +62,11 @@ private:
 TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 {
     auto tm = std::make_shared<TaskManager>();
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-              std::shared_ptr<AbstractPrinter>(&mp));
-    EXPECT_CALL(mr, read)
+    auto mr = std::make_shared<MockReader>();
+    auto mp = std::make_shared<MockPrinter>();
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(mr),
+              std::shared_ptr<AbstractPrinter>(mp));
+    EXPECT_CALL(*mr, read)
             .Times(17)
             .WillOnce(Return("add"))
             .WillOnce(Return("test 1"))
@@ -86,7 +86,7 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
             .WillOnce(Return("Y"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(mp, print)
+    EXPECT_CALL(*mp, print)
             .Times(AtLeast(1));
 
     Machine m(tm, f, Factory::State::HOME);
@@ -113,11 +113,11 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
 {
     auto tm = std::make_shared<TaskManager>();
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
+    auto mr = std::make_shared<MockReader>();
+    auto mp = std::make_shared<MockPrinter>();
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(mr),
+                             std::shared_ptr<AbstractPrinter>(mp));
+    EXPECT_CALL(*mr, read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("test"))
@@ -134,7 +134,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
             .WillOnce(Return("complete 1"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(mp, print(_))
+    EXPECT_CALL(*mp, print(_))
             .Times(AtLeast(1));
 
     Machine m(tm, f, Factory::State::HOME);
@@ -171,11 +171,11 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
 {
     auto tm = std::make_shared<TaskManager>();
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
-    EXPECT_CALL(mr, read)
+    auto mr = std::make_shared<MockReader>();
+    auto mp = std::make_shared<MockPrinter>();
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(mr),
+                             std::shared_ptr<AbstractPrinter>(mp));
+    EXPECT_CALL(*mr, read)
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("task 1"))
@@ -196,7 +196,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
             .WillOnce(Return("l2"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(mp, print)
+    EXPECT_CALL(*mp, print)
             .Times(AtLeast(1));
 
     Machine m(tm, f, Factory::State::HOME);
