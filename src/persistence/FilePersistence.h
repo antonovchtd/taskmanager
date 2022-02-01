@@ -7,7 +7,6 @@
 
 #include <vector>
 #include "Persister.h"
-#include "Task.pb.h"
 
 class FilePersistence : public Persister {
 public:

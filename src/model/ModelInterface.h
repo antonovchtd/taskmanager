@@ -12,8 +12,7 @@
 #include <utility>
 #include <fstream>
 
-#include "Task.pb.h"
-#include "ui/actions/ActionResult.h"
+#include "Core.pb.h"
 class IDGenerator;
 
 class ModelInterface {
@@ -23,16 +22,16 @@ public:
     virtual std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const = 0;
 
 public:
-    virtual ActionResult Add(const Core::Task &) = 0;
-    virtual ActionResult AddSubtask(const Core::Task &, const Core::TaskID &) = 0;
-    virtual ActionResult Edit(const Core::TaskID &id, const Core::Task &t) = 0;
-    virtual ActionResult Complete(const Core::TaskID &) = 0;
-    virtual ActionResult Uncomplete(const Core::TaskID &) = 0;
-    virtual ActionResult Delete(const Core::TaskID &, bool deleteChildren) = 0;
-    virtual ActionResult IsPresent(const Core::TaskID &) const = 0;
-    virtual ActionResult AddLabel(const Core::TaskID &, const std::string &label) = 0;
-    virtual ActionResult ClearLabel(const Core::TaskID &, const std::string &label) = 0;
-    virtual ActionResult ClearLabels(const Core::TaskID &) = 0;
+    virtual ModelInquiryResult Add(const Core::Task &) = 0;
+    virtual ModelInquiryResult AddSubtask(const Core::Task &, const Core::TaskID &) = 0;
+    virtual ModelInquiryResult Edit(const Core::TaskID &id, const Core::Task &t) = 0;
+    virtual ModelInquiryResult Complete(const Core::TaskID &) = 0;
+    virtual ModelInquiryResult Uncomplete(const Core::TaskID &) = 0;
+    virtual ModelInquiryResult Delete(const Core::TaskID &, bool deleteChildren) = 0;
+    virtual ModelInquiryResult IsPresent(const Core::TaskID &) const = 0;
+    virtual ModelInquiryResult AddLabel(const Core::TaskID &, const std::string &label) = 0;
+    virtual ModelInquiryResult ClearLabel(const Core::TaskID &, const std::string &label) = 0;
+    virtual ModelInquiryResult ClearLabels(const Core::TaskID &) = 0;
 
 public:
     virtual void Replace(const std::vector<Core::TaskEntity> &) = 0;

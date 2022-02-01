@@ -6,7 +6,7 @@
 #define TASKMANAGER_SRC_UI_ACTIONS_ACTIONRESULT_H_
 
 #include <optional>
-#include "Task.pb.h"
+#include "Core.pb.h"
 
 struct ActionResult {
     enum class Status {

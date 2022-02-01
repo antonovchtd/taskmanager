@@ -5,7 +5,7 @@
 #ifndef TASKMANAGER_SRC_UTILITIES_TASKENTITYUTILS_H_
 #define TASKMANAGER_SRC_UTILITIES_TASKENTITYUTILS_H_
 
-#include "Task.pb.h"
+#include "Core.pb.h"
 #include "TaskUtils.h"
 
 namespace Core {

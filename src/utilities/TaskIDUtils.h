@@ -5,7 +5,7 @@
 #ifndef TASKMANAGER_SRC_UTILITIES_TASKIDUTILS_H_
 #define TASKMANAGER_SRC_UTILITIES_TASKIDUTILS_H_
 
-#include "Task.pb.h"
+#include "Core.pb.h"
 
 namespace Core {
     bool operator==(const Core::TaskID &lhs, const Core::TaskID &rhs);

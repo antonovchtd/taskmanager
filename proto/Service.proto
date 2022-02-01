@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "Task.proto";
+import "Core.proto";
 
 package Transfer;
 
