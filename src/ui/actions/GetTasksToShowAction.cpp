@@ -3,6 +3,7 @@
 //
 
 #include "GetTasksToShowAction.h"
+#include "utilities/ModelInquiryResultUtils.h"
 
 GetTasksToShowAction::GetTasksToShowAction(const std::string &arg) : arg_{arg} {
 }
@@ -11,8 +12,9 @@ ActionResult GetTasksToShowAction::execute(const std::shared_ptr<ModelInterface>
     std::optional<Core::TaskID> id{Core::TaskID()};
     try {
         id->set_value(std::stoi(arg_));
-        if (!model->IsPresent(*id))
-            return {ActionResult::Status::ID_NOT_FOUND, id};
+        auto check = model->IsPresent(*id);
+        if (!ToBool(check))
+            return check;
     } catch (const std::invalid_argument &) {
         id = std::nullopt;
     }
@@ -25,5 +27,5 @@ ActionResult GetTasksToShowAction::execute(const std::shared_ptr<ModelInterface>
     else
         tasks = model->getTasks(arg_);
 
-    return {ActionResult::Status::SUCCESS, tasks};
+    return ActionResult(tasks);
 }

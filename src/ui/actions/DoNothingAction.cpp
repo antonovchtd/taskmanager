@@ -5,5 +5,7 @@
 #include "DoNothingAction.h"
 
 ActionResult DoNothingAction::execute(const std::shared_ptr<ModelInterface> &) {
-    return {ActionResult::Status::SUCCESS, std::nullopt};
+    Core::ModelInquiryResult result;
+    result.set_status(Core::ModelInquiryResult_Status_SUCCESS);
+    return result;
 }

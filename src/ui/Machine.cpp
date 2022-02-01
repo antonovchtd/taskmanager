@@ -20,9 +20,9 @@ Context Machine::run() {
 
 void updateContext(Context &context, const ActionResult &result) {
     switch (result.type_id) {
-        case ActionResult::kID:
-            if (result.id)
-                context.setID(result.id);
+        case ActionResult::kResult:
+            if (result.model_result.has_id())
+                context.setID(result.model_result.id());
             break;
         case ActionResult::kEntity:
             context.setTasks(std::vector<Core::TaskEntity>{result.entity});

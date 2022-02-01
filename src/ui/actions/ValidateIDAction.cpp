@@ -3,23 +3,29 @@
 //
 
 #include "ValidateIDAction.h"
-#include "ui/Context.h"
+#include "utilities/ModelInquiryResultUtils.h"
 
 ValidateIDAction::ValidateIDAction(const std::string &arg) : arg_{arg} {
 }
 
 ActionResult ValidateIDAction::execute(const std::shared_ptr<ModelInterface> &model) {
+    Core::ModelInquiryResult result;
     Core::TaskID id;
-    if (arg_.empty())
-        return {ActionResult::Status::TAKES_ARG, std::nullopt};
+
+    if (arg_.empty()) {
+        result.set_status(Core::ModelInquiryResult_Status_TAKES_ARG);
+        return result;
+    }
+
     try {
         id.set_value(std::stoi(arg_));
-        auto result = model->IsPresent(id);
-        if (result)
-            return {result.status, model->getTaskWithSubtasks(id)};
+        auto check = model->IsPresent(id);
+        if (ToBool(check))
+            return ActionResult(model->getTaskWithSubtasks(id));
         else
-            return {result.status, id};
+            return check;
     } catch (const std::invalid_argument &) {
-        return {ActionResult::Status::TAKES_ID, std::nullopt};
+        result.set_status(Core::ModelInquiryResult_Status_TAKES_ID);
+        return result;
     }
 }
