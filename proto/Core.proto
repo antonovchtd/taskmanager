@@ -32,22 +32,21 @@ message Label {
   string label = 1;
 }
 
-enum Status {
-    SUCCESS = 0;
-    ID_NOT_FOUND = 1;
-    PARENT_ID_NOT_FOUND = 2;
-    HAS_CHILDREN = 3;
-    DUPLICATE_ID = 4;
-    FILE_NOT_FOUND = 5;
-    FAILED_TO_OPEN_FILE = 6;
-    TAKES_NO_ARG = 7;
-    TAKES_ARG = 8;
-    TAKES_ID = 9;
-    TAKES_ALPHA_NOT_ID = 10;
-    TAKES_ALPHA = 11;
-};
-
 message ModelInquiryResult {
+    enum Status {
+      SUCCESS = 0;
+      ID_NOT_FOUND = 1;
+      PARENT_ID_NOT_FOUND = 2;
+      HAS_CHILDREN = 3;
+      DUPLICATE_ID = 4;
+      FILE_NOT_FOUND = 5;
+      FAILED_TO_OPEN_FILE = 6;
+      TAKES_NO_ARG = 7;
+      TAKES_ARG = 8;
+      TAKES_ID = 9;
+      TAKES_ALPHA_NOT_ID = 10;
+      TAKES_ALPHA = 11;
+    };
     oneof data {
         Status status = 1;
         TaskID id = 2;
