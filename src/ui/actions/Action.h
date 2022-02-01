@@ -5,7 +5,7 @@
 #ifndef TASKMANAGER_SRC_UI_ACTIONS_ACTION_H_
 #define TASKMANAGER_SRC_UI_ACTIONS_ACTION_H_
 
-#include "utilities/ActionResult.h"
+#include "ActionResult.h"
 #include "model/ModelInterface.h"
 
 class Context;

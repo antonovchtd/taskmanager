@@ -2,8 +2,8 @@
 // Created by Anton O. on 12/18/21.
 //
 
-#ifndef TASKMANAGER_SRC_MODEL_ACTIONRESULT_H_
-#define TASKMANAGER_SRC_MODEL_ACTIONRESULT_H_
+#ifndef TASKMANAGER_SRC_UI_ACTIONS_ACTIONRESULT_H_
+#define TASKMANAGER_SRC_UI_ACTIONS_ACTIONRESULT_H_
 
 #include <optional>
 #include "Task.pb.h"
@@ -46,4 +46,4 @@ public:
     ~ActionResult();
 };
 
-#endif //TASKMANAGER_SRC_MODEL_ACTIONRESULT_H_
+#endif //TASKMANAGER_SRC_UI_ACTIONS_ACTIONRESULT_H_

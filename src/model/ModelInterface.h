@@ -13,7 +13,7 @@
 #include <fstream>
 
 #include "Task.pb.h"
-#include "utilities/ActionResult.h"
+#include "ui/actions/ActionResult.h"
 class IDGenerator;
 
 class ModelInterface {
