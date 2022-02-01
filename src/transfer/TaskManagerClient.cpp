@@ -43,119 +43,96 @@ std::vector<Core::TaskEntity> TaskManagerClient::getTaskWithSubtasks(const Core:
     return ManyTaskEntitiesTransformer(reply);
 }
 
-ActionResult ActionResultTransformer(const Transfer::ActionResult &old_result) {
-    ActionResult::Status status;
-    switch (old_result.status()) {
-        case Transfer::ActionResult_Status_SUCCESS:
-            status = ActionResult::Status::SUCCESS;
-            break;
-        case Transfer::ActionResult_Status_ID_NOT_FOUND:
-            status = ActionResult::Status::ID_NOT_FOUND;
-            break;
-            // TODO
-    }
-    if (old_result.tasks_size() > 0) {
-        std::vector<Core::TaskEntity> vec{old_result.tasks().begin(), old_result.tasks().end()};
-        return {status, vec};
-    } else if (old_result.has_task()) {
-        std::vector<Core::TaskEntity> vec{old_result.task()};
-        return {status, vec};
-//        ActionResult new_result{status, old_result.task()};
-    } else {
-        return {status, old_result.id()};
-    }
-}
-
-ActionResult TaskManagerClient::Add(const Core::Task& request) {
-    Transfer::ActionResult reply;
+Core::ModelInquiryResult TaskManagerClient::Add(const Core::Task& request) {
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Add(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
-ActionResult TaskManagerClient::AddSubtask(const Core::Task& task, const Core::TaskID &id) {
+Core::ModelInquiryResult TaskManagerClient::AddSubtask(const Core::Task& task, const Core::TaskID &id) {
     Core::TaskEntity request;
     request.mutable_id()->CopyFrom(id);
     request.mutable_data()->CopyFrom(task);
-    Transfer::ActionResult reply;
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->AddSubtask(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
-ActionResult TaskManagerClient::Edit(const Core::TaskID &id, const Core::Task& task) {
+Core::ModelInquiryResult TaskManagerClient::Edit(const Core::TaskID &id, const Core::Task& task) {
     Core::TaskEntity request;
     request.mutable_id()->CopyFrom(id);
     request.mutable_data()->CopyFrom(task);
-    Transfer::ActionResult reply;
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Edit(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
-ActionResult TaskManagerClient::Complete(const Core::TaskID &request) {
-    Transfer::ActionResult reply;
+Core::ModelInquiryResult TaskManagerClient::Complete(const Core::TaskID &request) {
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Complete(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
-ActionResult TaskManagerClient::Uncomplete(const Core::TaskID &request) {
-    Transfer::ActionResult reply;
+Core::ModelInquiryResult TaskManagerClient::Uncomplete(const Core::TaskID &request) {
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Uncomplete(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
-ActionResult TaskManagerClient::Delete(const Core::TaskID &request, bool deleteChildren) {
-    Transfer::ActionResult reply;
+Core::ModelInquiryResult TaskManagerClient::Delete(const Core::TaskID &request, bool deleteChildren) {
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Delete(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
-ActionResult TaskManagerClient::IsPresent(const Core::TaskID &request) const {
-    Transfer::ActionResult reply;
+Core::ModelInquiryResult TaskManagerClient::IsPresent(const Core::TaskID &request) const {
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->IsPresent(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
-ActionResult TaskManagerClient::AddLabel(const Core::TaskID &id, const std::string &label) {
+Core::ModelInquiryResult TaskManagerClient::AddLabel(const Core::TaskID &id, const std::string &label) {
     Transfer::IDWithLabel request;
     request.mutable_id()->CopyFrom(id);
     request.mutable_label()->set_label(label);
-    Transfer::ActionResult reply;
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->AddLabel(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
-ActionResult TaskManagerClient::ClearLabel(const Core::TaskID &id, const std::string &label) {
+Core::ModelInquiryResult TaskManagerClient::ClearLabel(const Core::TaskID &id, const std::string &label) {
     Transfer::IDWithLabel request;
     request.mutable_id()->CopyFrom(id);
     request.mutable_label()->set_label(label);
-    Transfer::ActionResult reply;
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->ClearLabel(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
-ActionResult TaskManagerClient::ClearLabels(const Core::TaskID &request) {
-    Transfer::ActionResult reply;
+Core::ModelInquiryResult TaskManagerClient::ClearLabels(const Core::TaskID &request) {
+    Core::ModelInquiryResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->ClearLabels(&context, request, &reply);
 
-    return ActionResultTransformer(reply);
+    return reply;
 }
 
 void TaskManagerClient::Replace(const std::vector<Core::TaskEntity> &vec) {
