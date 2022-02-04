@@ -17,7 +17,7 @@ ActionResult LoadFromFileAction::execute(const std::shared_ptr<ModelInterface> &
         return result;
     }
 
-    persister_ = std::unique_ptr<Persister>(std::make_unique<FilePersistence>(filename_));
+    persister_ = std::make_unique<FilePersistence>(filename_);
     std::vector<Core::TaskEntity> data;
     if (persister_->load(data)) {
         model->Replace(data);

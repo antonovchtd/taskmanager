@@ -50,12 +50,8 @@ Core::ModelInquiryResult TaskManager::Add(const Core::Task &t) {
     Core::ModelInquiryResult result;
     auto id = gen_->genID();
 
-    if (ToBool(IsPresent(id))) {
-        result.set_status(Core::ModelInquiryResult_Status_DUPLICATE_ID);
-    } else {
-        tasks_.insert(std::make_pair(id, std::make_pair(t, Node())));
-        result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
-    }
+    tasks_.insert(std::make_pair(id, std::make_pair(t, Node())));
+    result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
 
     return result;
 }
@@ -64,9 +60,7 @@ Core::ModelInquiryResult TaskManager::AddSubtask(const Core::Task &t, const Core
     Core::ModelInquiryResult result;
     auto id = gen_->genID();
 
-    if (ToBool(IsPresent(id)))
-        result.set_status(Core::ModelInquiryResult_Status_DUPLICATE_ID);
-    else if (!ToBool(IsPresent(parent)))
+    if (!ToBool(IsPresent(parent)))
         result.set_status(Core::ModelInquiryResult_Status_PARENT_ID_NOT_FOUND);
     else {
         tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));

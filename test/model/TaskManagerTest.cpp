@@ -47,35 +47,6 @@ TEST_F(TaskManagerTest, shouldAddTask)
     EXPECT_TRUE(ToBool(tm.IsPresent(id)));
 }
 
-TEST_F(TaskManagerTest, shouldFailToAddTaskWithDuplicateID)
-{
-    auto gen = std::make_shared<MockIDGenerator>();
-    Core::TaskID id;
-    id.set_value(1);
-    EXPECT_CALL(*gen, genID).WillRepeatedly(Return(id));
-    TaskManager tm{gen};
-    tm.Add(Core::Task());
-
-    Core::ModelInquiryResult result = tm.Add(Core::Task());
-    ASSERT_TRUE(result.has_status());
-    EXPECT_EQ(result.status(), Core::ModelInquiryResult_Status_DUPLICATE_ID);
-}
-
-TEST_F(TaskManagerTest, shouldFailToAddSubtaskWithDuplicateID)
-{
-    auto gen = std::make_shared<MockIDGenerator>();
-    Core::TaskID id;
-    id.set_value(1);
-    EXPECT_CALL(*gen, genID).WillRepeatedly(Return(id));
-    TaskManager tm{gen};
-    tm.Add(Core::Task());
-
-    Core::ModelInquiryResult result = tm.AddSubtask(Core::Task(), id);
-
-    ASSERT_TRUE(result.has_status());
-    EXPECT_EQ(result.status(), Core::ModelInquiryResult_Status_DUPLICATE_ID);
-}
-
 TEST_F(TaskManagerTest, shouldFailToAddSubtaskWithMissingParent)
 {
     auto gen = std::make_shared<MockIDGenerator>();
