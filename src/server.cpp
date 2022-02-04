@@ -1,7 +1,6 @@
 //
 // Created by Anton Ovcharenko on 26.01.2022.
 //
-#include <boost/log/trivial.hpp>
 
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <grpcpp/grpcpp.h>
@@ -9,8 +8,17 @@
 #include "model/ModelInterface.h"
 #include "model/TaskManager.h"
 #include "transfer/TaskManagerService.h"
+#include "logging/Logger.h"
 
 int main(int argc, char** argv) {
+
+    auto logger = Logger()
+                  .SetFilename("taskmanager_server.log")
+                  .PrintToConsole(true)
+                  .SetFilterLevel(logging::trivial::debug);
+
+    logger.init();
+
     std::string server_address("0.0.0.0:50051");
     auto model = std::shared_ptr<ModelInterface>(std::make_shared<TaskManager>());
     TaskManagerService service{model};
@@ -25,7 +33,8 @@ int main(int argc, char** argv) {
     builder.RegisterService(&service);
     // Finally assemble the server.
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-    BOOST_LOG_TRIVIAL(info) << "Server listening on " << server_address;
+
+    LOG_STREAM(info) << "Server listening on " << server_address;
 
     // Wait for the server to shutdown. Note that some other thread must be
     // responsible for shutting down the server for this call to ever return.
