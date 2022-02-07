@@ -15,18 +15,9 @@ public:
     explicit ActionResult(const std::vector<Core::TaskEntity> &);
 
 public:
-    explicit operator bool() const;
-
-public:
-    union {
-        Core::ModelInquiryResult model_result;
-        Core::TaskEntity entity;
-        std::vector<Core::TaskEntity> tasks;
-    };
-    enum {kResult, kEntity, kVector} type_id;
-
-public:
-    ~ActionResult();
+    std::optional<Core::ModelInquiryResult> model_result;
+    std::optional<Core::TaskEntity> entity;
+    std::optional<std::vector<Core::TaskEntity>> tasks;
 };
 
 #endif //TASKMANAGER_SRC_UI_ACTIONS_ACTIONRESULT_H_

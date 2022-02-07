@@ -31,7 +31,7 @@ public:
         task_.set_is_complete(false);
         AddTaskAction act{task_};
         ActionResult result = act.execute(tm_);
-        id_ = result.model_result.id();
+        id_ = result.model_result->id();
         service_ = std::make_shared<TaskManagerService>(tm_);
     }
 };
