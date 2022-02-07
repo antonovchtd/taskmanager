@@ -4,22 +4,17 @@
 
 #include "GetTaskToShowLabelsAction.h"
 
-GetTaskToShowLabelsAction::GetTaskToShowLabelsAction(const std::string &arg) : arg_{arg} {
+GetTaskToShowLabelsAction::GetTaskToShowLabelsAction(const std::optional<Core::TaskID> &id) : id_{id} {
 }
 
 ActionResult GetTaskToShowLabelsAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    Core::TaskID id;
-    try {
-        id.set_value(std::stoi(arg_));
-        if (!model->IsPresent(id))
-            return {ActionResult::Status::ID_NOT_FOUND, id};
-    } catch (const std::invalid_argument &) {
-        return {ActionResult::Status::TAKES_ID, std::nullopt};
+    if (id_) {
+        if (!model->IsPresent(*id_))
+            return {ActionResult::Status::ID_NOT_FOUND, id_};
+    } else {
+        return {ActionResult::Status::TAKES_ID, id_};
     }
 
-    std::vector<Core::TaskEntity> tasks = model->getTaskWithSubtasks(id);
-    if (!tasks.empty())
-        return {ActionResult::Status::SUCCESS, tasks[0]};
-    else
-        return {ActionResult::Status::ID_NOT_FOUND, id};
+    std::vector<Core::TaskEntity> tasks = model->getTaskWithSubtasks(*id_);
+    return {ActionResult::Status::SUCCESS, tasks[0]};
 }

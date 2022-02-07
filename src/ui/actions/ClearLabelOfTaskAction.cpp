@@ -10,5 +10,5 @@ ClearLabelOfTaskAction::ClearLabelOfTaskAction(const Core::TaskID &id, const std
 }
 
 ActionResult ClearLabelOfTaskAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    return model->ClearLabel(id_, label_);
+    return model->RemoveLabel(id_, label_);
 }

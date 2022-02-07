@@ -9,5 +9,5 @@ ClearAllLabelsOfTaskAction::ClearAllLabelsOfTaskAction(const Core::TaskID &id) :
 }
 
 ActionResult ClearAllLabelsOfTaskAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    return model->ClearLabels(id_);
+    return model->RemoveAllLabels(id_);
 }

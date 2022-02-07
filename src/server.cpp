@@ -8,12 +8,12 @@
 #include <grpcpp/health_check_service_interface.h>
 #include "model/ModelInterface.h"
 #include "model/TaskManager.h"
-#include "transfer/TaskManagerService.h"
+#include "transport/TaskManagerGRPCService.h"
 
 int main(int argc, char** argv) {
     std::string server_address("0.0.0.0:50051");
     auto model = std::shared_ptr<ModelInterface>(std::make_shared<TaskManager>());
-    TaskManagerService service{model};
+    TaskManagerGRPCService service{model};
 
     grpc::EnableDefaultHealthCheckService(true);
     grpc::reflection::InitProtoReflectionServerBuilderPlugin();

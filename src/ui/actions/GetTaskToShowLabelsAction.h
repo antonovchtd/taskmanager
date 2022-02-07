@@ -9,13 +9,13 @@
 
 class GetTaskToShowLabelsAction : public Action {
 public:
-    explicit GetTaskToShowLabelsAction(const std::string &arg);
+    explicit GetTaskToShowLabelsAction(const std::optional<Core::TaskID> &id);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
 
 private:
-    std::string arg_;
+    std::optional<Core::TaskID> id_;
 };
 
 
