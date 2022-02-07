@@ -2,7 +2,7 @@
 // Created by Anton Ovcharenko on 26.01.2022.
 //
 
-#include "transfer/TaskManagerService.h"
+#include "transport/TaskManagerGRPCService.h"
 #include "model/TaskManager.h"
 #include "ui/actions/AddTaskAction.h"
 
@@ -14,13 +14,13 @@ using ::testing::Return;
 using ::testing::_;
 using testing::SaveArg;
 
-class TaskManagerServiceTest : public ::testing::Test
+class TaskManagerGRPCServiceTest : public ::testing::Test
 {
 public:
     std::shared_ptr<ModelInterface> tm_;
     Core::TaskID id_;
     Core::Task task_;
-    std::shared_ptr<TaskManagerService> service_;
+    std::shared_ptr<TaskManagerGRPCService> service_;
 
     void SetUp() override {
         tm_ = std::shared_ptr<ModelInterface>(new TaskManager);
@@ -32,11 +32,11 @@ public:
         AddTaskAction act{task_};
         ActionResult result = act.execute(tm_);
         id_ = *result.id;
-        service_ = std::make_shared<TaskManagerService>(tm_);
+        service_ = std::make_shared<TaskManagerGRPCService>(tm_);
     }
 };
 
-TEST_F(TaskManagerServiceTest, shouldGetAllTasks)
+TEST_F(TaskManagerGRPCServiceTest, shouldGetAllTasks)
 {
     grpc::ServerContext context;
     Transfer::EmptyMessage msg;
@@ -50,7 +50,7 @@ TEST_F(TaskManagerServiceTest, shouldGetAllTasks)
     EXPECT_FALSE(tasks[0].has_parent());
 }
 
-TEST_F(TaskManagerServiceTest, shouldGetTaskByLabel)
+TEST_F(TaskManagerGRPCServiceTest, shouldGetTaskByLabel)
 {
     grpc::ServerContext context;
     Core::Label request;
@@ -65,7 +65,7 @@ TEST_F(TaskManagerServiceTest, shouldGetTaskByLabel)
     EXPECT_FALSE(tasks[0].has_parent());
 }
 
-TEST_F(TaskManagerServiceTest, shouldGetTaskByID)
+TEST_F(TaskManagerGRPCServiceTest, shouldGetTaskByID)
 {
     grpc::ServerContext context;
     Core::TaskID request;
@@ -80,7 +80,7 @@ TEST_F(TaskManagerServiceTest, shouldGetTaskByID)
     EXPECT_FALSE(tasks[0].has_parent());
 }
 
-TEST_F(TaskManagerServiceTest, shouldAddTask)
+TEST_F(TaskManagerGRPCServiceTest, shouldAddTask)
 {
     grpc::ServerContext context;
     Core::Task request;
@@ -94,7 +94,7 @@ TEST_F(TaskManagerServiceTest, shouldAddTask)
     EXPECT_EQ(2, tm_->getTasks().size());
 }
 
-TEST_F(TaskManagerServiceTest, shouldAddSubtask)
+TEST_F(TaskManagerGRPCServiceTest, shouldAddSubtask)
 {
     grpc::ServerContext context;
     Core::TaskEntity request;
@@ -113,7 +113,7 @@ TEST_F(TaskManagerServiceTest, shouldAddSubtask)
     EXPECT_EQ(result.id(), tasks[1].id());
 }
 
-TEST_F(TaskManagerServiceTest, shouldEditTask)
+TEST_F(TaskManagerGRPCServiceTest, shouldEditTask)
 {
     grpc::ServerContext context;
     Core::TaskEntity request;
@@ -132,7 +132,7 @@ TEST_F(TaskManagerServiceTest, shouldEditTask)
     EXPECT_EQ(new_title, tasks[0].data().title());
 }
 
-TEST_F(TaskManagerServiceTest, shouldFailToEditTaskWithWrongID)
+TEST_F(TaskManagerGRPCServiceTest, shouldFailToEditTaskWithWrongID)
 {
     grpc::ServerContext context;
     Core::TaskEntity request;
@@ -147,7 +147,7 @@ TEST_F(TaskManagerServiceTest, shouldFailToEditTaskWithWrongID)
     EXPECT_EQ(Transfer::ActionResult_Status_ID_NOT_FOUND, result.status());
 }
 
-TEST_F(TaskManagerServiceTest, shouldCompleteTask)
+TEST_F(TaskManagerGRPCServiceTest, shouldCompleteTask)
 {
     grpc::ServerContext context;
     Core::TaskID request;
@@ -163,7 +163,7 @@ TEST_F(TaskManagerServiceTest, shouldCompleteTask)
     EXPECT_TRUE(tasks[0].data().is_complete());
 }
 
-TEST_F(TaskManagerServiceTest, shouldFailToCompleteTaskWithWrongID)
+TEST_F(TaskManagerGRPCServiceTest, shouldFailToCompleteTaskWithWrongID)
 {
     grpc::ServerContext context;
     Core::TaskID request;
@@ -179,7 +179,7 @@ TEST_F(TaskManagerServiceTest, shouldFailToCompleteTaskWithWrongID)
     EXPECT_FALSE(tasks[0].data().is_complete());
 }
 
-TEST_F(TaskManagerServiceTest, shouldUncompleteTask)
+TEST_F(TaskManagerGRPCServiceTest, shouldUncompleteTask)
 {
     grpc::ServerContext context;
     Core::TaskID request;
@@ -196,7 +196,7 @@ TEST_F(TaskManagerServiceTest, shouldUncompleteTask)
     EXPECT_FALSE(tasks[0].data().is_complete());
 }
 
-TEST_F(TaskManagerServiceTest, shouldFailToUncompleteTaskWithWrongID)
+TEST_F(TaskManagerGRPCServiceTest, shouldFailToUncompleteTaskWithWrongID)
 {
     grpc::ServerContext context;
     Core::TaskID request;
@@ -216,7 +216,7 @@ TEST_F(TaskManagerServiceTest, shouldFailToUncompleteTaskWithWrongID)
     EXPECT_TRUE(tasks[0].data().is_complete());
 }
 
-TEST_F(TaskManagerServiceTest, shouldDeleteTaskWithSubtasks)
+TEST_F(TaskManagerGRPCServiceTest, shouldDeleteTaskWithSubtasks)
 {
     grpc::ServerContext context;
     Core::TaskEntity request1;
@@ -236,7 +236,7 @@ TEST_F(TaskManagerServiceTest, shouldDeleteTaskWithSubtasks)
     EXPECT_EQ(0, tasks.size());
 }
 
-TEST_F(TaskManagerServiceTest, shouldFailDeleteTaskWithWrongID)
+TEST_F(TaskManagerGRPCServiceTest, shouldFailDeleteTaskWithWrongID)
 {
     grpc::ServerContext context;
     Core::TaskID request;
@@ -251,7 +251,7 @@ TEST_F(TaskManagerServiceTest, shouldFailDeleteTaskWithWrongID)
     EXPECT_EQ(1, tasks.size());
 }
 
-TEST_F(TaskManagerServiceTest, shouldReturnSuccessOnIsPresent)
+TEST_F(TaskManagerGRPCServiceTest, shouldReturnSuccessOnIsPresent)
 {
     grpc::ServerContext context;
     Core::TaskID request;
@@ -265,7 +265,7 @@ TEST_F(TaskManagerServiceTest, shouldReturnSuccessOnIsPresent)
     EXPECT_EQ(id_, result.id());
 }
 
-TEST_F(TaskManagerServiceTest, shouldReturnIDNotFoundOnIsPresent)
+TEST_F(TaskManagerGRPCServiceTest, shouldReturnIDNotFoundOnIsPresent)
 {
     grpc::ServerContext context;
     Core::TaskID request;
@@ -278,7 +278,7 @@ TEST_F(TaskManagerServiceTest, shouldReturnIDNotFoundOnIsPresent)
     EXPECT_EQ(request, result.id());
 }
 
-TEST_F(TaskManagerServiceTest, shouldAddLabel)
+TEST_F(TaskManagerGRPCServiceTest, shouldAddLabel)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
@@ -301,7 +301,7 @@ TEST_F(TaskManagerServiceTest, shouldAddLabel)
     EXPECT_EQ(new_label, labels[1]);
 }
 
-TEST_F(TaskManagerServiceTest, shouldFailToAddLabelWithInvalidID)
+TEST_F(TaskManagerGRPCServiceTest, shouldFailToAddLabelWithInvalidID)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
@@ -323,7 +323,7 @@ TEST_F(TaskManagerServiceTest, shouldFailToAddLabelWithInvalidID)
     EXPECT_EQ(task_.labels(0), labels[0]);
 }
 
-TEST_F(TaskManagerServiceTest, shouldRemoveLabel)
+TEST_F(TaskManagerGRPCServiceTest, shouldRemoveLabel)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
@@ -344,7 +344,7 @@ TEST_F(TaskManagerServiceTest, shouldRemoveLabel)
     ASSERT_EQ(0, labels.size());
 }
 
-TEST_F(TaskManagerServiceTest, shouldFailToRemoveLabelWithInvalidID)
+TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveLabelWithInvalidID)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
@@ -366,7 +366,7 @@ TEST_F(TaskManagerServiceTest, shouldFailToRemoveLabelWithInvalidID)
     EXPECT_EQ(task_.labels(0), labels[0]);
 }
 
-TEST_F(TaskManagerServiceTest, shouldFailToRemoveLabelWrongLabel)
+TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveLabelWrongLabel)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
@@ -388,7 +388,7 @@ TEST_F(TaskManagerServiceTest, shouldFailToRemoveLabelWrongLabel)
     EXPECT_EQ(task_.labels(0), labels[0]);
 }
 
-TEST_F(TaskManagerServiceTest, shouldRemoveAllLabels)
+TEST_F(TaskManagerGRPCServiceTest, shouldRemoveAllLabels)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request1;
@@ -415,7 +415,7 @@ TEST_F(TaskManagerServiceTest, shouldRemoveAllLabels)
     ASSERT_EQ(0, labels.size());
 }
 
-TEST_F(TaskManagerServiceTest, shouldFailToRemoveAllLabelsWithWrongID)
+TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveAllLabelsWithWrongID)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request1;
@@ -442,7 +442,7 @@ TEST_F(TaskManagerServiceTest, shouldFailToRemoveAllLabelsWithWrongID)
     ASSERT_EQ(2, labels.size());
 }
 
-TEST_F(TaskManagerServiceTest, shouldReplaceAllTasks)
+TEST_F(TaskManagerGRPCServiceTest, shouldReplaceAllTasks)
 {
     Core::TaskEntity te;
     te.mutable_data()->CopyFrom(task_);

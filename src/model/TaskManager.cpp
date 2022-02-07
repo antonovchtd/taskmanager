@@ -211,7 +211,7 @@ ActionResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &la
     return {ActionResult::Status::SUCCESS, id};
 }
 
-ActionResult TaskManager::ClearLabel(const Core::TaskID &id, const std::string &label) {
+ActionResult TaskManager::RemoveLabel(const Core::TaskID &id, const std::string &label) {
     auto it = tasks_.find(id);
     if (it != tasks_.end()) {
         auto labels = it->second.first.mutable_labels();
@@ -226,7 +226,7 @@ ActionResult TaskManager::ClearLabel(const Core::TaskID &id, const std::string &
     return {ActionResult::Status::SUCCESS, id};
 }
 
-ActionResult TaskManager::ClearLabels(const Core::TaskID &id) {
+ActionResult TaskManager::RemoveAllLabels(const Core::TaskID &id) {
     auto it = tasks_.find(id);
     if (it != tasks_.end()) {
         it->second.first.clear_labels();

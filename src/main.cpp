@@ -16,7 +16,7 @@
 
 #include "ui/Machine.h"
 #include "logging/Logger.h"
-#include "transfer/TaskManagerClient.h"
+#include "transport/TaskManagerGRPCClient.h"
 
 int main() {
     auto logger = Logger()
@@ -27,7 +27,7 @@ int main() {
     logger.init();
 
     std::string target_str = "localhost:50051";
-    auto model = std::make_shared<TaskManagerClient>(
+    auto model = std::make_shared<TaskManagerGRPCClient>(
             grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
 
 //    src::severity_logger<logging::trivial::severity_level> lg;
