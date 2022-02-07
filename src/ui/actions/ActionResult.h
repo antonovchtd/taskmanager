@@ -10,12 +10,12 @@
 
 struct ActionResult {
 public:
-    ActionResult(const Core::ModelInquiryResult &); // not explicit by design
+    ActionResult(const Core::ModelRequestResult &); // not explicit by design
     explicit ActionResult(const Core::TaskEntity &);
     explicit ActionResult(const std::vector<Core::TaskEntity> &);
 
 public:
-    std::optional<Core::ModelInquiryResult> model_result;
+    std::optional<Core::ModelRequestResult> model_result;
     std::optional<Core::TaskEntity> entity;
     std::optional<std::vector<Core::TaskEntity>> tasks;
 };

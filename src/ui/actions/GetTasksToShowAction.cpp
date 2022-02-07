@@ -3,7 +3,7 @@
 //
 
 #include "GetTasksToShowAction.h"
-#include "utilities/ModelInquiryResultUtils.h"
+#include "utilities/ModelRequestResultUtils.h"
 
 GetTasksToShowAction::GetTasksToShowAction(const std::string &arg) : arg_{arg} {
 }

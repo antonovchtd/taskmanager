@@ -9,16 +9,16 @@ service TaskManager {
   rpc getTasksByLabel (Core.Label) returns (ManyTaskEntities) {}
   rpc getTaskWithSubtasks (Core.TaskID) returns (ManyTaskEntities) {}
 
-  rpc Add (Core.Task) returns (Core.ModelInquiryResult) {}
-  rpc AddSubtask (Core.TaskEntity) returns (Core.ModelInquiryResult) {}
-  rpc Edit (Core.TaskEntity) returns (Core.ModelInquiryResult) {}
-  rpc Complete (Core.TaskID) returns (Core.ModelInquiryResult) {}
-  rpc Uncomplete (Core.TaskID) returns (Core.ModelInquiryResult) {}
-  rpc Delete (Core.TaskID) returns (Core.ModelInquiryResult) {}
-  rpc IsPresent (Core.TaskID) returns (Core.ModelInquiryResult) {}
-  rpc AddLabel (IDWithLabel) returns (Core.ModelInquiryResult) {}
-  rpc ClearLabel (IDWithLabel) returns (Core.ModelInquiryResult) {}
-  rpc ClearLabels (Core.TaskID) returns (Core.ModelInquiryResult) {}
+  rpc Add (Core.Task) returns (Core.ModelRequestResult) {}
+  rpc AddSubtask (Core.TaskEntity) returns (Core.ModelRequestResult) {}
+  rpc Edit (Core.TaskEntity) returns (Core.ModelRequestResult) {}
+  rpc Complete (Core.TaskID) returns (Core.ModelRequestResult) {}
+  rpc Uncomplete (Core.TaskID) returns (Core.ModelRequestResult) {}
+  rpc Delete (Core.TaskID) returns (Core.ModelRequestResult) {}
+  rpc IsPresent (Core.TaskID) returns (Core.ModelRequestResult) {}
+  rpc AddLabel (IDWithLabel) returns (Core.ModelRequestResult) {}
+  rpc ClearLabel (IDWithLabel) returns (Core.ModelRequestResult) {}
+  rpc ClearLabels (Core.TaskID) returns (Core.ModelRequestResult) {}
 
   rpc Replace (ManyTaskEntities) returns (EmptyMessage) {}
 }

@@ -10,10 +10,10 @@ LoadFromFileAction::LoadFromFileAction(const std::string &filename) : filename_{
 }
 
 ActionResult LoadFromFileAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    Core::ModelInquiryResult result;
+    Core::ModelRequestResult result;
 
     if (filename_.empty()) {
-        result.set_status(Core::ModelInquiryResult_Status_TAKES_ARG);
+        result.set_status(Core::ModelRequestResult_Status_TAKES_ARG);
         return result;
     }
 
@@ -21,10 +21,10 @@ ActionResult LoadFromFileAction::execute(const std::shared_ptr<ModelInterface> &
     std::vector<Core::TaskEntity> data;
     if (persister_->load(data)) {
         model->Replace(data);
-        result.set_status(Core::ModelInquiryResult_Status_SUCCESS);
+        result.set_status(Core::ModelRequestResult_Status_SUCCESS);
     }
     else {
-        result.set_status(Core::ModelInquiryResult_Status_FILE_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_FILE_NOT_FOUND);
     }
 
     return result;

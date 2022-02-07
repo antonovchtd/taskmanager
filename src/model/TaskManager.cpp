@@ -46,8 +46,8 @@ std::optional<Core::TaskID> TaskManager::ParentOf(const Core::TaskID &id) const 
         return std::nullopt;
 }
 
-Core::ModelInquiryResult TaskManager::Add(const Core::Task &t) {
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::Add(const Core::Task &t) {
+    Core::ModelRequestResult result;
     auto id = gen_->genID();
 
     tasks_.insert(std::make_pair(id, std::make_pair(t, Node())));
@@ -56,12 +56,12 @@ Core::ModelInquiryResult TaskManager::Add(const Core::Task &t) {
     return result;
 }
 
-Core::ModelInquiryResult TaskManager::AddSubtask(const Core::Task &t, const Core::TaskID &parent) {
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::AddSubtask(const Core::Task &t, const Core::TaskID &parent) {
+    Core::ModelRequestResult result;
     auto id = gen_->genID();
 
     if (!ToBool(IsPresent(parent)))
-        result.set_status(Core::ModelInquiryResult_Status_PARENT_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_PARENT_ID_NOT_FOUND);
     else {
         tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
         AddChild(parent, id);
@@ -114,11 +114,11 @@ std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskI
     return tasks;
 }
 
-Core::ModelInquiryResult TaskManager::Delete(const Core::TaskID &id, bool deleteChildren) {
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::Delete(const Core::TaskID &id, bool deleteChildren) {
+    Core::ModelRequestResult result;
     if (ToBool(IsPresent(id))) {
         if (!ChildrenOf(id).empty() && !deleteChildren) {
-            result.set_status(Core::ModelInquiryResult_Status_HAS_CHILDREN);
+            result.set_status(Core::ModelRequestResult_Status_HAS_CHILDREN);
         } else {
             std::optional<Core::TaskID> ancestor = ParentOf(id);
             if (ancestor && ToBool(IsPresent(*ancestor)))
@@ -132,28 +132,28 @@ Core::ModelInquiryResult TaskManager::Delete(const Core::TaskID &id, bool delete
             result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
         }
     } else {
-        result.set_status(Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
 
     return result;
 }
 
-Core::ModelInquiryResult TaskManager::Edit(const Core::TaskID &id, const Core::Task &t) {
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::Edit(const Core::TaskID &id, const Core::Task &t) {
+    Core::ModelRequestResult result;
     auto it = tasks_.find(id);
 
     if (it != tasks_.end()) {
         it->second.first = t;
         result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        result.set_status(Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
 
     return result;
 }
 
-Core::ModelInquiryResult TaskManager::Complete(const Core::TaskID &id) {
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::Complete(const Core::TaskID &id) {
+    Core::ModelRequestResult result;
     auto it = tasks_.find(id);
 
     if (it != tasks_.end()) {
@@ -163,14 +163,14 @@ Core::ModelInquiryResult TaskManager::Complete(const Core::TaskID &id) {
 
         result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        result.set_status(Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
 
     return result;
 }
 
-Core::ModelInquiryResult TaskManager::Uncomplete(const Core::TaskID &id) {
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::Uncomplete(const Core::TaskID &id) {
+    Core::ModelRequestResult result;
     auto it = tasks_.find(id);
 
     if (it != tasks_.end()) {
@@ -180,19 +180,19 @@ Core::ModelInquiryResult TaskManager::Uncomplete(const Core::TaskID &id) {
 
         result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        result.set_status(Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
 
     return result;
 }
 
-Core::ModelInquiryResult TaskManager::IsPresent(const Core::TaskID &id) const{
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::IsPresent(const Core::TaskID &id) const{
+    Core::ModelRequestResult result;
 
     if (tasks_.find(id) != tasks_.end())
         result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     else
-        result.set_status(Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
 
     return result;
 }
@@ -201,8 +201,8 @@ size_t TaskManager::size() const {
     return tasks_.size();
 }
 
-Core::ModelInquiryResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &label) {
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &label) {
+    Core::ModelRequestResult result;
     auto it = tasks_.find(id);
 
     if (it != tasks_.end()) {
@@ -212,14 +212,14 @@ Core::ModelInquiryResult TaskManager::AddLabel(const Core::TaskID &id, const std
 
         result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        result.set_status(Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
 
     return result;
 }
 
-Core::ModelInquiryResult TaskManager::ClearLabel(const Core::TaskID &id, const std::string &label) {
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::ClearLabel(const Core::TaskID &id, const std::string &label) {
+    Core::ModelRequestResult result;
     auto it = tasks_.find(id);
 
     if (it != tasks_.end()) {
@@ -230,21 +230,21 @@ Core::ModelInquiryResult TaskManager::ClearLabel(const Core::TaskID &id, const s
 
         result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        result.set_status(Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
 
     return result;
 }
 
-Core::ModelInquiryResult TaskManager::ClearLabels(const Core::TaskID &id) {
-    Core::ModelInquiryResult result;
+Core::ModelRequestResult TaskManager::ClearLabels(const Core::TaskID &id) {
+    Core::ModelRequestResult result;
     auto it = tasks_.find(id);
 
     if (it != tasks_.end()) {
         it->second.first.clear_labels();
         result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        result.set_status(Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
 
     return result;

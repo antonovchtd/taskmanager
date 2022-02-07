@@ -3,13 +3,13 @@
 //
 
 #include "GetTaskToShowLabelsAction.h"
-#include "utilities/ModelInquiryResultUtils.h"
+#include "utilities/ModelRequestResultUtils.h"
 
 GetTaskToShowLabelsAction::GetTaskToShowLabelsAction(const std::string &arg) : arg_{arg} {
 }
 
 ActionResult GetTaskToShowLabelsAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    Core::ModelInquiryResult result;
+    Core::ModelRequestResult result;
     Core::TaskID id;
     try {
         id.set_value(std::stoi(arg_));
@@ -17,7 +17,7 @@ ActionResult GetTaskToShowLabelsAction::execute(const std::shared_ptr<ModelInter
         if (!ToBool(check))
             return check;
     } catch (const std::invalid_argument &) {
-        result.set_status(Core::ModelInquiryResult_Status_TAKES_ID);
+        result.set_status(Core::ModelRequestResult_Status_TAKES_ID);
         return result;
     }
 
@@ -25,7 +25,7 @@ ActionResult GetTaskToShowLabelsAction::execute(const std::shared_ptr<ModelInter
     if (!tasks.empty())
         return ActionResult(tasks[0]);
     else {
-        result.set_status(Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
         return result;
     }
 }

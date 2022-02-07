@@ -22,8 +22,8 @@ std::shared_ptr<Step> ConfirmDeleteStep::getConfirmation(const std::shared_ptr<F
     while (true) {
         std::string reply = reader()->read("Delete task with all its subtasks? Y/[N] > ");
         if (reply == "Y" || reply == "y") {
-            Core::ModelInquiryResult result;
-            result.set_status(Core::ModelInquiryResult_Status_SUCCESS);
+            Core::ModelRequestResult result;
+            result.set_status(Core::ModelRequestResult_Status_SUCCESS);
             return processResult(*this, factory, result, "");
         } else if (reply.empty() || reply == "N" || reply == "n") {
             // disregard nextStep and go to HomeStep

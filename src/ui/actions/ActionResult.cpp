@@ -3,9 +3,9 @@
 //
 
 #include "ActionResult.h"
-#include "utilities/ModelInquiryResultUtils.h"
+#include "utilities/ModelRequestResultUtils.h"
 
-ActionResult::ActionResult(const Core::ModelInquiryResult &result) : model_result{result} {
+ActionResult::ActionResult(const Core::ModelRequestResult &result) : model_result{result} {
 }
 
 ActionResult::ActionResult(const Core::TaskEntity &te) : entity{te} {

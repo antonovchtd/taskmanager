@@ -8,7 +8,7 @@
 #include "ui/steps/Step.h"
 #include "ui/StepSwitcher.h"
 #include "ui/Factory.h"
-#include "utilities/ModelInquiryResultUtils.h"
+#include "utilities/ModelRequestResultUtils.h"
 
 
 template <typename T>

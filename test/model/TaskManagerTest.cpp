@@ -40,7 +40,7 @@ TEST_F(TaskManagerTest, shouldAddTask)
     t.set_due_date(time(nullptr) + 10);
     t.add_labels("label");
     t.set_is_complete(false);
-    Core::ModelInquiryResult result = tm.Add(t);
+    Core::ModelRequestResult result = tm.Add(t);
     ASSERT_TRUE(result.has_id());
     const Core::TaskID& id = result.id();
     ASSERT_EQ(1, tm.size());
@@ -54,10 +54,10 @@ TEST_F(TaskManagerTest, shouldFailToAddSubtaskWithMissingParent)
     id.set_value(1);
     EXPECT_CALL(*gen, genID).WillRepeatedly(Return(id));
     TaskManager tm{gen};
-    Core::ModelInquiryResult result = tm.AddSubtask(Core::Task(), id);
+    Core::ModelRequestResult result = tm.AddSubtask(Core::Task(), id);
 
     ASSERT_TRUE(result.has_status());
-    EXPECT_EQ(result.status(), Core::ModelInquiryResult_Status_PARENT_ID_NOT_FOUND);
+    EXPECT_EQ(result.status(), Core::ModelRequestResult_Status_PARENT_ID_NOT_FOUND);
 }
 
 TEST_F(TaskManagerTest, shouldAddSubtask)
@@ -70,11 +70,11 @@ TEST_F(TaskManagerTest, shouldAddSubtask)
     t.add_labels("label");
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
     t.set_title("SubTask");
-    Core::ModelInquiryResult subtask_result = tm.AddSubtask(t, id);
+    Core::ModelRequestResult subtask_result = tm.AddSubtask(t, id);
     ASSERT_TRUE(subtask_result.has_id());
     const auto& id_ch = subtask_result.id();
 
@@ -93,7 +93,7 @@ TEST_F(TaskManagerTest, shouldEdit)
     t.set_due_date(time(nullptr) + 10);
     t.add_labels("label");
     t.set_is_complete(false);
-    Core::ModelInquiryResult result = tm.Add(t);
+    Core::ModelRequestResult result = tm.Add(t);
     ASSERT_TRUE(result.has_id());
     const auto& id = result.id();
 
@@ -111,15 +111,15 @@ TEST_F(TaskManagerTest, shouldFailToEditWrongID)
     t.set_due_date(time(nullptr) + 10);
     t.add_labels("label");
     t.set_is_complete(false);
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     auto id = add_result.id();
 
     t.set_title("Edited");
     id.set_value(id.value()+1);
-    Core::ModelInquiryResult edit_result = tm.Edit(id, t);
+    Core::ModelRequestResult edit_result = tm.Edit(id, t);
     ASSERT_TRUE(edit_result.has_status());
-    EXPECT_EQ(edit_result.status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(edit_result.status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(TaskManagerTest, shouldDeleteTask)
@@ -131,7 +131,7 @@ TEST_F(TaskManagerTest, shouldDeleteTask)
     t.set_due_date(time(nullptr) + 10);
     t.add_labels("label");
     t.set_is_complete(false);
-    Core::ModelInquiryResult result = tm.Add(t);
+    Core::ModelRequestResult result = tm.Add(t);
     ASSERT_TRUE(result.has_id());
     const auto& id = result.id();
     tm.Delete(id, false);
@@ -147,14 +147,14 @@ TEST_F(TaskManagerTest, shouldFailToDeleteTaskWithWrongID)
     t.set_due_date(time(nullptr) + 10);
     t.add_labels("label");
     t.set_is_complete(false);
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     auto id = add_result.id();
 
     id.set_value(id.value()+1);
-    Core::ModelInquiryResult delete_result = tm.Delete(id, false);
+    Core::ModelRequestResult delete_result = tm.Delete(id, false);
     ASSERT_TRUE(delete_result.has_status());
-    EXPECT_EQ(delete_result.status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(delete_result.status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(TaskManagerTest, shouldFailToDeleteTaskWithChildren)
@@ -162,13 +162,13 @@ TEST_F(TaskManagerTest, shouldFailToDeleteTaskWithChildren)
     TaskManager tm;
     Core::Task t;
     t.set_title("TestTitle");
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
     tm.AddSubtask(t, id);
-    Core::ModelInquiryResult delete_result = tm.Delete(id, false);
+    Core::ModelRequestResult delete_result = tm.Delete(id, false);
     ASSERT_TRUE(delete_result.has_status());
-    EXPECT_EQ(delete_result.status(), Core::ModelInquiryResult_Status_HAS_CHILDREN);
+    EXPECT_EQ(delete_result.status(), Core::ModelRequestResult_Status_HAS_CHILDREN);
 }
 
 TEST_F(TaskManagerTest, shouldDeleteTaskWithChildren)
@@ -176,12 +176,12 @@ TEST_F(TaskManagerTest, shouldDeleteTaskWithChildren)
     TaskManager tm;
     Core::Task t;
     t.set_title("TestTitle");
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
 
     tm.AddSubtask(t, id);
-    Core::ModelInquiryResult delete_result = tm.Delete(id, true);
+    Core::ModelRequestResult delete_result = tm.Delete(id, true);
     ASSERT_TRUE(delete_result.has_id());
     EXPECT_EQ(delete_result.id(), id);
     EXPECT_EQ(0, tm.size());
@@ -193,7 +193,7 @@ TEST_F(TaskManagerTest, shouldCompleteTaskWithSubtasks)
     Core::Task t;
     t.set_title("TestTitle");
     t.set_is_complete(false);
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
 
@@ -215,14 +215,14 @@ TEST_F(TaskManagerTest, shouldFailToCompleteTaskWithWrongID)
     t.add_labels("label");
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     auto id = add_result.id();
 
     id.set_value(id.value()+1);
-    Core::ModelInquiryResult result = tm.Complete(id);
+    Core::ModelRequestResult result = tm.Complete(id);
     ASSERT_TRUE(result.has_status());
-    EXPECT_EQ(result.status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(result.status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(TaskManagerTest, shouldUncompleteTask)
@@ -235,7 +235,7 @@ TEST_F(TaskManagerTest, shouldUncompleteTask)
     t.add_labels("label");
     t.set_is_complete(true);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
 
@@ -254,14 +254,14 @@ TEST_F(TaskManagerTest, shouldFailToUncompleteTaskWithWrongID)
     t.set_title("TestTitle");
     t.set_is_complete(true);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     auto id = add_result.id();
 
     id.set_value(2);
-    Core::ModelInquiryResult result = tm.Uncomplete(id);
+    Core::ModelRequestResult result = tm.Uncomplete(id);
     ASSERT_TRUE(result.has_status());
-    EXPECT_EQ(result.status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(result.status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
@@ -274,12 +274,12 @@ TEST_F(TaskManagerTest, shouldDeleteAncestorsChild)
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id1 = add_result.id();
 
     t.set_title("Subtask");
-    Core::ModelInquiryResult subtask_result = tm.AddSubtask(t, id1);
+    Core::ModelRequestResult subtask_result = tm.AddSubtask(t, id1);
     ASSERT_TRUE(subtask_result.has_id());
     const auto& id2 = subtask_result.id();
 
@@ -298,7 +298,7 @@ TEST_F(TaskManagerTest, shouldAddLabel){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
 
@@ -316,7 +316,7 @@ TEST_F(TaskManagerTest, shouldAddMultipleLabels){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
 
@@ -337,7 +337,7 @@ TEST_F(TaskManagerTest, shouldAddMultipleLabelsClearOne){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
 
@@ -360,7 +360,7 @@ TEST_F(TaskManagerTest, shouldFailToClearLabelInvalidID){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
 
@@ -368,12 +368,12 @@ TEST_F(TaskManagerTest, shouldFailToClearLabelInvalidID){
     tm.AddLabel(id, label);
     Core::TaskID id2;
     id2.set_value(id.value()+1);
-    Core::ModelInquiryResult clear_result = tm.ClearLabel(id2, label);
+    Core::ModelRequestResult clear_result = tm.ClearLabel(id2, label);
     auto tasks = tm.getTasks();
     ASSERT_EQ(1, tasks[0].data().labels().size());
     EXPECT_EQ(label, tasks[0].data().labels()[0]);
     ASSERT_TRUE(clear_result.has_status());
-    EXPECT_EQ(clear_result.status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(clear_result.status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(TaskManagerTest, shouldFailToClearAllLabelsInvalidID){
@@ -385,7 +385,7 @@ TEST_F(TaskManagerTest, shouldFailToClearAllLabelsInvalidID){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
 
@@ -393,12 +393,12 @@ TEST_F(TaskManagerTest, shouldFailToClearAllLabelsInvalidID){
     tm.AddLabel(id, label);
     Core::TaskID id2;
     id2.set_value(id.value()+1);
-    Core::ModelInquiryResult clear_result = tm.ClearLabels(id2);
+    Core::ModelRequestResult clear_result = tm.ClearLabels(id2);
     auto tasks = tm.getTasks();
     ASSERT_EQ(1, tasks[0].data().labels().size());
     EXPECT_EQ(label, tasks[0].data().labels()[0]);
     ASSERT_TRUE(clear_result.has_status());
-    EXPECT_EQ(clear_result.status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(clear_result.status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(TaskManagerTest, shouldAddMultipleLabelsClearAll){
@@ -410,7 +410,7 @@ TEST_F(TaskManagerTest, shouldAddMultipleLabelsClearAll){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     const auto& id = add_result.id();
 
@@ -431,15 +431,15 @@ TEST_F(TaskManagerTest, shouldFailToAddLabelWithWrongID){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     auto id = add_result.id();
 
     std::string label = "testing";
     id.set_value(id.value()+1);
-    Core::ModelInquiryResult result = tm.AddLabel(id, label);
+    Core::ModelRequestResult result = tm.AddLabel(id, label);
     ASSERT_TRUE(result.has_status());
-    EXPECT_EQ(result.status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(result.status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(TaskManagerTest, shouldReturnTasks){
@@ -451,7 +451,7 @@ TEST_F(TaskManagerTest, shouldReturnTasks){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     auto id1 = add_result.id();
 
@@ -491,7 +491,7 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificID){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     auto id1 = add_result.id();
 
@@ -527,7 +527,7 @@ TEST_F(TaskManagerTest, shouldReturnTasksWithSpecificLabel){
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
 
-    Core::ModelInquiryResult add_result = tm.Add(t);
+    Core::ModelRequestResult add_result = tm.Add(t);
     ASSERT_TRUE(add_result.has_id());
     auto id1 = add_result.id();
 

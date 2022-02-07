@@ -8,9 +8,9 @@
 #include "Core.pb.h"
 
 namespace Core {
-    bool ToBool(const Core::ModelInquiryResult &result);
-    std::string ToString(const Core::ModelInquiryResult::Status &status);
-    std::string ToString(const Core::ModelInquiryResult::Status &status,
+    bool ToBool(const Core::ModelRequestResult &result);
+    std::string ToString(const Core::ModelRequestResult::Status &status);
+    std::string ToString(const Core::ModelRequestResult::Status &status,
                          const Core::TaskID &id);
 };
 

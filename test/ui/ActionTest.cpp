@@ -90,7 +90,7 @@ TEST_F(ActionTest, shouldExecuteValidateIDInvalidID)
     ActionResult result_validate = act.execute(tm_);
     ASSERT_TRUE(result_validate.model_result);
     ASSERT_TRUE(result_validate.model_result->has_status());
-    EXPECT_EQ(result_validate.model_result->status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(result_validate.model_result->status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(ActionTest, shouldExecuteValidateIDNoID)
@@ -99,7 +99,7 @@ TEST_F(ActionTest, shouldExecuteValidateIDNoID)
     ActionResult result_validate = act.execute(tm_);
     ASSERT_TRUE(result_validate.model_result);
     ASSERT_TRUE(result_validate.model_result->has_status());
-    EXPECT_EQ(result_validate.model_result->status(), Core::ModelInquiryResult_Status_TAKES_ARG);
+    EXPECT_EQ(result_validate.model_result->status(), Core::ModelRequestResult_Status_TAKES_ARG);
 }
 
 TEST_F(ActionTest, shouldExecuteValidateIDBadString)
@@ -108,7 +108,7 @@ TEST_F(ActionTest, shouldExecuteValidateIDBadString)
     ActionResult result_validate = act.execute(tm_);
     ASSERT_TRUE(result_validate.model_result);
     ASSERT_TRUE(result_validate.model_result->has_status());
-    EXPECT_EQ(result_validate.model_result->status(), Core::ModelInquiryResult_Status_TAKES_ID);
+    EXPECT_EQ(result_validate.model_result->status(), Core::ModelRequestResult_Status_TAKES_ID);
 }
 
 TEST_F(ActionTest, shouldExecuteValidateNoArgActionSomeArg)
@@ -117,7 +117,7 @@ TEST_F(ActionTest, shouldExecuteValidateNoArgActionSomeArg)
     ActionResult result = act.execute(tm_);
     ASSERT_TRUE(result.model_result);
     ASSERT_TRUE(result.model_result->has_status());
-    EXPECT_EQ(result.model_result->status(), Core::ModelInquiryResult_Status_TAKES_NO_ARG);
+    EXPECT_EQ(result.model_result->status(), Core::ModelRequestResult_Status_TAKES_NO_ARG);
 }
 
 TEST_F(ActionTest, shouldExecuteValidateNoArgActionNoArg)
@@ -126,7 +126,7 @@ TEST_F(ActionTest, shouldExecuteValidateNoArgActionNoArg)
     ActionResult result = act.execute(tm_);
     ASSERT_TRUE(result.model_result);
     ASSERT_TRUE(result.model_result->has_status());
-    EXPECT_EQ(result.model_result->status(), Core::ModelInquiryResult_Status_SUCCESS);
+    EXPECT_EQ(result.model_result->status(), Core::ModelRequestResult_Status_SUCCESS);
 }
 
 TEST_F(ActionTest, shouldEditTask)
@@ -188,7 +188,7 @@ TEST_F(ActionTest, shouldFailToGetTasksToShowWithInvalidID)
 
     ASSERT_TRUE(result.model_result);
     ASSERT_TRUE(result.model_result->has_status());
-    EXPECT_EQ(result.model_result->status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(result.model_result->status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(ActionTest, shouldCompleteTaskWithValidID)
@@ -211,7 +211,7 @@ TEST_F(ActionTest, shouldNotCompleteTaskWithInvalidID)
     ASSERT_EQ(1, tm_->getTasks().size());
     ASSERT_TRUE(result_complete.model_result);
     ASSERT_TRUE(result_complete.model_result->has_status());
-    EXPECT_EQ(result_complete.model_result->status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(result_complete.model_result->status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
     EXPECT_FALSE(tm_->getTasks()[0].data().is_complete());
 }
 
@@ -248,7 +248,7 @@ TEST_F(ActionTest, shouldFailToDeleteTaskWithInvalidID)
     EXPECT_EQ(1, tm_->getTasks().size());
     ASSERT_TRUE(result_delete.model_result);
     ASSERT_TRUE(result_delete.model_result->has_status());
-    EXPECT_EQ(result_delete.model_result->status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(result_delete.model_result->status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(ActionTest, shouldDeleteTaskValidIDWithSubtasks)
@@ -288,7 +288,7 @@ TEST_F(ActionTest, shouldNotLabelTaskWithInvalidID)
     ASSERT_EQ(1, tm_->getTasks().size());
     ASSERT_TRUE(result_label.model_result);
     ASSERT_TRUE(result_label.model_result->has_status());
-    EXPECT_EQ(result_label.model_result->status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(result_label.model_result->status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
     EXPECT_EQ("label", tm_->getTasks()[0].data().labels()[0]);
 }
 
@@ -299,7 +299,7 @@ TEST_F(ActionTest, shouldDoNothing)
     ASSERT_EQ(1, tm_->getTasks().size());
     ASSERT_TRUE(result.model_result);
     ASSERT_TRUE(result.model_result->has_status());
-    EXPECT_EQ(result.model_result->status(), Core::ModelInquiryResult_Status_SUCCESS);
+    EXPECT_EQ(result.model_result->status(), Core::ModelRequestResult_Status_SUCCESS);
 
 }
 
@@ -355,7 +355,7 @@ TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidID)
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_TRUE(result.model_result);
-    EXPECT_EQ(result.model_result->status(), Core::ModelInquiryResult_Status_ID_NOT_FOUND);
+    EXPECT_EQ(result.model_result->status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
 }
 
 TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidArg)
@@ -364,5 +364,5 @@ TEST_F(ActionTest, shouldFailToGetTaskToShowItsLabelsWithInvalidArg)
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->getTasks().size());
     EXPECT_TRUE(result.model_result);
-    EXPECT_EQ(result.model_result->status(), Core::ModelInquiryResult_Status_TAKES_ID);
+    EXPECT_EQ(result.model_result->status(), Core::ModelRequestResult_Status_TAKES_ID);
 }
