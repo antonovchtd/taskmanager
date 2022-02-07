@@ -10,10 +10,10 @@
 
 #include "model/ModelInterface.h"
 
-class TaskManagerClient : public ModelInterface {
+class TaskManagerGRPCClient : public ModelInterface {
 public:
-    explicit TaskManagerClient(const std::shared_ptr<grpc::Channel> &channel);
-    explicit TaskManagerClient(std::unique_ptr<Transfer::TaskManager::StubInterface> stub);
+    explicit TaskManagerGRPCClient(const std::shared_ptr<grpc::Channel> &channel);
+    explicit TaskManagerGRPCClient(std::unique_ptr<Transfer::TaskManager::StubInterface> stub);
 
 public:
     std::vector<Core::TaskEntity> getTasks() const override;
@@ -29,8 +29,8 @@ public:
     ActionResult Delete(const Core::TaskID &, bool deleteChildren) override;
     ActionResult IsPresent(const Core::TaskID &) const override;
     ActionResult AddLabel(const Core::TaskID &, const std::string &label) override;
-    ActionResult ClearLabel(const Core::TaskID &, const std::string &label) override;
-    ActionResult ClearLabels(const Core::TaskID &) override;
+    ActionResult RemoveLabel(const Core::TaskID &, const std::string &label) override;
+    ActionResult RemoveAllLabels(const Core::TaskID &) override;
 
 public:
     void Replace(const std::vector<Core::TaskEntity> &) override;
