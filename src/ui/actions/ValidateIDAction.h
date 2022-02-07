@@ -9,13 +9,13 @@
 
 class ValidateIDAction : public Action {
 public:
-    explicit ValidateIDAction(const std::string &arg);
+    explicit ValidateIDAction(const std::optional<Core::TaskID> &id);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
 
 private:
-    std::string arg_;
+    std::optional<Core::TaskID> id_;
 };
 
 
