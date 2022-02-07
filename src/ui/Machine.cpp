@@ -14,6 +14,10 @@ Machine::Machine(const std::shared_ptr<ModelInterface> &model, const std::shared
         factory_{f}, initial_step_{s}, model_{model} {
 }
 
+Machine::Machine(const std::shared_ptr<Factory> &f, const Factory::State &s) :
+        factory_{f}, initial_step_{s} {
+}
+
 Context Machine::run() {
     return run(context_);
 }
