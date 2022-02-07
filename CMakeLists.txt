@@ -64,7 +64,7 @@ set(Boost_USE_DEBUG_LIBS         OFF) # ignore debug libs and
 set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
-find_package(Boost REQUIRED COMPONENTS log_setup log)
+find_package(Boost REQUIRED COMPONENTS log_setup log program_options)
 
 include_directories(src/)
 file(GLOB_RECURSE UI src/ui/*)
