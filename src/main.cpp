@@ -18,7 +18,7 @@
 
 #include "ui/Machine.h"
 #include "logging/Logger.h"
-#include "transfer/TaskManagerClient.h"
+#include "transport/TaskManagerGRPCClient.h"
 
 namespace po = boost::program_options;
 
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     logger.init();
 
     std::string target_str = hostname + ":" + port;
-    auto model = std::make_shared<TaskManagerClient>(
+    auto model = std::make_shared<TaskManagerGRPCClient>(
             grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
 
 //    src::severity_logger<logging::trivial::severity_level> lg;

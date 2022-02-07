@@ -9,9 +9,9 @@
 #include "model/ModelInterface.h"
 #include <grpcpp/grpcpp.h>
 
-class TaskManagerService final : public Transfer::TaskManager::Service {
+class TaskManagerGRPCService final : public Transfer::TaskManager::Service {
 public:
-    explicit TaskManagerService(const std::shared_ptr<ModelInterface> &model);
+    explicit TaskManagerGRPCService(const std::shared_ptr<ModelInterface> &model);
     grpc::Status getTasks(grpc::ServerContext* context, const Transfer::EmptyMessage* msg,
                      Transfer::ManyTaskEntities* result) override;
     grpc::Status getTasksByLabel(grpc::ServerContext* context, const Core::Label* label,

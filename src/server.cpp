@@ -8,7 +8,7 @@
 #include <grpcpp/health_check_service_interface.h>
 #include "model/ModelInterface.h"
 #include "model/TaskManager.h"
-#include "transfer/TaskManagerService.h"
+#include "transport/TaskManagerGRPCService.h"
 #include "logging/Logger.h"
 
 namespace po = boost::program_options;
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
 
     std::string server_address = hostname + ":" + port;
     auto model = std::shared_ptr<ModelInterface>(std::make_shared<TaskManager>());
-    TaskManagerService service{model};
+    TaskManagerGRPCService service{model};
 
     grpc::EnableDefaultHealthCheckService(true);
     grpc::reflection::InitProtoReflectionServerBuilderPlugin();

@@ -2,7 +2,7 @@
 // Created by Anton Ovcharenko on 26.01.2022.
 //
 
-#include "transfer/TaskManagerClient.h"
+#include "transport/TaskManagerGRPCClient.h"
 #include "Service_mock.grpc.pb.h"
 #include "utilities/TaskUtils.h"
 #include "utilities/TaskEntityUtils.h"
@@ -25,7 +25,7 @@ using ::Core::TaskEntity;
 using ::Transfer::IDWithLabel;
 using ::Transfer::MockTaskManagerStub;
 
-class TaskManagerClientTest : public ::testing::Test
+class TaskManagerGRPCClientTest : public ::testing::Test
 {
 public:
     Core::Task task_;
@@ -70,7 +70,7 @@ bool operator==(const Transfer::ManyTaskEntities &lhs, const Transfer::ManyTaskE
 }
 }
 
-TEST_F(TaskManagerClientTest, shouldSendGetTasksRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendGetTasksRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     EXPECT_CALL(*stub, getTasks(_, _, _))
@@ -80,13 +80,13 @@ TEST_F(TaskManagerClientTest, shouldSendGetTasksRequest)
                     return grpc::Status::OK;
                 }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     std::vector<TaskEntity> result = client.getTasks();
     EXPECT_EQ(result.size(), 1);
     EXPECT_EQ(result[0], entity_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendGetTasksByLabelRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendGetTasksByLabelRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     Core::Label label;
@@ -101,13 +101,13 @@ TEST_F(TaskManagerClientTest, shouldSendGetTasksByLabelRequest)
                     return grpc::Status::OK;
                 }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     std::vector<TaskEntity> result = client.getTasks(request_label);
     EXPECT_EQ(result.size(), 1);
     EXPECT_EQ(result[0], entity_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendgetTaskWithSubtasksRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendgetTaskWithSubtasksRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
@@ -118,13 +118,13 @@ TEST_F(TaskManagerClientTest, shouldSendgetTaskWithSubtasksRequest)
                     return grpc::Status::OK;
                 }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     std::vector<TaskEntity> result = client.getTaskWithSubtasks(id_);
     EXPECT_EQ(result.size(), 1);
     EXPECT_EQ(result[0], entity_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendAddRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendAddRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     EXPECT_CALL(*stub, Add(_, task_, _))
@@ -135,14 +135,14 @@ TEST_F(TaskManagerClientTest, shouldSendAddRequest)
                     return grpc::Status::OK;
                 }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     ActionResult result = client.Add(task_);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(result.id->value(), 42);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendAddSubtaskRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendAddSubtaskRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     TaskID subtask_id;
@@ -156,14 +156,14 @@ TEST_F(TaskManagerClientTest, shouldSendAddSubtaskRequest)
                     return grpc::Status::OK;
                 }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     ActionResult result = client.AddSubtask(task_, id_);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, subtask_id);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendEditRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendEditRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
@@ -175,14 +175,14 @@ TEST_F(TaskManagerClientTest, shouldSendEditRequest)
                     return grpc::Status::OK;
                 }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     ActionResult result = client.Edit(id_, task_);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendCompleteRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendCompleteRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
@@ -194,14 +194,14 @@ TEST_F(TaskManagerClientTest, shouldSendCompleteRequest)
                     return grpc::Status::OK;
                 }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     ActionResult result = client.Complete(id_);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendUncompleteRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendUncompleteRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
@@ -213,14 +213,14 @@ TEST_F(TaskManagerClientTest, shouldSendUncompleteRequest)
                     return grpc::Status::OK;
                 }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     ActionResult result = client.Uncomplete(id_);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendDeleteRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendDeleteRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
@@ -232,14 +232,14 @@ TEST_F(TaskManagerClientTest, shouldSendDeleteRequest)
                     return grpc::Status::OK;
                 }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     ActionResult result = client.Delete(id_, true);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendIsPresentRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendIsPresentRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
@@ -251,14 +251,14 @@ TEST_F(TaskManagerClientTest, shouldSendIsPresentRequest)
                         return grpc::Status::OK;
                     }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     ActionResult result = client.IsPresent(id_);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendAddLabelRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendAddLabelRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     IDWithLabel request;
@@ -274,14 +274,14 @@ TEST_F(TaskManagerClientTest, shouldSendAddLabelRequest)
                         return grpc::Status::OK;
                     }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     ActionResult result = client.AddLabel(id_, new_label);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendRemoveLabelRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendRemoveLabelRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     IDWithLabel request;
@@ -297,14 +297,14 @@ TEST_F(TaskManagerClientTest, shouldSendRemoveLabelRequest)
                         return grpc::Status::OK;
                     }));
 
-    TaskManagerClient client{std::move(stub)};
-    ActionResult result = client.ClearLabel(id_, label);
+    TaskManagerGRPCClient client{std::move(stub)};
+    ActionResult result = client.RemoveLabel(id_, label);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendRemoveAllLabelsRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendRemoveAllLabelsRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
@@ -316,14 +316,14 @@ TEST_F(TaskManagerClientTest, shouldSendRemoveAllLabelsRequest)
                         return grpc::Status::OK;
                     }));
 
-    TaskManagerClient client{std::move(stub)};
-    ActionResult result = client.ClearLabels(id_);
+    TaskManagerGRPCClient client{std::move(stub)};
+    ActionResult result = client.RemoveAllLabels(id_);
     EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
     ASSERT_EQ(result.type_id, ActionResult::kID);
     EXPECT_EQ(*result.id, id_);
 }
 
-TEST_F(TaskManagerClientTest, shouldSendReplaceRequest)
+TEST_F(TaskManagerGRPCClientTest, shouldSendReplaceRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     ManyTaskEntities mte;
@@ -335,7 +335,7 @@ TEST_F(TaskManagerClientTest, shouldSendReplaceRequest)
                         return grpc::Status::OK;
                     }));
 
-    TaskManagerClient client{std::move(stub)};
+    TaskManagerGRPCClient client{std::move(stub)};
     std::vector<TaskEntity> vec{entity_};
     client.Replace(vec);
 }
