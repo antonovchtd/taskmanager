@@ -6,6 +6,7 @@
 #define TASKMANAGER_SRC_IO_CONSOLEREADER_H_
 
 #include <iostream>
+#include <algorithm>
 
 #include "AbstractReader.h"
 

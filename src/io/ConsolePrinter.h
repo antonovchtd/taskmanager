@@ -6,7 +6,6 @@
 #define TASKMANAGER_SRC_IO_CONSOLEPRINTER_H_
 
 #include <iostream>
-#include <algorithm>
 
 #include "AbstractPrinter.h"
 
