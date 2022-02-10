@@ -1,14 +1,16 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.16)
 project(taskmanager)
 
 set(CMAKE_CXX_STANDARD 17)
 
 enable_testing()
 include(GoogleTest)
-find_package(GTest REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 #include_directories(${GTEST_INCLUDE_DIR})
 #get_filename_component(GTEST_LIB_DIR ${GTEST_LIBRARY} DIRECTORY)
 #link_directories(${GTEST_LIB_DIR})
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined -fsanitize=nullability")
 
 find_package(Protobuf CONFIG REQUIRED)
 message(STATUS "Using protobuf ${Protobuf_VERSION}")
@@ -78,7 +80,7 @@ file(GLOB_RECURSE TEST test/*)
 add_executable(taskmanager src/main.cpp ${Model} ${Transport} ${Utils} ${LOG} ${UI} ${IO} ${PER} ${spine_generated_files})
 add_executable(server_taskmanager src/server.cpp ${Model} ${Transport} ${LOG} ${Utils} ${PER} ${spine_generated_files})
 add_executable(test_taskmanager ${Model} ${Transport} ${Utils} ${UI} ${LOG} ${IO} ${PER} ${TEST} ${spine_generated_files})
-target_link_libraries(test_taskmanager GTest::GTest GTest::Main GTest::gmock GTest::gmock_main)
+target_link_libraries(test_taskmanager GTest::gtest GTest::gmock GTest::gmock_main)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     target_link_libraries(taskmanager ${Boost_LIBRARIES})
