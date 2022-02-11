@@ -10,8 +10,8 @@ find_package(GTest CONFIG REQUIRED)
 #get_filename_component(GTEST_LIB_DIR ${GTEST_LIBRARY} DIRECTORY)
 #link_directories(${GTEST_LIB_DIR})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined -fsanitize=nullability")
-
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=undefined -fsanitize=nullability")
+list(APPEND CMAKE_PREFIX_PATH "/opt/protobuf/")
 find_package(Protobuf CONFIG REQUIRED)
 message(STATUS "Using protobuf ${Protobuf_VERSION}")
 find_program(_PROTOBUF_PROTOC protoc)
