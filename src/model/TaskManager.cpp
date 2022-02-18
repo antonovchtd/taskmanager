@@ -53,37 +53,48 @@ std::optional<Core::TaskID> TaskManager::ParentOf(const Core::TaskID &id) const 
 
 ActionResult TaskManager::Add(const Core::Task &t) {
     Core::TaskID id = gen_->genID();
-    if (IsPresent(id))
-        return {ActionResult::Status::DUPLICATE_ID, id};
+    {
+        std::lock_guard lk{mtx_};
+        if (IsPresent(id))
+            return {ActionResult::Status::DUPLICATE_ID, id};
 
-    tasks_.insert(std::make_pair(id, std::make_pair(t, Node())));
+        tasks_.insert(std::make_pair(id, std::make_pair(t, Node())));
+    }
     LOG_STREAM(debug) << "Added task with ID: " << id.value() << " " << t.ShortDebugString();
     return {ActionResult::Status::SUCCESS, id};
 }
 
 ActionResult TaskManager::AddSubtask(const Core::Task &t, const Core::TaskID &parent) {
     Core::TaskID id = gen_->genID();
-    if (IsPresent(id))
-        return {ActionResult::Status::DUPLICATE_ID, id};
-    if (!IsPresent(parent))
-        return {ActionResult::Status::PARENT_ID_NOT_FOUND, parent};
+    {
+        std::lock_guard lk{mtx_};
+        if (IsPresent(id))
+            return {ActionResult::Status::DUPLICATE_ID, id};
+        if (!IsPresent(parent))
+            return {ActionResult::Status::PARENT_ID_NOT_FOUND, parent};
 
-    tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
+        tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
+        AddChild(parent, id);
+    }
+
     LOG_STREAM(debug) << "Added Subtask of " << parent.value() << " with ID: " << id.value() << " " << t.ShortDebugString();
 
-    AddChild(parent, id);
     return {ActionResult::Status::SUCCESS, id};
 }
 
 std::vector<Core::TaskEntity> TaskManager::getTasks() const {
     std::vector<Core::TaskEntity> vec;
-    for (const auto &kv : tasks_) {
-        if (kv.second.second.parent()) {
-            vec.emplace_back(Core::createTaskEntity(kv.first, kv.second.first, *kv.second.second.parent()));
-        } else {
-            vec.emplace_back(Core::createTaskEntity(kv.first, kv.second.first));
+    {
+        std::lock_guard lk{mtx_};
+        for (const auto &kv: tasks_) {
+            if (kv.second.second.parent()) {
+                vec.emplace_back(Core::createTaskEntity(kv.first, kv.second.first, *kv.second.second.parent()));
+            } else {
+                vec.emplace_back(Core::createTaskEntity(kv.first, kv.second.first));
+            }
         }
     }
+
     LOG_STREAM(debug) << "Returned " << vec.size() << " tasks.";
 
     return vec;
@@ -91,14 +102,18 @@ std::vector<Core::TaskEntity> TaskManager::getTasks() const {
 
 std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) const {
     std::vector<Core::TaskEntity> tasks;
-    for (const auto &kv : tasks_) {
-        for (const auto &task_label : kv.second.first.labels()) {
-            if (task_label == label) {
-                tasks.emplace_back(Core::createTaskEntity(kv.first, kv.second.first));
-                break;
+    {
+        std::lock_guard lk{mtx_};
+        for (const auto &kv: tasks_) {
+            for (const auto &task_label: kv.second.first.labels()) {
+                if (task_label == label) {
+                    tasks.emplace_back(Core::createTaskEntity(kv.first, kv.second.first));
+                    break;
+                }
             }
         }
     }
+
     LOG_STREAM(debug) << "Returned " << tasks.size() << " tasks with label " << label << ".";
 
     return tasks;
@@ -106,27 +121,39 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) co
 
 std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskID &id) const {
     std::vector<Core::TaskEntity> tasks;
-    std::optional<Core::Task> task = GetTask(id);
+    std::optional<Core::Task> task;
+    {
+        std::lock_guard lk{mtx_};
+        task = GetTask(id);
+    }
+
     if (task)
         tasks.emplace_back(Core::createTaskEntity(id, *task));
     else {
         LOG_STREAM(debug) << "Task with ID " << id.value() << " not found.";
         return tasks;
     }
-    // not including parent, but will include children
-    for (const auto &ch_id : ChildrenOf(id)) {
-        auto ch_tasks = getTaskWithSubtasks(ch_id);
-        for (auto &ch_task : ch_tasks) {
-            ch_task.mutable_parent()->CopyFrom(*ParentOf(ch_task.id()));
+
+    {
+        std::lock_guard lk{mtx_};
+        // not including parent, but will include children
+        for (const auto &ch_id: ChildrenOf(id)) {
+            auto ch_tasks = getTaskWithSubtasks(ch_id);
+            for (auto &ch_task: ch_tasks) {
+                ch_task.mutable_parent()->CopyFrom(*ParentOf(ch_task.id()));
+            }
+            tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
         }
-        tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
     }
+
     LOG_STREAM(debug) << "Returned task " << id.value() << " with " << tasks.size() - 1 << " subtasks.";
 
     return tasks;
 }
 
 ActionResult TaskManager::Delete(const Core::TaskID &id, bool deleteChildren) {
+    std::lock_guard lk{mtx_};
+
     if (IsPresent(id)) {
         if (!ChildrenOf(id).empty() && !deleteChildren) {
             LOG_STREAM(debug) << "Failed to delete task (has children).";
@@ -149,6 +176,8 @@ ActionResult TaskManager::Delete(const Core::TaskID &id, bool deleteChildren) {
 }
 
 ActionResult TaskManager::Edit(const Core::TaskID &id, const Core::Task &t) {
+    std::lock_guard lk{mtx_};
+
     auto it = tasks_.find(id);
     if (it != tasks_.end()) {
         it->second.first = t;
@@ -160,6 +189,8 @@ ActionResult TaskManager::Edit(const Core::TaskID &id, const Core::Task &t) {
 }
 
 ActionResult TaskManager::Complete(const Core::TaskID &id) {
+    std::lock_guard lk{mtx_};
+
     auto it = tasks_.find(id);
     if (it != tasks_.end()) {
         it->second.first.set_is_complete(true);
@@ -174,6 +205,8 @@ ActionResult TaskManager::Complete(const Core::TaskID &id) {
 }
 
 ActionResult TaskManager::Uncomplete(const Core::TaskID &id) {
+    std::lock_guard lk{mtx_};
+
     auto it = tasks_.find(id);
     if (it != tasks_.end()) {
         it->second.first.set_is_complete(false);
@@ -186,7 +219,9 @@ ActionResult TaskManager::Uncomplete(const Core::TaskID &id) {
     return {ActionResult::Status::SUCCESS, id};
 }
 
-ActionResult TaskManager::IsPresent(const Core::TaskID &id) const{
+ActionResult TaskManager::IsPresent(const Core::TaskID &id) const {
+    std::lock_guard lk{mtx_};
+
     if (tasks_.find(id) != tasks_.end())
         return {ActionResult::Status::SUCCESS, id};
     else
@@ -194,10 +229,13 @@ ActionResult TaskManager::IsPresent(const Core::TaskID &id) const{
 }
 
 size_t TaskManager::size() const {
+    std::lock_guard lk{mtx_};
     return tasks_.size();
 }
 
 ActionResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &label) {
+    std::lock_guard lk{mtx_};
+
     auto it = tasks_.find(id);
     if (it != tasks_.end()) {
         auto labels = it->second.first.labels();
@@ -212,6 +250,8 @@ ActionResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &la
 }
 
 ActionResult TaskManager::RemoveLabel(const Core::TaskID &id, const std::string &label) {
+    std::lock_guard lk{mtx_};
+
     auto it = tasks_.find(id);
     if (it != tasks_.end()) {
         auto labels = it->second.first.mutable_labels();
@@ -227,6 +267,8 @@ ActionResult TaskManager::RemoveLabel(const Core::TaskID &id, const std::string 
 }
 
 ActionResult TaskManager::RemoveAllLabels(const Core::TaskID &id) {
+    std::lock_guard lk{mtx_};
+
     auto it = tasks_.find(id);
     if (it != tasks_.end()) {
         it->second.first.clear_labels();
@@ -238,6 +280,8 @@ ActionResult TaskManager::RemoveAllLabels(const Core::TaskID &id) {
 }
 
 void TaskManager::Replace(const std::vector<Core::TaskEntity> &vec) {
+    std::lock_guard lk{mtx_};
+
     tasks_.clear();
     LOG_STREAM(debug) << "Cleared all tasks.";
 
