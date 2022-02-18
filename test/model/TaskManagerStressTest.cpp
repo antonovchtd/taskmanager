@@ -49,11 +49,12 @@ std::random_device rd;     // only used once to initialise (seed) engine
 std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
 
 Core::TaskID getRandomID(const TaskManager &tm) {
-    auto sz = tm.size();
+    auto tasks = tm.getTasks();
+    auto sz = tasks.size();
     if (sz > 0) {
         std::uniform_int_distribution<unsigned long> uni(0, sz-1);
         auto random_position = uni(rng);
-        return tm.getTasks()[random_position].id();
+        return tasks[random_position].id();
     } else {
         Core::TaskID id;
         id.set_value(0);
@@ -116,7 +117,7 @@ std::vector<Core::TaskEntity> runCommand(const Command &command, TaskManager &tm
             tm.Uncomplete(getRandomID(tm));
             break;
         case Command::DELETE:
-//            tm.Delete(getRandomID(tm), true);
+            tm.Delete(getRandomID(tm), true);
             break;
         case Command::IS_PRESENT:
             tm.IsPresent(id);
@@ -149,7 +150,7 @@ void runRandomCommands(TaskManager &tm, int n) {
 
 void runRandomCommandsMultiThread(TaskManager &tm) {
     int num_threads = 5;
-    int num_commands_per_thread = 500;
+    int num_commands_per_thread = 1000;
 
     std::vector<std::thread> threads;
     threads.reserve(num_threads);
