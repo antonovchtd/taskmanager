@@ -60,7 +60,26 @@ Core::Task Core::createTask(const std::string &title,
     t.set_title(title);
     t.set_priority(priority);
     t.set_due_date(due_date);
-    t.add_labels(label);
+    if (!label.empty()) {
+        auto label_ptr = std::make_unique<Core::Label>();
+        label_ptr->set_str(label);
+        t.mutable_labels()->AddAllocated(label_ptr.release());
+    }
+    t.set_is_complete(is_complete);
+    return t;
+}
+
+Core::Task Core::createTask(const std::string &title,
+                            const Core::Task::Priority &priority,
+                            const time_t &due_date,
+                            const Core::Label &label,
+                            bool is_complete) {
+    Core::Task t;
+    t.set_title(title);
+    t.set_priority(priority);
+    t.set_due_date(due_date);
+    if (!label.str().empty())
+        t.mutable_labels()->AddAllocated(std::make_unique<Core::Label>(label).release());
     t.set_is_complete(is_complete);
     return t;
 }

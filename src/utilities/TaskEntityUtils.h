@@ -7,6 +7,7 @@
 
 #include "Core.pb.h"
 #include "TaskUtils.h"
+#include "LabelUtils.h"
 
 namespace Core {
 bool operator==(const Core::TaskEntity &lhs, const Core::TaskEntity &rhs);

@@ -25,12 +25,10 @@ std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks() const {
     return ToTaskEntitiesVector(reply);
 }
 
-std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks(const std::string &label) const {
-    Core::Label request;
-    request.set_label(label);
+std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks(const Core::Label &label) const {
     Transfer::ManyTaskEntities reply;
     grpc::ClientContext context;
-    grpc::Status status = stub_->getTasksByLabel(&context, request, &reply);
+    grpc::Status status = stub_->getTasksByLabel(&context, label, &reply);
 
     return ToTaskEntitiesVector(reply);
 }
@@ -105,10 +103,10 @@ Core::ModelRequestResult TaskManagerGRPCClient::IsPresent(const Core::TaskID &re
     return reply;
 }
 
-Core::ModelRequestResult TaskManagerGRPCClient::AddLabel(const Core::TaskID &id, const std::string &label) {
+Core::ModelRequestResult TaskManagerGRPCClient::AddLabel(const Core::TaskID &id, const Core::Label &label) {
     Transfer::IDWithLabel request;
     request.mutable_id()->CopyFrom(id);
-    request.mutable_label()->set_label(label);
+    request.mutable_label()->CopyFrom(label);
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->AddLabel(&context, request, &reply);
@@ -116,10 +114,10 @@ Core::ModelRequestResult TaskManagerGRPCClient::AddLabel(const Core::TaskID &id,
     return reply;
 }
 
-Core::ModelRequestResult TaskManagerGRPCClient::RemoveLabel(const Core::TaskID &id, const std::string &label) {
+Core::ModelRequestResult TaskManagerGRPCClient::RemoveLabel(const Core::TaskID &id, const Core::Label &label) {
     Transfer::IDWithLabel request;
     request.mutable_id()->CopyFrom(id);
-    request.mutable_label()->set_label(label);
+    request.mutable_label()->CopyFrom(label);
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->RemoveLabel(&context, request, &reply);

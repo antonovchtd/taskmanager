@@ -7,6 +7,7 @@
 #include "utilities/TaskUtils.h"
 #include "utilities/TaskEntityUtils.h"
 #include "utilities/TaskIDUtils.h"
+#include "utilities/LabelUtils.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -33,22 +34,17 @@ public:
     Core::TaskEntity entity_;
 
     void SetUp() override {
-        task_.set_title("test");
-        task_.set_priority(Core::Task::Priority::Task_Priority_HIGH);
-        task_.set_due_date(time(nullptr));
-        task_.add_labels("label");
+        task_ = Core::createTask("test",
+                                 Core::Task::Priority::Task_Priority_HIGH,
+                                 time(nullptr),
+                                 "label",
+                                 false);
         task_.set_is_complete(false);
         id_.set_value(42);
         entity_.mutable_id()->CopyFrom(id_);
         entity_.mutable_data()->CopyFrom(task_);
     }
 };
-
-namespace Core {
-bool operator==(const Core::Label &lhs, const Core::Label &rhs) {
-    return rhs.label() == lhs.label();
-}
-}
 
 namespace Transfer {
 bool operator==(const Transfer::IDWithLabel &lhs, const Transfer::IDWithLabel &rhs) {
@@ -91,8 +87,8 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendGetTasksByLabelRequest)
     auto stub = std::make_unique<MockTaskManagerStub>();
     Core::Label label;
     std::string request_label = "request_label";
-    label.set_label(request_label);
-    entity_.mutable_data()->add_labels(request_label);
+    label.set_str(request_label);
+    entity_.mutable_data()->mutable_labels()->AddAllocated(std::make_unique<Core::Label>(label).release());
 
     EXPECT_CALL(*stub, getTasksByLabel(_, label, _))
         .WillOnce(testing::Invoke(
@@ -102,7 +98,7 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendGetTasksByLabelRequest)
                 }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    std::vector<TaskEntity> result = client.getTasks(request_label);
+    std::vector<TaskEntity> result = client.getTasks(label);
     EXPECT_EQ(result.size(), 1);
     EXPECT_EQ(result[0], entity_);
 }
@@ -249,8 +245,9 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendAddLabelRequest)
     auto stub = std::make_unique<MockTaskManagerStub>();
     IDWithLabel request;
     request.mutable_id()->CopyFrom(id_);
-    std::string new_label = "new_label";
-    request.mutable_label()->set_label(new_label);
+    Core::Label new_label;
+    new_label.set_str("new_label");
+    request.mutable_label()->CopyFrom(new_label);
 
     EXPECT_CALL(*stub, AddLabel(_, request, _))
             .WillOnce(testing::Invoke(
@@ -270,8 +267,9 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendRemoveLabelRequest)
     auto stub = std::make_unique<MockTaskManagerStub>();
     IDWithLabel request;
     request.mutable_id()->CopyFrom(id_);
-    std::string label = "label";
-    request.mutable_label()->set_label(label);
+    Core::Label label;
+    label.set_str("label");
+    request.mutable_label()->CopyFrom(label);
 
     EXPECT_CALL(*stub, RemoveLabel(_, request, _))
             .WillOnce(testing::Invoke(

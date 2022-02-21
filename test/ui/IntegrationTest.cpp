@@ -214,13 +214,13 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
     id2.set_value(2);
     ASSERT_TRUE(ToBool(tm->IsPresent(id2)));
     EXPECT_EQ(1, tasks[1].data().labels().size());
-    EXPECT_EQ("l2", tasks[1].data().labels()[0]);
+    EXPECT_EQ("l2", tasks[1].data().labels()[0].str());
 
     Core::TaskID id3;
     id3.set_value(3);
     ASSERT_TRUE(ToBool(tm->IsPresent(id3)));
     EXPECT_EQ(1, tasks[2].data().labels().size());
-    EXPECT_EQ("l3", tasks[2].data().labels()[0]);
+    EXPECT_EQ("l3", tasks[2].data().labels()[0].str());
 
     // check parents
     EXPECT_FALSE(tm->getTasks()[0].has_parent());

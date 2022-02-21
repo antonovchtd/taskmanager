@@ -24,7 +24,7 @@ grpc::Status TaskManagerGRPCService::getTasks(grpc::ServerContext* context,
 grpc::Status TaskManagerGRPCService::getTasksByLabel(grpc::ServerContext* context,
                                                      const Core::Label* label,
                                                      Transfer::ManyTaskEntities* result) {
-    *result = ToManyTaskEntities(model_->getTasks(label->label()));
+    *result = ToManyTaskEntities(model_->getTasks(*label));
     return grpc::Status::OK;
 }
 
@@ -86,14 +86,14 @@ grpc::Status TaskManagerGRPCService::IsPresent(grpc::ServerContext* context,
 grpc::Status TaskManagerGRPCService::AddLabel(grpc::ServerContext* context,
                                               const Transfer::IDWithLabel* msg,
                                               Core::ModelRequestResult* result) {
-    *result = model_->AddLabel(msg->id(), msg->label().label());
+    *result = model_->AddLabel(msg->id(), msg->label());
     return grpc::Status::OK;
 }
 
 grpc::Status TaskManagerGRPCService::RemoveLabel(grpc::ServerContext* context,
                                                 const Transfer::IDWithLabel* msg,
                                                 Core::ModelRequestResult* result) {
-    *result = model_->RemoveLabel(msg->id(), msg->label().label());
+    *result = model_->RemoveLabel(msg->id(), msg->label());
     return grpc::Status::OK;
 }
 

@@ -18,7 +18,7 @@ public:
     std::shared_ptr<Step> genNextStep(const ActionResult &, const std::shared_ptr<Factory> &) override;
 
 public:
-    std::string readLabel() const;
+    Core::Label readLabel() const;
 };
 
 

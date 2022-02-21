@@ -4,7 +4,7 @@
 
 #include "GetTasksToShowByLabelAction.h"
 
-GetTasksToShowByLabelAction::GetTasksToShowByLabelAction(const std::string &label) : label_{label} {
+GetTasksToShowByLabelAction::GetTasksToShowByLabelAction(const Core::Label &label) : label_{label} {
 }
 
 ActionResult GetTasksToShowByLabelAction::execute(const std::shared_ptr<ModelInterface> &model) {

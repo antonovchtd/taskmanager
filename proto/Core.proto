@@ -18,7 +18,7 @@ message Task {
   Priority priority = 2;
 //  google.protobuf.Timestamp due_date = 3;
   int64  due_date = 3;
-  repeated string labels = 4;
+  repeated Label labels = 4;
   bool is_complete = 5;
 }
 
@@ -29,7 +29,7 @@ message TaskEntity {
 }
 
 message Label {
-  string label = 1;
+  string str = 1;
 }
 
 message ModelRequestResult {

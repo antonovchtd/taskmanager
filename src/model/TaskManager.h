@@ -12,6 +12,7 @@
 #include "utilities/TaskEntityUtils.h"
 #include "utilities/ModelRequestResultUtils.h"
 #include "utilities/NodeUtils.h"
+#include "utilities/LabelUtils.h"
 #include "ModelInterface.h"
 #include "IDGenerator.h"
 #include "Node.h"
@@ -23,7 +24,7 @@ public:
 
 public:
     std::vector<Core::TaskEntity> getTasks() const override;
-    std::vector<Core::TaskEntity> getTasks(const std::string &label) const override;
+    std::vector<Core::TaskEntity> getTasks(const Core::Label &label) const override;
     std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const override;
     std::shared_ptr<IDGenerator> gen() const;
     size_t size() const;
@@ -36,8 +37,8 @@ public:
     Core::ModelRequestResult Uncomplete(const Core::TaskID &) override;
     Core::ModelRequestResult Delete(const Core::TaskID &id, bool deleteChildren) override;
     Core::ModelRequestResult IsPresent(const Core::TaskID &id) const override;
-    Core::ModelRequestResult AddLabel(const Core::TaskID &, const std::string &) override;
-    Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const std::string &) override;
+    Core::ModelRequestResult AddLabel(const Core::TaskID &, const Core::Label &) override;
+    Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const Core::Label &) override;
     Core::ModelRequestResult RemoveAllLabels(const Core::TaskID &) override;
 
 public:
