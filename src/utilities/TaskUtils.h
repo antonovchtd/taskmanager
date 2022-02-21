@@ -6,7 +6,7 @@
 #define TASKMANAGER_SRC_UTILITIES_TASKUTILS_H_
 
 #include <sstream>
-#include "Task.pb.h"
+#include "Core.pb.h"
 
 typedef ::google::protobuf::RepeatedPtrField<std::string> repStr;
 

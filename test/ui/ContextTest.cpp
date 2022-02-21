@@ -30,7 +30,7 @@ TEST_F(ContextTest, shouldSetTasks)
     t.add_labels("label");
     t.set_due_date(time(nullptr));
     t.set_is_complete(false);
-    Core::TaskID id = *tm.Add(t).id;
+    tm.Add(t);
     Context c;
     auto tasks = tm.getTasks();
     c.setTasks(tasks);

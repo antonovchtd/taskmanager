@@ -3,19 +3,21 @@
 //
 
 #include "ValidateIDAction.h"
-#include "ui/Context.h"
+#include "utilities/ModelRequestResultUtils.h"
 
 ValidateIDAction::ValidateIDAction(const std::optional<Core::TaskID> &id) : id_{id} {
 }
 
 ActionResult ValidateIDAction::execute(const std::shared_ptr<ModelInterface> &model) {
+    Core::ModelRequestResult result;
     if (id_) {
-        auto result = model->IsPresent(*id_);
-        if (result)
-            return {result.status, model->getTaskWithSubtasks(*id_)};
+        auto check = model->IsPresent(*id_);
+        if (ToBool(check))
+            return ActionResult(model->getTaskWithSubtasks(*id_));
         else
-            return {result.status, id_};
+            return check;
     } else {
-        return {ActionResult::Status::TAKES_ID, std::nullopt};
+        result.set_status(Core::ModelRequestResult_Status_TAKES_ID);
+        return result;
     }
 }

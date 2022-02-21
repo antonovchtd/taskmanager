@@ -31,7 +31,7 @@ public:
         task_.set_is_complete(false);
         AddTaskAction act{task_};
         ActionResult result = act.execute(tm_);
-        id_ = *result.id;
+        id_ = result.model_result->id();
         service_ = std::make_shared<TaskManagerGRPCService>(tm_);
     }
 };
@@ -85,11 +85,10 @@ TEST_F(TaskManagerGRPCServiceTest, shouldAddTask)
     grpc::ServerContext context;
     Core::Task request;
     request.CopyFrom(task_);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     grpc::Status status = service_->Add(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_.value()+1, result.id().value());
     EXPECT_EQ(2, tm_->getTasks().size());
 }
@@ -100,11 +99,10 @@ TEST_F(TaskManagerGRPCServiceTest, shouldAddSubtask)
     Core::TaskEntity request;
     request.mutable_data()->CopyFrom(task_);
     request.mutable_id()->CopyFrom(id_);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     grpc::Status status = service_->AddSubtask(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_.value()+1, result.id().value());
     auto tasks = tm_->getTasks();
     EXPECT_EQ(2, tasks.size());
@@ -121,11 +119,10 @@ TEST_F(TaskManagerGRPCServiceTest, shouldEditTask)
     std::string new_title = "edited";
     request.mutable_data()->set_title(new_title);
     request.mutable_id()->CopyFrom(id_);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     grpc::Status status = service_->Edit(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_, result.id());
     auto tasks = tm_->getTasks();
     EXPECT_EQ(1, tasks.size());
@@ -140,11 +137,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToEditTaskWithWrongID)
     std::string new_title = "edited";
     request.mutable_data()->set_title(new_title);
     request.mutable_id()->set_value(id_.value()+1);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     grpc::Status status = service_->Edit(&context, &request, &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_ID_NOT_FOUND, result.status());
+    ASSERT_TRUE(result.has_status());
+    EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
 }
 
 TEST_F(TaskManagerGRPCServiceTest, shouldCompleteTask)
@@ -152,11 +149,10 @@ TEST_F(TaskManagerGRPCServiceTest, shouldCompleteTask)
     grpc::ServerContext context;
     Core::TaskID request;
     request.CopyFrom(id_);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     grpc::Status status = service_->Complete(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_, result.id());
     auto tasks = tm_->getTasks();
     EXPECT_EQ(1, tasks.size());
@@ -168,12 +164,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToCompleteTaskWithWrongID)
     grpc::ServerContext context;
     Core::TaskID request;
     request.set_value(id_.value()+1);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     grpc::Status status = service_->Complete(&context, &request, &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_ID_NOT_FOUND, result.status());
-    EXPECT_EQ(request, result.id());
+    ASSERT_TRUE(result.has_status());
+    EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
     auto tasks = tm_->getTasks();
     EXPECT_EQ(1, tasks.size());
     EXPECT_FALSE(tasks[0].data().is_complete());
@@ -184,12 +179,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldUncompleteTask)
     grpc::ServerContext context;
     Core::TaskID request;
     request.CopyFrom(id_);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     service_->Complete(&context, &request, &result);
     grpc::Status status = service_->Uncomplete(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_, result.id());
     auto tasks = tm_->getTasks();
     EXPECT_EQ(1, tasks.size());
@@ -201,16 +195,15 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToUncompleteTaskWithWrongID)
     grpc::ServerContext context;
     Core::TaskID request;
     request.set_value(id_.value());
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     service_->Complete(&context, &request, &result);
 
     request.set_value(id_.value()+1);
     grpc::Status status = service_->Uncomplete(&context, &request, &result);
 
     ASSERT_TRUE(status.ok());
-    ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_ID_NOT_FOUND, result.status());
-    EXPECT_EQ(request, result.id());
+    ASSERT_TRUE(result.has_status());
+    EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
     auto tasks = tm_->getTasks();
     EXPECT_EQ(1, tasks.size());
     EXPECT_TRUE(tasks[0].data().is_complete());
@@ -222,7 +215,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldDeleteTaskWithSubtasks)
     Core::TaskEntity request1;
     request1.mutable_id()->CopyFrom(id_);
     request1.mutable_data()->CopyFrom(task_);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     service_->AddSubtask(&context, &request1, &result);
 
     Core::TaskID request2;
@@ -230,7 +223,6 @@ TEST_F(TaskManagerGRPCServiceTest, shouldDeleteTaskWithSubtasks)
     grpc::Status status = service_->Delete(&context, &request2, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_, result.id());
     auto tasks = tm_->getTasks();
     EXPECT_EQ(0, tasks.size());
@@ -241,12 +233,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailDeleteTaskWithWrongID)
     grpc::ServerContext context;
     Core::TaskID request;
     request.set_value(id_.value()+1);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     grpc::Status status = service_->Delete(&context, &request, &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_ID_NOT_FOUND, result.status());
-    EXPECT_EQ(request, result.id());
+    ASSERT_TRUE(result.has_status());
+    EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
     auto tasks = tm_->getTasks();
     EXPECT_EQ(1, tasks.size());
 }
@@ -256,12 +247,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldReturnSuccessOnIsPresent)
     grpc::ServerContext context;
     Core::TaskID request;
     request.CopyFrom(id_);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
 
     grpc::Status status = service_->IsPresent(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_, result.id());
 }
 
@@ -270,12 +260,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldReturnIDNotFoundOnIsPresent)
     grpc::ServerContext context;
     Core::TaskID request;
     request.set_value(id_.value()+1);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
     grpc::Status status = service_->IsPresent(&context, &request, &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_ID_NOT_FOUND, result.status());
-    EXPECT_EQ(request, result.id());
+    ASSERT_TRUE(result.has_status());
+    EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
 }
 
 TEST_F(TaskManagerGRPCServiceTest, shouldAddLabel)
@@ -285,12 +274,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldAddLabel)
     request.mutable_id()->CopyFrom(id_);
     std::string new_label = "new_label";
     request.mutable_label()->set_label(new_label);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
 
     grpc::Status status = service_->AddLabel(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_, result.id());
 
     auto tasks = tm_->getTasks();
@@ -308,13 +296,12 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToAddLabelWithInvalidID)
     request.mutable_id()->set_value(id_.value()+1);
     std::string new_label = "new_label";
     request.mutable_label()->set_label(new_label);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
 
     grpc::Status status = service_->AddLabel(&context, &request, &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_ID_NOT_FOUND, result.status());
-    EXPECT_EQ(request.id(), result.id());
+    ASSERT_TRUE(result.has_status());
+    EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
 
     auto tasks = tm_->getTasks();
     ASSERT_EQ(1, tasks.size());
@@ -330,12 +317,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldRemoveLabel)
     request.mutable_id()->CopyFrom(id_);
     std::string label_to_remove = task_.labels(0);
     request.mutable_label()->set_label(label_to_remove);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
 
     grpc::Status status = service_->ClearLabel(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_, result.id());
 
     auto tasks = tm_->getTasks();
@@ -351,13 +337,12 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveLabelWithInvalidID)
     request.mutable_id()->set_value(id_.value()+1);
     std::string label_to_remove = task_.labels(0);
     request.mutable_label()->set_label(label_to_remove);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
 
     grpc::Status status = service_->ClearLabel(&context, &request, &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_ID_NOT_FOUND, result.status());
-    EXPECT_EQ(request.id(), result.id());
+    ASSERT_TRUE(result.has_status());
+    EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
 
     auto tasks = tm_->getTasks();
     ASSERT_EQ(1, tasks.size());
@@ -373,12 +358,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveLabelWrongLabel)
     request.mutable_id()->CopyFrom(id_);
     std::string label_to_remove = "missing";
     request.mutable_label()->set_label(label_to_remove);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
 
     grpc::Status status = service_->ClearLabel(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_, result.id());
 
     auto tasks = tm_->getTasks();
@@ -395,7 +379,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldRemoveAllLabels)
     request1.mutable_id()->CopyFrom(id_);
     std::string new_label = "new_label";
     request1.mutable_label()->set_label(new_label);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
 
     service_->AddLabel(&context, &request1, &result);
     ASSERT_EQ(2, tm_->getTasks()[0].data().labels().size());
@@ -406,7 +390,6 @@ TEST_F(TaskManagerGRPCServiceTest, shouldRemoveAllLabels)
     grpc::Status status = service_->ClearLabels(&context, &request2, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_SUCCESS, result.status());
     EXPECT_EQ(id_, result.id());
 
     auto tasks = tm_->getTasks();
@@ -422,7 +405,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveAllLabelsWithWrongID)
     request1.mutable_id()->CopyFrom(id_);
     std::string new_label = "new_label";
     request1.mutable_label()->set_label(new_label);
-    Transfer::ActionResult result;
+    Core::ModelRequestResult result;
 
     service_->AddLabel(&context, &request1, &result);
     ASSERT_EQ(2, tm_->getTasks()[0].data().labels().size());
@@ -432,9 +415,8 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveAllLabelsWithWrongID)
 
     grpc::Status status = service_->ClearLabels(&context, &request2, &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(Transfer::ActionResult_Status_ID_NOT_FOUND, result.status());
-    EXPECT_EQ(request2, result.id());
+    ASSERT_TRUE(result.has_status());
+    EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
 
     auto tasks = tm_->getTasks();
     ASSERT_EQ(1, tasks.size());

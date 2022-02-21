@@ -9,11 +9,18 @@ SaveToFileAction::SaveToFileAction(const std::string &filename) : filename_{file
 }
 
 ActionResult SaveToFileAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    if (filename_.empty())
-        return {ActionResult::Status::TAKES_ARG, std::nullopt};
+    Core::ModelRequestResult result;
+
+    if (filename_.empty()) {
+        result.set_status(Core::ModelRequestResult_Status_TAKES_ARG);
+        return result;
+    }
+
     persister_ = std::unique_ptr<Persister>(new FilePersistence{filename_});
     if (persister_->save(model->getTasks()))
-        return {ActionResult::Status::SUCCESS, std::nullopt};
+        result.set_status(Core::ModelRequestResult_Status_SUCCESS);
     else
-        return {ActionResult::Status::FAILED_TO_OPEN_FILE, std::nullopt};
+        result.set_status(Core::ModelRequestResult_Status_FAILED_TO_OPEN_FILE);
+
+    return result;
 }

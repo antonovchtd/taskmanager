@@ -6,7 +6,7 @@
 #define TASKMANAGER_SRC_PERSISTENCE_PERSISTERINTERFACE_H_
 
 #include <memory>
-#include "Task.pb.h"
+#include "Core.pb.h"
 class ModelInterface;
 
 class Persister {

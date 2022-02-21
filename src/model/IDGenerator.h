@@ -6,7 +6,7 @@
 #define TASKMANAGER_SRC_MODEL_IDGENERATOR_H_
 
 #include <atomic>
-#include "Task.pb.h"
+#include "Core.pb.h"
 
 class IDGenerator{
 public:

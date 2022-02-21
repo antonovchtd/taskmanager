@@ -23,21 +23,18 @@ Context Machine::run() {
 }
 
 void updateContext(Context &context, const ActionResult &result) {
-    switch (result.type_id) {
-        case ActionResult::kID:
-            if (result.id)
-                context.setID(result.id);
-            break;
-        case ActionResult::kEntity:
-            context.setTasks(std::vector<Core::TaskEntity>{result.entity});
-            break;
-        case ActionResult::kVector:
-            context.setTasks(result.tasks);
-            if (!result.tasks.empty()) {
-                context.setTask(result.tasks[0].data());
-                context.setID(result.tasks[0].id());
-            }
-            break;
+    if (result.model_result)
+        context.setID(result.model_result->id());
+
+    if (result.entity)
+        context.setTasks(std::vector<Core::TaskEntity>{*result.entity});
+
+    if (result.tasks) {
+        context.setTasks(*result.tasks);
+        if (!result.tasks->empty()) {
+            context.setTask((*result.tasks)[0].data());
+            context.setID((*result.tasks)[0].id());
+        }
     }
 }
 

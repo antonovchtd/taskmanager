@@ -21,25 +21,25 @@ public:
 
 public:
     grpc::Status Add(grpc::ServerContext* context, const Core::Task* task,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
     grpc::Status AddSubtask(grpc::ServerContext* context, const Core::TaskEntity* te,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
     grpc::Status Edit(grpc::ServerContext* context, const Core::TaskEntity* te,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
     grpc::Status Complete(grpc::ServerContext* context, const Core::TaskID* id,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
     grpc::Status Uncomplete(grpc::ServerContext* context, const Core::TaskID* id,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
     grpc::Status Delete(grpc::ServerContext* context, const Core::TaskID* id,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
     grpc::Status IsPresent(grpc::ServerContext* context, const Core::TaskID* id,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
     grpc::Status AddLabel(grpc::ServerContext* context, const Transfer::IDWithLabel* msg,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
     grpc::Status ClearLabel(grpc::ServerContext* context, const Transfer::IDWithLabel* msg,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
     grpc::Status ClearLabels(grpc::ServerContext* context, const Core::TaskID* id,
-                     Transfer::ActionResult* result) override;
+                     Core::ModelRequestResult* result) override;
 public:
     grpc::Status Replace(grpc::ServerContext* context, const Transfer::ManyTaskEntities* mte,
                          Transfer::EmptyMessage* result) override;
