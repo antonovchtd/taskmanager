@@ -23,7 +23,7 @@ Context Machine::run() {
 }
 
 void updateContext(Context &context, const ActionResult &result) {
-    if (result.model_result)
+    if (result.model_result && result.model_result->has_id())
         context.setID(result.model_result->id());
 
     if (result.entity)

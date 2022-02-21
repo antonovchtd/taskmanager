@@ -319,7 +319,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldRemoveLabel)
     request.mutable_label()->set_label(label_to_remove);
     Core::ModelRequestResult result;
 
-    grpc::Status status = service_->ClearLabel(&context, &request, &result);
+    grpc::Status status = service_->RemoveLabel(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
     EXPECT_EQ(id_, result.id());
@@ -339,7 +339,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveLabelWithInvalidID)
     request.mutable_label()->set_label(label_to_remove);
     Core::ModelRequestResult result;
 
-    grpc::Status status = service_->ClearLabel(&context, &request, &result);
+    grpc::Status status = service_->RemoveLabel(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_status());
     EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
@@ -360,10 +360,10 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveLabelWrongLabel)
     request.mutable_label()->set_label(label_to_remove);
     Core::ModelRequestResult result;
 
-    grpc::Status status = service_->ClearLabel(&context, &request, &result);
+    grpc::Status status = service_->RemoveLabel(&context, &request, &result);
     ASSERT_TRUE(status.ok());
-    ASSERT_TRUE(result.has_id());
-    EXPECT_EQ(id_, result.id());
+    ASSERT_FALSE(result.has_status());
+    ASSERT_FALSE(result.has_id());
 
     auto tasks = tm_->getTasks();
     ASSERT_EQ(1, tasks.size());
@@ -387,7 +387,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldRemoveAllLabels)
     Core::TaskID request2;
     request2.CopyFrom(id_);
 
-    grpc::Status status = service_->ClearLabels(&context, &request2, &result);
+    grpc::Status status = service_->RemoveAllLabels(&context, &request2, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
     EXPECT_EQ(id_, result.id());
@@ -413,7 +413,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveAllLabelsWithWrongID)
     Core::TaskID request2;
     request2.set_value(id_.value()+1);
 
-    grpc::Status status = service_->ClearLabels(&context, &request2, &result);
+    grpc::Status status = service_->RemoveAllLabels(&context, &request2, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_status());
     EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());

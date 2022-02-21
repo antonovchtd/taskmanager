@@ -82,8 +82,7 @@ TEST_F(ActionTest, shouldExecuteValidateIDValidID)
 {
     ValidateIDAction act{id_};
     ActionResult result_validate = act.execute(tm_);
-    ASSERT_TRUE(result_validate.tasks);
-    EXPECT_EQ(1, result_validate.tasks->size());
+    ASSERT_TRUE(result_validate.model_result);
 }
 
 TEST_F(ActionTest, shouldExecuteValidateIDInvalidID)
@@ -101,9 +100,9 @@ TEST_F(ActionTest, shouldExecuteValidateIDNoID)
 {
     ValidateIDAction act{std::nullopt};
     ActionResult result_validate = act.execute(tm_);
-    EXPECT_EQ(result_validate.status, ActionResult::Status::TAKES_ID);
-    EXPECT_FALSE(result_validate);
-    EXPECT_FALSE(result_validate.id.has_value());
+    ASSERT_TRUE(result_validate.model_result);
+    ASSERT_TRUE(result_validate.model_result->has_status());
+    EXPECT_EQ(result_validate.model_result->status(), Core::ModelRequestResult_Status_TAKES_ID);
 }
 
 TEST_F(ActionTest, shouldExecuteValidateNoArgActionSomeArg)

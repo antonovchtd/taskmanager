@@ -17,7 +17,7 @@ using ::testing::Return;
 using ::testing::DoAll;
 using ::testing::Invoke;
 
-class TaskManagerStressTest : public ::testing::Test
+class DISABLED_TaskManagerStressTest : public ::testing::Test
 {
 
 };
@@ -162,7 +162,7 @@ void runRandomCommandsMultiThread(TaskManager &tm) {
         t.join();
 }
 
-TEST_F(TaskManagerStressTest, shouldRunRandomCommandsWithMockedIDGenerator) {
+TEST_F(DISABLED_TaskManagerStressTest, shouldRunRandomCommandsWithMockedIDGenerator) {
     auto gen = std::make_shared<MockIDGenerator>();
     std::mutex id_mut;
     Core::TaskID id;
@@ -178,7 +178,7 @@ TEST_F(TaskManagerStressTest, shouldRunRandomCommandsWithMockedIDGenerator) {
     runRandomCommandsMultiThread(tm);
 }
 
-TEST_F(TaskManagerStressTest, shouldRunRandomCommandsWithRealIDGenerator) {
+TEST_F(DISABLED_TaskManagerStressTest, shouldRunRandomCommandsWithRealIDGenerator) {
     TaskManager tm;
     runRandomCommandsMultiThread(tm);
 }

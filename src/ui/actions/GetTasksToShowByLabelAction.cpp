@@ -8,6 +8,6 @@ GetTasksToShowByLabelAction::GetTasksToShowByLabelAction(const std::string &labe
 }
 
 ActionResult GetTasksToShowByLabelAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    auto tasks = model->getTasks(label_);
-    return {ActionResult::Status::SUCCESS, tasks};
+    ActionResult result{model->getTasks(label_)};
+    return result;
 }

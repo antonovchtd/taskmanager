@@ -122,7 +122,7 @@ Core::ModelRequestResult TaskManagerGRPCClient::RemoveLabel(const Core::TaskID &
     request.mutable_label()->set_label(label);
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
-    grpc::Status status = stub_->ClearLabel(&context, request, &reply);
+    grpc::Status status = stub_->RemoveLabel(&context, request, &reply);
 
     return reply;
 }
@@ -130,7 +130,7 @@ Core::ModelRequestResult TaskManagerGRPCClient::RemoveLabel(const Core::TaskID &
 Core::ModelRequestResult TaskManagerGRPCClient::RemoveAllLabels(const Core::TaskID &request) {
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
-    grpc::Status status = stub_->ClearLabels(&context, request, &reply);
+    grpc::Status status = stub_->RemoveAllLabels(&context, request, &reply);
 
     return reply;
 }

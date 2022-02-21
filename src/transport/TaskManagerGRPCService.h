@@ -36,9 +36,9 @@ public:
                      Core::ModelRequestResult* result) override;
     grpc::Status AddLabel(grpc::ServerContext* context, const Transfer::IDWithLabel* msg,
                      Core::ModelRequestResult* result) override;
-    grpc::Status ClearLabel(grpc::ServerContext* context, const Transfer::IDWithLabel* msg,
+    grpc::Status RemoveLabel(grpc::ServerContext* context, const Transfer::IDWithLabel* msg,
                      Core::ModelRequestResult* result) override;
-    grpc::Status ClearLabels(grpc::ServerContext* context, const Core::TaskID* id,
+    grpc::Status RemoveAllLabels(grpc::ServerContext* context, const Core::TaskID* id,
                      Core::ModelRequestResult* result) override;
 public:
     grpc::Status Replace(grpc::ServerContext* context, const Transfer::ManyTaskEntities* mte,

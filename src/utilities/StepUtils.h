@@ -22,6 +22,8 @@ std::shared_ptr<Step> processResult(const T &step,
             if (result.model_result->has_id())
                 step.printer()->print(" (ID: " + std::to_string(result.model_result->id().value()) + ")\n");
         }
+    } else if (result.entity || result.tasks) {
+        // move on
     }
     else {
         if (result.model_result && result.model_result->has_status())
