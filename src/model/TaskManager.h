@@ -5,6 +5,8 @@
 #ifndef TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 #define TASKMANAGER_SRC_MODEL_TASKMANAGER_H_
 
+#include <mutex>
+
 #include "utilities/TaskIDUtils.h"
 #include "utilities/TaskUtils.h"
 #include "utilities/TaskEntityUtils.h"
@@ -52,6 +54,7 @@ private:
 private:
     std::map<Core::TaskID, std::pair<Core::Task, Node>> tasks_;
     std::shared_ptr<IDGenerator> gen_;
+    mutable std::recursive_mutex mtx_;
 };
 
 
