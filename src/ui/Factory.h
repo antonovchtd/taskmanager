@@ -19,7 +19,7 @@ class Machine;
 class Context;
 class Step;
 
-class Factory : public std::enable_shared_from_this<Factory> {
+class Factory {
 public:
     enum class State{
         HOME,
@@ -56,7 +56,7 @@ public:
     std::shared_ptr<Step> getNewStep(const State &s);
     std::shared_ptr<Step> lazyInitStep(const State &state);
 
-    std::shared_ptr<Machine> createMachine(const State &state);
+    std::shared_ptr<Machine> createMachine(const State &state) const;
 
 public:
     std::shared_ptr<AbstractReader> reader() const;
