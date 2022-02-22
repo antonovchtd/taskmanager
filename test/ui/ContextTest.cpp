@@ -9,7 +9,16 @@
 
 class ContextTest : public ::testing::Test
 {
+public:
+    Core::Task task_;
 
+    void SetUp() override {
+        task_ = Core::createTask("test",
+                                 Core::Task::Priority::Task_Priority_NONE,
+                                 time(nullptr),
+                                 "label",
+                                 false);
+    }
 };
 
 TEST_F(ContextTest, shouldSetID)
@@ -24,13 +33,7 @@ TEST_F(ContextTest, shouldSetID)
 TEST_F(ContextTest, shouldSetTasks)
 {
     TaskManager tm;
-    Core::Task t;
-    t.set_title("test");
-    t.set_priority(Core::Task_Priority_NONE);
-    t.add_labels("label");
-    t.set_due_date(time(nullptr));
-    t.set_is_complete(false);
-    tm.Add(t);
+    tm.Add(task_);
     Context c;
     auto tasks = tm.getTasks();
     c.setTasks(tasks);
@@ -41,19 +44,13 @@ TEST_F(ContextTest, shouldSetTasks)
 }
 
 TEST_F(ContextTest, shouldSetData){
-    Core::Task t;
-    t.set_title("test");
-    t.set_priority(Core::Task_Priority_NONE);
-    t.add_labels("label");
-    t.set_due_date(time(nullptr));
-    t.set_is_complete(false);
     Context c;
-    c.setTask(t);
-    EXPECT_EQ(t.title(), c.task().title());
-    EXPECT_EQ(t.priority(), c.task().priority());
-    EXPECT_EQ(t.due_date(), c.task().due_date());
-    EXPECT_EQ(t.labels()[0], c.task().labels()[0]);
-    EXPECT_EQ(t.is_complete(), c.task().is_complete());
+    c.setTask(task_);
+    EXPECT_EQ(task_.title(), c.task().title());
+    EXPECT_EQ(task_.priority(), c.task().priority());
+    EXPECT_EQ(task_.due_date(), c.task().due_date());
+    EXPECT_EQ(task_.labels()[0], c.task().labels()[0]);
+    EXPECT_EQ(task_.is_complete(), c.task().is_complete());
 }
 
 TEST_F(ContextTest, shouldSetTitle){

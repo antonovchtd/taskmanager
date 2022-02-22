@@ -11,8 +11,8 @@ LabelStep::LabelStep(const std::shared_ptr<AbstractReader> &reader,
 }
 
 std::unique_ptr<Action> LabelStep::genAction(Context &context) {
-    std::string label = readLabel();
-    return std::unique_ptr<Action>(new LabelTaskAction(*context.id(), label));
+    auto label = readLabel();
+    return std::make_unique<LabelTaskAction>(*context.id(), label);
 }
 
 std::shared_ptr<Step> LabelStep::genNextStep(const ActionResult &result, const std::shared_ptr<Factory> &factory) {
@@ -20,9 +20,11 @@ std::shared_ptr<Step> LabelStep::genNextStep(const ActionResult &result, const s
 
 }
 
-std::string LabelStep::readLabel() const {
-    std::string label = reader()->read("[Add Label]\n    >> ");
-    while (label.empty())
-        label = reader()->read("Label cannot be empty. Try again.\n    >> ");
+Core::Label LabelStep::readLabel() const {
+    Core::Label label;
+    std::string str = reader()->read("[Clear Label]\n    >> ");
+    while (str.empty())
+        str = reader()->read("Label cannot be empty. Try again.\n    >> ");
+    label.set_str(str);
     return label;
 }

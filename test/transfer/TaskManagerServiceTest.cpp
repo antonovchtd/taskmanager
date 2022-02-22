@@ -24,11 +24,11 @@ public:
 
     void SetUp() override {
         tm_ = std::shared_ptr<ModelInterface>(new TaskManager);
-        task_.set_title("test");
-        task_.set_priority(Core::Task::Priority::Task_Priority_HIGH);
-        task_.set_due_date(time(nullptr));
-        task_.add_labels("label");
-        task_.set_is_complete(false);
+        task_ = Core::createTask("test",
+                                 Core::Task::Priority::Task_Priority_HIGH,
+                                 time(nullptr),
+                                 "label",
+                                 false);
         AddTaskAction act{task_};
         ActionResult result = act.execute(tm_);
         id_ = result.model_result->id();
@@ -54,7 +54,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldGetTaskByLabel)
 {
     grpc::ServerContext context;
     Core::Label request;
-    request.set_label("label");
+    request.set_str("label");
     Transfer::ManyTaskEntities result;
     grpc::Status status = service_->getTasksByLabel(&context, &request, &result);
     ASSERT_TRUE(status.ok());
@@ -97,8 +97,8 @@ TEST_F(TaskManagerGRPCServiceTest, shouldAddSubtask)
 {
     grpc::ServerContext context;
     Core::TaskEntity request;
-    request.mutable_data()->CopyFrom(task_);
-    request.mutable_id()->CopyFrom(id_);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+    request.set_allocated_data(std::make_unique<Core::Task>(task_).release());
     Core::ModelRequestResult result;
     grpc::Status status = service_->AddSubtask(&context, &request, &result);
     ASSERT_TRUE(status.ok());
@@ -115,10 +115,12 @@ TEST_F(TaskManagerGRPCServiceTest, shouldEditTask)
 {
     grpc::ServerContext context;
     Core::TaskEntity request;
-    request.mutable_data()->CopyFrom(task_);
+
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
     std::string new_title = "edited";
-    request.mutable_data()->set_title(new_title);
-    request.mutable_id()->CopyFrom(id_);
+    auto task = std::make_unique<Core::Task>(task_);
+    task->set_title(new_title);
+    request.set_allocated_data(task.release());
     Core::ModelRequestResult result;
     grpc::Status status = service_->Edit(&context, &request, &result);
     ASSERT_TRUE(status.ok());
@@ -133,10 +135,13 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToEditTaskWithWrongID)
 {
     grpc::ServerContext context;
     Core::TaskEntity request;
-    request.mutable_data()->CopyFrom(task_);
+    auto id = std::make_unique<Core::TaskID>(id_);
+    id->set_value(id->value()+1);
+    request.set_allocated_id(id.release());
     std::string new_title = "edited";
-    request.mutable_data()->set_title(new_title);
-    request.mutable_id()->set_value(id_.value()+1);
+    auto task = std::make_unique<Core::Task>(task_);
+    task->set_title(new_title);
+    request.set_allocated_data(task.release());
     Core::ModelRequestResult result;
     grpc::Status status = service_->Edit(&context, &request, &result);
     ASSERT_TRUE(status.ok());
@@ -213,8 +218,8 @@ TEST_F(TaskManagerGRPCServiceTest, shouldDeleteTaskWithSubtasks)
 {
     grpc::ServerContext context;
     Core::TaskEntity request1;
-    request1.mutable_id()->CopyFrom(id_);
-    request1.mutable_data()->CopyFrom(task_);
+    request1.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+    request1.set_allocated_data(std::make_unique<Core::Task>(task_).release());
     Core::ModelRequestResult result;
     service_->AddSubtask(&context, &request1, &result);
 
@@ -249,7 +254,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldReturnSuccessOnIsPresent)
     request.CopyFrom(id_);
     Core::ModelRequestResult result;
 
-    grpc::Status status = service_->IsPresent(&context, &request, &result);
+    grpc::Status status = service_->CheckTask(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
     EXPECT_EQ(id_, result.id());
@@ -261,7 +266,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldReturnIDNotFoundOnIsPresent)
     Core::TaskID request;
     request.set_value(id_.value()+1);
     Core::ModelRequestResult result;
-    grpc::Status status = service_->IsPresent(&context, &request, &result);
+    grpc::Status status = service_->CheckTask(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_status());
     EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());
@@ -271,9 +276,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldAddLabel)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
-    request.mutable_id()->CopyFrom(id_);
-    std::string new_label = "new_label";
-    request.mutable_label()->set_label(new_label);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+    std::string new_label_str = "new_label";
+    Core::Label new_label;
+    new_label.set_str(new_label_str);
+    request.set_allocated_label(std::make_unique<Core::Label>(new_label).release());
     Core::ModelRequestResult result;
 
     grpc::Status status = service_->AddLabel(&context, &request, &result);
@@ -293,9 +300,13 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToAddLabelWithInvalidID)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
-    request.mutable_id()->set_value(id_.value()+1);
-    std::string new_label = "new_label";
-    request.mutable_label()->set_label(new_label);
+    auto id = std::make_unique<Core::TaskID>(id_);
+    id->set_value(id->value()+1);
+    request.set_allocated_id(id.release());
+    std::string new_label_str = "new_label";
+    Core::Label new_label;
+    new_label.set_str(new_label_str);
+    request.set_allocated_label(std::make_unique<Core::Label>(new_label).release());
     Core::ModelRequestResult result;
 
     grpc::Status status = service_->AddLabel(&context, &request, &result);
@@ -314,9 +325,9 @@ TEST_F(TaskManagerGRPCServiceTest, shouldRemoveLabel)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
-    request.mutable_id()->CopyFrom(id_);
-    std::string label_to_remove = task_.labels(0);
-    request.mutable_label()->set_label(label_to_remove);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+    auto label_to_remove = task_.labels(0);
+    request.set_allocated_label(std::make_unique<Core::Label>(label_to_remove).release());
     Core::ModelRequestResult result;
 
     grpc::Status status = service_->RemoveLabel(&context, &request, &result);
@@ -334,9 +345,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveLabelWithInvalidID)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
-    request.mutable_id()->set_value(id_.value()+1);
-    std::string label_to_remove = task_.labels(0);
-    request.mutable_label()->set_label(label_to_remove);
+    auto id = std::make_unique<Core::TaskID>(id_);
+    id->set_value(id->value()+1);
+    request.set_allocated_id(id.release());
+    auto label_to_remove = task_.labels(0);
+    request.set_allocated_label(std::make_unique<Core::Label>(label_to_remove).release());
     Core::ModelRequestResult result;
 
     grpc::Status status = service_->RemoveLabel(&context, &request, &result);
@@ -355,9 +368,10 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveLabelWrongLabel)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request;
-    request.mutable_id()->CopyFrom(id_);
-    std::string label_to_remove = "missing";
-    request.mutable_label()->set_label(label_to_remove);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+    Core::Label label_to_remove;
+    label_to_remove.set_str("missing");
+    request.set_allocated_label(std::make_unique<Core::Label>(label_to_remove).release());
     Core::ModelRequestResult result;
 
     grpc::Status status = service_->RemoveLabel(&context, &request, &result);
@@ -376,9 +390,10 @@ TEST_F(TaskManagerGRPCServiceTest, shouldRemoveAllLabels)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request1;
-    request1.mutable_id()->CopyFrom(id_);
-    std::string new_label = "new_label";
-    request1.mutable_label()->set_label(new_label);
+    request1.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+    Core::Label new_label;
+    new_label.set_str("new_label");
+    request1.set_allocated_label(std::make_unique<Core::Label>(new_label).release());
     Core::ModelRequestResult result;
 
     service_->AddLabel(&context, &request1, &result);
@@ -402,9 +417,10 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveAllLabelsWithWrongID)
 {
     grpc::ServerContext context;
     Transfer::IDWithLabel request1;
-    request1.mutable_id()->CopyFrom(id_);
-    std::string new_label = "new_label";
-    request1.mutable_label()->set_label(new_label);
+    request1.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+    Core::Label new_label;
+    new_label.set_str("new_label");
+    request1.set_allocated_label(std::make_unique<Core::Label>(new_label).release());
     Core::ModelRequestResult result;
 
     service_->AddLabel(&context, &request1, &result);
@@ -427,10 +443,11 @@ TEST_F(TaskManagerGRPCServiceTest, shouldFailToRemoveAllLabelsWithWrongID)
 TEST_F(TaskManagerGRPCServiceTest, shouldReplaceAllTasks)
 {
     Core::TaskEntity te;
-    te.mutable_data()->CopyFrom(task_);
-    std::string new_title = "new";
-    te.mutable_data()->set_title(new_title);
-    te.mutable_id()->CopyFrom(id_);
+    auto task = std::make_unique<Core::Task>(task_);
+    std::string new_title{"new"};
+    task->set_title(new_title);
+    te.set_allocated_data(task.release());
+    te.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
 
     Transfer::ManyTaskEntities request;
     request.mutable_tasks()->Add(std::move(te));

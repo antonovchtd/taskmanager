@@ -9,14 +9,14 @@
 
 class ClearLabelOfTaskAction : public Action {
 public:
-    explicit ClearLabelOfTaskAction(const Core::TaskID &, const std::string &label);
+    explicit ClearLabelOfTaskAction(const Core::TaskID &, const Core::Label &label);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
 
 private:
     Core::TaskID id_;
-    std::string label_;
+    Core::Label label_;
 };
 
 

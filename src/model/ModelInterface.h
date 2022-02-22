@@ -18,7 +18,7 @@ class IDGenerator;
 class ModelInterface {
 public:
     virtual std::vector<Core::TaskEntity> getTasks() const = 0;
-    virtual std::vector<Core::TaskEntity> getTasks(const std::string &label) const = 0;
+    virtual std::vector<Core::TaskEntity> getTasks(const Core::Label &label) const = 0;
     virtual std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const = 0;
 
 public:
@@ -28,9 +28,9 @@ public:
     virtual Core::ModelRequestResult Complete(const Core::TaskID &) = 0;
     virtual Core::ModelRequestResult Uncomplete(const Core::TaskID &) = 0;
     virtual Core::ModelRequestResult Delete(const Core::TaskID &, bool deleteChildren) = 0;
-    virtual Core::ModelRequestResult IsPresent(const Core::TaskID &) const = 0;
-    virtual Core::ModelRequestResult AddLabel(const Core::TaskID &, const std::string &label) = 0;
-    virtual Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const std::string &label) = 0;
+    virtual Core::ModelRequestResult CheckTask(const Core::TaskID &) const = 0;
+    virtual Core::ModelRequestResult AddLabel(const Core::TaskID &, const Core::Label &label) = 0;
+    virtual Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const Core::Label &label) = 0;
     virtual Core::ModelRequestResult RemoveAllLabels(const Core::TaskID &) = 0;
 
 public:

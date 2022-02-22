@@ -11,7 +11,7 @@ GetTaskToShowLabelsAction::GetTaskToShowLabelsAction(const std::optional<Core::T
 ActionResult GetTaskToShowLabelsAction::execute(const std::shared_ptr<ModelInterface> &model) {
     Core::ModelRequestResult result;
     if (id_) {
-        auto check = model->IsPresent(*id_);
+        auto check = model->CheckTask(*id_);
         if (!ToBool(check))
             return check;
     } else {

@@ -43,11 +43,11 @@ public:
 
     void SetUp() override {
         tm_ = std::shared_ptr<ModelInterface>(new TaskManager);
-        task_.set_title("test");
-        task_.set_priority(Core::Task::Priority::Task_Priority_HIGH);
-        task_.set_due_date(time(nullptr));
-        task_.add_labels("label");
-        task_.set_is_complete(false);
+        task_ = Core::createTask("test",
+                                 Core::Task::Priority::Task_Priority_HIGH,
+                                 time(nullptr),
+                                 "label",
+                                 false);
         AddTaskAction act{task_};
         ActionResult result = act.execute(tm_);
         id_ = result.model_result->id();
@@ -58,7 +58,7 @@ public:
 TEST_F(ActionTest, shouldAddTask)
 {
     ASSERT_EQ(1, tm_->getTasks().size());
-    EXPECT_TRUE(ToBool(tm_->IsPresent(id_)));
+    EXPECT_TRUE(ToBool(tm_->CheckTask(id_)));
 }
 
 TEST_F(ActionTest, shouldAddSubtask)
@@ -70,7 +70,7 @@ TEST_F(ActionTest, shouldAddSubtask)
     ActionResult result_subtask = subact.execute(tm_);
     ASSERT_EQ(2, tm_->getTasks().size());
     ASSERT_TRUE(result_subtask.model_result);
-    auto check = tm_->IsPresent(result_subtask.model_result->id());
+    auto check = tm_->CheckTask(result_subtask.model_result->id());
     ASSERT_TRUE(check.has_id());
     EXPECT_NE(id_, result_subtask.model_result->id());
 
@@ -134,7 +134,7 @@ TEST_F(ActionTest, shouldEditTask)
     ActionResult result_edit = act.execute(tm_);
 
     ASSERT_EQ(1, tm_->getTasks().size());
-    EXPECT_TRUE(ToBool(tm_->IsPresent(id_)));
+    EXPECT_TRUE(ToBool(tm_->CheckTask(id_)));
 
     ASSERT_TRUE(result_edit.model_result);
     ASSERT_TRUE(result_edit.model_result->has_id());
@@ -157,7 +157,9 @@ TEST_F(ActionTest, shouldGetTasksToShowWithNoArg)
 
 TEST_F(ActionTest, shouldGetTasksToShowWithLabelArg)
 {
-    GetTasksToShowByLabelAction act{"label"};
+    Core::Label label;
+    label.set_str("label");
+    GetTasksToShowByLabelAction act{label};
     ActionResult result = act.execute(tm_);
 
     ASSERT_TRUE(result.tasks);
@@ -263,14 +265,15 @@ TEST_F(ActionTest, shouldDeleteTaskValidIDWithSubtasks)
 
 TEST_F(ActionTest, shouldLabelTask)
 {
-    std::string label = "custom";
+    Core::Label label;
+    label.set_str("custom");
     LabelTaskAction act{id_, label};
     ActionResult result_label = act.execute(tm_);
     ASSERT_EQ(1, tm_->getTasks().size());
     ASSERT_TRUE(result_label.model_result);
     ASSERT_TRUE(result_label.model_result->has_id());
     EXPECT_EQ(result_label.model_result->id(), id_);
-    EXPECT_EQ("label", tm_->getTasks()[0].data().labels()[0]);
+    EXPECT_EQ("label", tm_->getTasks()[0].data().labels()[0].str());
     EXPECT_EQ(label, tm_->getTasks()[0].data().labels()[1]);
 }
 
@@ -278,14 +281,15 @@ TEST_F(ActionTest, shouldNotLabelTaskWithInvalidID)
 {
     Core::TaskID new_id;
     new_id.set_value(id_.value()+1);
-    std::string label = "custom";
+    Core::Label label;
+    label.set_str("custom");
     LabelTaskAction act{new_id, label};
     ActionResult result_label = act.execute(tm_);
     ASSERT_EQ(1, tm_->getTasks().size());
     ASSERT_TRUE(result_label.model_result);
     ASSERT_TRUE(result_label.model_result->has_status());
     EXPECT_EQ(result_label.model_result->status(), Core::ModelRequestResult_Status_ID_NOT_FOUND);
-    EXPECT_EQ("label", tm_->getTasks()[0].data().labels()[0]);
+    EXPECT_EQ("label", tm_->getTasks()[0].data().labels()[0].str());
 }
 
 TEST_F(ActionTest, shouldDoNothing)
@@ -301,8 +305,11 @@ TEST_F(ActionTest, shouldDoNothing)
 
 TEST_F(ActionTest, shouldClearAllLabelsOfTask)
 {
-    LabelTaskAction label_action(id_, "mylabel");
-    LabelTaskAction label_action2(id_, "mylabel2");
+    Core::Label mylabel, mylabel2;
+    mylabel.set_str("mylabel");
+    mylabel2.set_str("mylabel2");
+    LabelTaskAction label_action(id_, mylabel);
+    LabelTaskAction label_action2(id_, mylabel2);
     label_action.execute(tm_);
     label_action2.execute(tm_);
 
@@ -318,12 +325,15 @@ TEST_F(ActionTest, shouldClearAllLabelsOfTask)
 
 TEST_F(ActionTest, shouldClearOneLabelOfTask)
 {
-    LabelTaskAction label_action(id_, "mylabel");
-    LabelTaskAction label_action2(id_, "mylabel2");
+    Core::Label mylabel, mylabel2;
+    mylabel.set_str("mylabel");
+    mylabel2.set_str("mylabel2");
+    LabelTaskAction label_action(id_, mylabel);
+    LabelTaskAction label_action2(id_, mylabel2);
     label_action.execute(tm_);
     label_action2.execute(tm_);
 
-    ClearLabelOfTaskAction act{id_, "mylabel2"};
+    ClearLabelOfTaskAction act{id_, mylabel2};
     ActionResult result = act.execute(tm_);
     ASSERT_EQ(1, tm_->getTasks().size());
     ASSERT_TRUE(result.model_result);
@@ -332,7 +342,7 @@ TEST_F(ActionTest, shouldClearOneLabelOfTask)
 
     auto tasks = tm_->getTaskWithSubtasks(id_);
     EXPECT_EQ(2, tasks[0].data().labels().size());
-    EXPECT_EQ("mylabel", tasks[0].data().labels()[1]);
+    EXPECT_EQ(mylabel, tasks[0].data().labels()[1]);
 }
 
 TEST_F(ActionTest, shouldGetTaskToShowItsLabels)

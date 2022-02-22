@@ -69,7 +69,7 @@ Core::ModelRequestResult TaskManager::AddSubtask(const Core::Task &t, const Core
     auto id = gen_->genID();
 
     std::lock_guard lk{mtx_};
-    if (!ToBool(IsPresent(parent)))
+    if (!ToBool(CheckTask(parent)))
         result.set_status(Core::ModelRequestResult_Status_PARENT_ID_NOT_FOUND);
     else {
         tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
@@ -98,7 +98,7 @@ std::vector<Core::TaskEntity> TaskManager::getTasks() const {
     return vec;
 }
 
-std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) const {
+std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::Label &label) const {
     std::vector<Core::TaskEntity> tasks;
 
     std::lock_guard lk{mtx_};
@@ -111,7 +111,7 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) co
         }
     }
 
-    LOG_STREAM(debug) << "Returned " << tasks.size() << " tasks with label " << label << ".";
+    LOG_STREAM(debug) << "Returned " << tasks.size() << " tasks with label " << label.str() << ".";
 
     return tasks;
 }
@@ -137,7 +137,7 @@ std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskI
         for (const auto &ch_id: ChildrenOf(id)) {
             auto ch_tasks = getTaskWithSubtasks(ch_id);
             for (auto &ch_task: ch_tasks) {
-                ch_task.mutable_parent()->CopyFrom(*ParentOf(ch_task.id()));
+                ch_task.set_allocated_parent(std::make_unique<Core::TaskID>(*ParentOf(ch_task.id())).release());
             }
             tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
         }
@@ -152,13 +152,13 @@ Core::ModelRequestResult TaskManager::Delete(const Core::TaskID &id, bool delete
     Core::ModelRequestResult result;
 
     std::lock_guard lk{mtx_};
-    if (ToBool(IsPresent(id))) {
+    if (ToBool(CheckTask(id))) {
         if (!ChildrenOf(id).empty() && !deleteChildren) {
             LOG_STREAM(debug) << "Failed to delete task (has children).";
             result.set_status(Core::ModelRequestResult_Status_HAS_CHILDREN);
         } else {
             std::optional<Core::TaskID> ancestor = ParentOf(id);
-            if (ancestor && ToBool(IsPresent(*ancestor)))
+            if (ancestor && ToBool(CheckTask(*ancestor)))
                 RemoveChild(*ancestor, id);
 
             for (auto const &ch: ChildrenOf(id))
@@ -229,7 +229,7 @@ Core::ModelRequestResult TaskManager::Uncomplete(const Core::TaskID &id) {
     return result;
 }
 
-Core::ModelRequestResult TaskManager::IsPresent(const Core::TaskID &id) const {
+Core::ModelRequestResult TaskManager::CheckTask(const Core::TaskID &id) const {
     Core::ModelRequestResult result;
     std::lock_guard lk{mtx_};
 
@@ -246,16 +246,16 @@ size_t TaskManager::size() const {
     return tasks_.size();
 }
 
-Core::ModelRequestResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &label) {
+Core::ModelRequestResult TaskManager::AddLabel(const Core::TaskID &id, const Core::Label &label) {
     Core::ModelRequestResult result;
     std::lock_guard lk{mtx_};
     auto it = tasks_.find(id);
 
     if (it != tasks_.end()) {
         auto labels = it->second.first.labels();
-        if (find(labels.begin(), labels.end(), label) == labels.end()) {
-            it->second.first.add_labels(label);
-            LOG_STREAM(debug) << "Added " << label << "label to " << id.value() << ".";
+        if (std::find(labels.begin(), labels.end(), label) == labels.end()) {
+            it->second.first.mutable_labels()->AddAllocated(std::make_unique<Core::Label>(label).release());
+            LOG_STREAM(debug) << "Added " << label.str() << "label to " << id.value() << ".";
             result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
         }
     } else {
@@ -265,17 +265,17 @@ Core::ModelRequestResult TaskManager::AddLabel(const Core::TaskID &id, const std
     return result;
 }
 
-Core::ModelRequestResult TaskManager::RemoveLabel(const Core::TaskID &id, const std::string &label) {
+Core::ModelRequestResult TaskManager::RemoveLabel(const Core::TaskID &id, const Core::Label &label) {
     Core::ModelRequestResult result;
     std::lock_guard lk{mtx_};
     auto it = tasks_.find(id);
 
     if (it != tasks_.end()) {
         auto labels = it->second.first.mutable_labels();
-        auto label_it = find(labels->begin(), labels->end(), label);
+        auto label_it = std::find(labels->begin(), labels->end(), label);
         if (label_it != labels->end()) {
             it->second.first.mutable_labels()->erase(label_it);
-            LOG_STREAM(debug) << "Removed " << label << "label from " << id.value() << ".";
+            LOG_STREAM(debug) << "Removed " << label.str() << "label from " << id.value() << ".";
             result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
         }
     } else {

@@ -62,10 +62,12 @@ Core::TaskID getRandomID(const TaskManager &tm) {
     }
 }
 
-std::string getRandomLabel() {
+Core::Label getRandomLabel() {
+    Core::Label label;
     std::uniform_int_distribution<int> uni(0, 50); // guaranteed unbiased
     auto random_integer = uni(rng);
-    return std::to_string(random_integer);
+    label.set_str(std::to_string(random_integer));
+    return label;
 }
 
 std::vector<Core::TaskEntity> runCommand(const Command &command, TaskManager &tm) {
@@ -120,7 +122,7 @@ std::vector<Core::TaskEntity> runCommand(const Command &command, TaskManager &tm
             tm.Delete(getRandomID(tm), true);
             break;
         case Command::IS_PRESENT:
-            tm.IsPresent(id);
+            tm.CheckTask(id);
             break;
         case Command::LABEL:
             tm.AddLabel(getRandomID(tm), getRandomLabel());

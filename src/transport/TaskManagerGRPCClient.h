@@ -17,7 +17,7 @@ public:
 
 public:
     std::vector<Core::TaskEntity> getTasks() const override;
-    std::vector<Core::TaskEntity> getTasks(const std::string &label) const override;
+    std::vector<Core::TaskEntity> getTasks(const Core::Label &label) const override;
     std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const override;
 
 public:
@@ -27,9 +27,9 @@ public:
     Core::ModelRequestResult Complete(const Core::TaskID &) override;
     Core::ModelRequestResult Uncomplete(const Core::TaskID &) override;
     Core::ModelRequestResult Delete(const Core::TaskID &, bool deleteChildren) override;
-    Core::ModelRequestResult IsPresent(const Core::TaskID &) const override;
-    Core::ModelRequestResult AddLabel(const Core::TaskID &, const std::string &label) override;
-    Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const std::string &label) override;
+    Core::ModelRequestResult CheckTask(const Core::TaskID &) const override;
+    Core::ModelRequestResult AddLabel(const Core::TaskID &, const Core::Label &label) override;
+    Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const Core::Label &label) override;
     Core::ModelRequestResult RemoveAllLabels(const Core::TaskID &) override;
 
 public:

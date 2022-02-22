@@ -95,17 +95,17 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(ToBool(tm->IsPresent(id)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     EXPECT_EQ(tm->getTasks()[0].id(), id);
     EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
 
     id.set_value(2);
-    ASSERT_TRUE(ToBool(tm->IsPresent(id)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     EXPECT_EQ(tm->getTasks()[1].id(), id);
     EXPECT_FALSE(tm->getTasks()[1].data().is_complete());
 
     id.set_value(3);
-    EXPECT_FALSE(ToBool(tm->IsPresent(id)));
+    EXPECT_FALSE(ToBool(tm->CheckTask(id)));
 
     EXPECT_EQ(4, tm->gen()->state());
 }
@@ -144,19 +144,19 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
     // check completeness
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(ToBool(tm->IsPresent(id)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     EXPECT_EQ(tm->getTasks()[0].id(), id);
     EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
 
     Core::TaskID id2;
     id2.set_value(2);
-    ASSERT_TRUE(ToBool(tm->IsPresent(id2)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id2)));
     EXPECT_EQ(tm->getTasks()[1].id(), id2);
     EXPECT_TRUE(tm->getTasks()[1].data().is_complete());
 
     Core::TaskID id3;
     id3.set_value(3);
-    ASSERT_TRUE(ToBool(tm->IsPresent(id3)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id3)));
     EXPECT_EQ(tm->getTasks()[2].id(), id3);
     EXPECT_TRUE(tm->getTasks()[2].data().is_complete());
 
@@ -207,20 +207,20 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
     // check labels
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(ToBool(tm->IsPresent(id)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     EXPECT_TRUE(tasks[0].data().labels().empty());
 
     Core::TaskID id2;
     id2.set_value(2);
-    ASSERT_TRUE(ToBool(tm->IsPresent(id2)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id2)));
     EXPECT_EQ(1, tasks[1].data().labels().size());
-    EXPECT_EQ("l2", tasks[1].data().labels()[0]);
+    EXPECT_EQ("l2", tasks[1].data().labels()[0].str());
 
     Core::TaskID id3;
     id3.set_value(3);
-    ASSERT_TRUE(ToBool(tm->IsPresent(id3)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id3)));
     EXPECT_EQ(1, tasks[2].data().labels().size());
-    EXPECT_EQ("l3", tasks[2].data().labels()[0]);
+    EXPECT_EQ("l3", tasks[2].data().labels()[0].str());
 
     // check parents
     EXPECT_FALSE(tm->getTasks()[0].has_parent());
@@ -263,11 +263,11 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTwoWithConfirm)
 
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_FALSE(ToBool(tm->IsPresent(id)));
+    ASSERT_FALSE(ToBool(tm->CheckTask(id)));
     id.set_value(2);
-    ASSERT_TRUE(ToBool(tm->IsPresent(id)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     id.set_value(3);
-    ASSERT_FALSE(ToBool(tm->IsPresent(id)));
+    ASSERT_FALSE(ToBool(tm->CheckTask(id)));
 
     for (int i = 0; i <  prompts.size(); ++i) {
         EXPECT_EQ(prompts[i], prompts_expected[i]);
@@ -315,7 +315,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
 
     Core::TaskID id;
     id.set_value(1);
-    EXPECT_TRUE(ToBool(tm->IsPresent(id)));
+    EXPECT_TRUE(ToBool(tm->CheckTask(id)));
 
     for (int i = 0; i <  prompts.size(); ++i) {
         EXPECT_EQ(prompts[i], prompts_expected[i]);
@@ -396,17 +396,17 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
     id2.set_value(2);
     id3.set_value(3);
 
-    ASSERT_TRUE(ToBool(tm->IsPresent(id1)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id1)));
     EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
     EXPECT_EQ(tm->getTasks()[0].data().title(), "Task 1");
     EXPECT_FALSE(tm->getTasks()[0].has_parent());
 
-    ASSERT_TRUE(ToBool(tm->IsPresent(id2)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id2)));
     EXPECT_TRUE(tm->getTasks()[1].data().is_complete());
     EXPECT_EQ(tm->getTasks()[1].data().title(), "Subtask 2");
     EXPECT_EQ(id1, tm->getTasks()[1].parent());
 
-    ASSERT_TRUE(ToBool(tm->IsPresent(id3)));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id3)));
     EXPECT_TRUE(tm->getTasks()[2].data().is_complete());
     EXPECT_EQ(tm->getTasks()[2].data().title(), "Subtask 3");
     EXPECT_EQ(id2, tm->getTasks()[2].parent());

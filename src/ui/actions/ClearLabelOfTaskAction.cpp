@@ -5,7 +5,7 @@
 #include "ClearLabelOfTaskAction.h"
 #include "ui/Context.h"
 
-ClearLabelOfTaskAction::ClearLabelOfTaskAction(const Core::TaskID &id, const std::string &label) :
+ClearLabelOfTaskAction::ClearLabelOfTaskAction(const Core::TaskID &id, const Core::Label &label) :
         id_{id}, label_{label} {
 }
 
