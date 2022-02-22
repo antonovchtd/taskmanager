@@ -249,7 +249,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldReturnSuccessOnIsPresent)
     request.CopyFrom(id_);
     Core::ModelRequestResult result;
 
-    grpc::Status status = service_->IsPresent(&context, &request, &result);
+    grpc::Status status = service_->CheckTask(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_id());
     EXPECT_EQ(id_, result.id());
@@ -261,7 +261,7 @@ TEST_F(TaskManagerGRPCServiceTest, shouldReturnIDNotFoundOnIsPresent)
     Core::TaskID request;
     request.set_value(id_.value()+1);
     Core::ModelRequestResult result;
-    grpc::Status status = service_->IsPresent(&context, &request, &result);
+    grpc::Status status = service_->CheckTask(&context, &request, &result);
     ASSERT_TRUE(status.ok());
     ASSERT_TRUE(result.has_status());
     EXPECT_EQ(Core::ModelRequestResult_Status_ID_NOT_FOUND, result.status());

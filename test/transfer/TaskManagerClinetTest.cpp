@@ -227,7 +227,7 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendIsPresentRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
-    EXPECT_CALL(*stub, IsPresent(_, id_, _))
+    EXPECT_CALL(*stub, CheckTask(_, id_, _))
             .WillOnce(testing::Invoke(
                     [this] (ClientContext*, const TaskID &request, Core::ModelRequestResult* reply) -> grpc::Status {
                         reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
@@ -235,7 +235,7 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendIsPresentRequest)
                     }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    Core::ModelRequestResult result = client.IsPresent(id_);
+    Core::ModelRequestResult result = client.CheckTask(id_);
     ASSERT_TRUE(result.has_id());
     EXPECT_EQ(result.id(), id_);
 }

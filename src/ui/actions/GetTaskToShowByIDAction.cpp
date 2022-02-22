@@ -9,7 +9,7 @@ GetTaskToShowByIDAction::GetTaskToShowByIDAction(const Core::TaskID &id) : id_{i
 }
 
 ActionResult GetTaskToShowByIDAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    auto check = model->IsPresent(id_);
+    auto check = model->CheckTask(id_);
     if (!ToBool(check))
         return check;
 

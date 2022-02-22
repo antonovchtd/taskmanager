@@ -47,7 +47,7 @@ TEST_F(TaskManagerTest, shouldAddTask)
     ASSERT_TRUE(result.has_id());
     const Core::TaskID& id = result.id();
     ASSERT_EQ(1, tm.size());
-    EXPECT_TRUE(ToBool(tm.IsPresent(id)));
+    EXPECT_TRUE(ToBool(tm.CheckTask(id)));
 }
 
 TEST_F(TaskManagerTest, shouldFailToAddSubtaskWithMissingParent)
@@ -75,8 +75,8 @@ TEST_F(TaskManagerTest, shouldAddSubtask)
     const auto& id_ch = subtask_result.id();
 
     ASSERT_EQ(2, tm.size());
-    EXPECT_TRUE(ToBool(tm.IsPresent(id)));
-    EXPECT_TRUE(ToBool(tm.IsPresent(id_ch)));
+    EXPECT_TRUE(ToBool(tm.CheckTask(id)));
+    EXPECT_TRUE(ToBool(tm.CheckTask(id_ch)));
     EXPECT_EQ(id, tm.getTasks()[1].parent());
 }
 
@@ -113,7 +113,7 @@ TEST_F(TaskManagerTest, shouldDeleteTask)
     ASSERT_TRUE(result.has_id());
     const auto& id = result.id();
     tm.Delete(id, false);
-    EXPECT_FALSE(ToBool(tm.IsPresent(id)));
+    EXPECT_FALSE(ToBool(tm.CheckTask(id)));
 }
 
 TEST_F(TaskManagerTest, shouldFailToDeleteTaskWithWrongID)

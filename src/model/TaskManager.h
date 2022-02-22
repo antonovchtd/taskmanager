@@ -36,7 +36,7 @@ public:
     Core::ModelRequestResult Complete(const Core::TaskID &) override;
     Core::ModelRequestResult Uncomplete(const Core::TaskID &) override;
     Core::ModelRequestResult Delete(const Core::TaskID &id, bool deleteChildren) override;
-    Core::ModelRequestResult IsPresent(const Core::TaskID &id) const override;
+    Core::ModelRequestResult CheckTask(const Core::TaskID &id) const override;
     Core::ModelRequestResult AddLabel(const Core::TaskID &, const Core::Label &) override;
     Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const Core::Label &) override;
     Core::ModelRequestResult RemoveAllLabels(const Core::TaskID &) override;

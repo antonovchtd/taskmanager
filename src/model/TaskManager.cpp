@@ -69,7 +69,7 @@ Core::ModelRequestResult TaskManager::AddSubtask(const Core::Task &t, const Core
     auto id = gen_->genID();
 
     std::lock_guard lk{mtx_};
-    if (!ToBool(IsPresent(parent)))
+    if (!ToBool(CheckTask(parent)))
         result.set_status(Core::ModelRequestResult_Status_PARENT_ID_NOT_FOUND);
     else {
         tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
@@ -152,13 +152,13 @@ Core::ModelRequestResult TaskManager::Delete(const Core::TaskID &id, bool delete
     Core::ModelRequestResult result;
 
     std::lock_guard lk{mtx_};
-    if (ToBool(IsPresent(id))) {
+    if (ToBool(CheckTask(id))) {
         if (!ChildrenOf(id).empty() && !deleteChildren) {
             LOG_STREAM(debug) << "Failed to delete task (has children).";
             result.set_status(Core::ModelRequestResult_Status_HAS_CHILDREN);
         } else {
             std::optional<Core::TaskID> ancestor = ParentOf(id);
-            if (ancestor && ToBool(IsPresent(*ancestor)))
+            if (ancestor && ToBool(CheckTask(*ancestor)))
                 RemoveChild(*ancestor, id);
 
             for (auto const &ch: ChildrenOf(id))
@@ -229,7 +229,7 @@ Core::ModelRequestResult TaskManager::Uncomplete(const Core::TaskID &id) {
     return result;
 }
 
-Core::ModelRequestResult TaskManager::IsPresent(const Core::TaskID &id) const {
+Core::ModelRequestResult TaskManager::CheckTask(const Core::TaskID &id) const {
     Core::ModelRequestResult result;
     std::lock_guard lk{mtx_};
 

@@ -95,10 +95,10 @@ Core::ModelRequestResult TaskManagerGRPCClient::Delete(const Core::TaskID &reque
     return reply;
 }
 
-Core::ModelRequestResult TaskManagerGRPCClient::IsPresent(const Core::TaskID &request) const {
+Core::ModelRequestResult TaskManagerGRPCClient::CheckTask(const Core::TaskID &request) const {
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
-    grpc::Status status = stub_->IsPresent(&context, request, &reply);
+    grpc::Status status = stub_->CheckTask(&context, request, &reply);
 
     return reply;
 }

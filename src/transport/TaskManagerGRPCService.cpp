@@ -76,10 +76,10 @@ grpc::Status TaskManagerGRPCService::Delete(grpc::ServerContext* context,
     return grpc::Status::OK;
 }
 
-grpc::Status TaskManagerGRPCService::IsPresent(grpc::ServerContext* context,
+grpc::Status TaskManagerGRPCService::CheckTask(grpc::ServerContext* context,
                                                const Core::TaskID* id,
                                                Core::ModelRequestResult* result) {
-    *result = model_->IsPresent(*id);
+    *result = model_->CheckTask(*id);
     return grpc::Status::OK;
 }
 
