@@ -137,7 +137,7 @@ std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskI
         for (const auto &ch_id: ChildrenOf(id)) {
             auto ch_tasks = getTaskWithSubtasks(ch_id);
             for (auto &ch_task: ch_tasks) {
-                ch_task.mutable_parent()->CopyFrom(*ParentOf(ch_task.id()));
+                ch_task.set_allocated_parent(std::make_unique<Core::TaskID>(*ParentOf(ch_task.id())).release());
             }
             tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
         }
