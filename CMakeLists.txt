@@ -12,7 +12,6 @@ find_package(GTest CONFIG REQUIRED)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=undefined -fsanitize=nullability")
 set(Protobuf_USE_STATIC_LIBS ON)
-#list(APPEND CMAKE_PREFIX_PATH "/opt/protobuf/cmake/")
 find_package(Protobuf CONFIG REQUIRED)
 message(STATUS "Using protobuf ${Protobuf_VERSION}")
 find_program(_PROTOBUF_PROTOC protoc)

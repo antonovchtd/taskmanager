@@ -44,7 +44,7 @@ RUN git clone https://github.com/protocolbuffers/protobuf.git && cd protobuf && 
 
 ## TaskManager
 WORKDIR /opt
-RUN git clone --branch docker --single-branch https://github.com/antonovchtd/taskmanager.git && \
+RUN git clone https://github.com/antonovchtd/taskmanager.git && \
     mkdir taskmanager/build && cd taskmanager/build && \
     cmake .. && cmake --build . -- -j 2
 
