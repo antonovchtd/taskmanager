@@ -51,32 +51,41 @@ std::optional<Core::TaskID> TaskManager::ParentOf(const Core::TaskID &id) const 
         return std::nullopt;
 }
 
-ActionResult TaskManager::Add(const Core::Task &t) {
+Core::ModelRequestResult TaskManager::Add(const Core::Task &t) {
+    Core::ModelRequestResult result;
     Core::TaskID id = gen_->genID();
-    if (IsPresent(id))
-        return {ActionResult::Status::DUPLICATE_ID, id};
+
+    std::lock_guard lk{mtx_};
 
     tasks_.insert(std::make_pair(id, std::make_pair(t, Node())));
     LOG_STREAM(debug) << "Added task with ID: " << id.value() << " " << t.ShortDebugString();
-    return {ActionResult::Status::SUCCESS, id};
+    result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
+
+    return result;
 }
 
-ActionResult TaskManager::AddSubtask(const Core::Task &t, const Core::TaskID &parent) {
-    Core::TaskID id = gen_->genID();
-    if (IsPresent(id))
-        return {ActionResult::Status::DUPLICATE_ID, id};
-    if (!IsPresent(parent))
-        return {ActionResult::Status::PARENT_ID_NOT_FOUND, parent};
+Core::ModelRequestResult TaskManager::AddSubtask(const Core::Task &t, const Core::TaskID &parent) {
+    Core::ModelRequestResult result;
+    auto id = gen_->genID();
 
-    tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
+    std::lock_guard lk{mtx_};
+    if (!ToBool(CheckTask(parent)))
+        result.set_status(Core::ModelRequestResult_Status_PARENT_ID_NOT_FOUND);
+    else {
+        tasks_.insert(std::make_pair(id, std::make_pair(t, Node(parent))));
+        AddChild(parent, id);
+        result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
+    }
+
     LOG_STREAM(debug) << "Added Subtask of " << parent.value() << " with ID: " << id.value() << " " << t.ShortDebugString();
 
-    AddChild(parent, id);
-    return {ActionResult::Status::SUCCESS, id};
+    return result;
 }
 
 std::vector<Core::TaskEntity> TaskManager::getTasks() const {
     std::vector<Core::TaskEntity> vec;
+
+    std::lock_guard lk{mtx_};
     for (const auto &kv : tasks_) {
         if (kv.second.second.parent()) {
             vec.emplace_back(Core::createTaskEntity(kv.first, kv.second.first, *kv.second.second.parent()));
@@ -89,8 +98,10 @@ std::vector<Core::TaskEntity> TaskManager::getTasks() const {
     return vec;
 }
 
-std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) const {
+std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::Label &label) const {
     std::vector<Core::TaskEntity> tasks;
+
+    std::lock_guard lk{mtx_};
     for (const auto &kv : tasks_) {
         for (const auto &task_label : kv.second.first.labels()) {
             if (task_label == label) {
@@ -99,145 +110,200 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const std::string &label) co
             }
         }
     }
-    LOG_STREAM(debug) << "Returned " << tasks.size() << " tasks with label " << label << ".";
+
+    LOG_STREAM(debug) << "Returned " << tasks.size() << " tasks with label " << label.str() << ".";
 
     return tasks;
 }
 
 std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskID &id) const {
     std::vector<Core::TaskEntity> tasks;
-    std::optional<Core::Task> task = GetTask(id);
+    std::optional<Core::Task> task;
+    {
+        std::lock_guard lk{mtx_};
+        task = GetTask(id);
+    }
+
     if (task)
         tasks.emplace_back(Core::createTaskEntity(id, *task));
     else {
         LOG_STREAM(debug) << "Task with ID " << id.value() << " not found.";
         return tasks;
     }
-    // not including parent, but will include children
-    for (const auto &ch_id : ChildrenOf(id)) {
-        auto ch_tasks = getTaskWithSubtasks(ch_id);
-        for (auto &ch_task : ch_tasks) {
-            ch_task.mutable_parent()->CopyFrom(*ParentOf(ch_task.id()));
+
+    {
+        std::lock_guard lk{mtx_};
+        // not including parent, but will include children
+        for (const auto &ch_id: ChildrenOf(id)) {
+            auto ch_tasks = getTaskWithSubtasks(ch_id);
+            for (auto &ch_task: ch_tasks) {
+                ch_task.set_allocated_parent(std::make_unique<Core::TaskID>(*ParentOf(ch_task.id())).release());
+            }
+            tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
         }
-        tasks.insert(tasks.end(), ch_tasks.begin(), ch_tasks.end());
     }
+
     LOG_STREAM(debug) << "Returned task " << id.value() << " with " << tasks.size() - 1 << " subtasks.";
 
     return tasks;
 }
 
-ActionResult TaskManager::Delete(const Core::TaskID &id, bool deleteChildren) {
-    if (IsPresent(id)) {
+Core::ModelRequestResult TaskManager::Delete(const Core::TaskID &id, bool deleteChildren) {
+    Core::ModelRequestResult result;
+
+    std::lock_guard lk{mtx_};
+    if (ToBool(CheckTask(id))) {
         if (!ChildrenOf(id).empty() && !deleteChildren) {
             LOG_STREAM(debug) << "Failed to delete task (has children).";
-            return {ActionResult::Status::HAS_CHILDREN, id};
+            result.set_status(Core::ModelRequestResult_Status_HAS_CHILDREN);
+        } else {
+            std::optional<Core::TaskID> ancestor = ParentOf(id);
+            if (ancestor && ToBool(CheckTask(*ancestor)))
+                RemoveChild(*ancestor, id);
+
+            for (auto const &ch: ChildrenOf(id))
+                Delete(ch, true);
+
+            tasks_.erase(id);
+            LOG_STREAM(debug) << "Erased task with ID " << id.value();
+            result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
         }
-
-        std::optional<Core::TaskID> ancestor = ParentOf(id);
-        if (ancestor && IsPresent(*ancestor))
-            RemoveChild(*ancestor, id);
-
-        for (auto const &ch: ChildrenOf(id))
-            Delete(ch, true);
-
-        tasks_.erase(id);
-        LOG_STREAM(debug) << "Erased task with ID " << id.value();
-        return {ActionResult::Status::SUCCESS, id};
     } else {
-        return {ActionResult::Status::ID_NOT_FOUND, id};
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
+
+    return result;
 }
 
-ActionResult TaskManager::Edit(const Core::TaskID &id, const Core::Task &t) {
+Core::ModelRequestResult TaskManager::Edit(const Core::TaskID &id, const Core::Task &t) {
+    std::lock_guard lk{mtx_};
+
+    Core::ModelRequestResult result;
     auto it = tasks_.find(id);
+
     if (it != tasks_.end()) {
         it->second.first = t;
         LOG_STREAM(debug) << "Edited task with ID " << id.value();
-        return {ActionResult::Status::SUCCESS, id};
+        result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        return {ActionResult::Status::ID_NOT_FOUND, id};
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
+
+    return result;
 }
 
-ActionResult TaskManager::Complete(const Core::TaskID &id) {
+Core::ModelRequestResult TaskManager::Complete(const Core::TaskID &id) {
+    std::lock_guard lk{mtx_};
+    Core::ModelRequestResult result;
     auto it = tasks_.find(id);
+
     if (it != tasks_.end()) {
         it->second.first.set_is_complete(true);
         LOG_STREAM(debug) << "Marked " << id.value() << " as completed.";
+        for (auto const &ch : ChildrenOf(id))
+            Complete(ch);
+
+        result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        return {ActionResult::Status::ID_NOT_FOUND, id};
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
 
-    for (auto const &ch : ChildrenOf(id))
-        Complete(ch);
-    return {ActionResult::Status::SUCCESS, id};
+    return result;
 }
 
-ActionResult TaskManager::Uncomplete(const Core::TaskID &id) {
+Core::ModelRequestResult TaskManager::Uncomplete(const Core::TaskID &id) {
+    Core::ModelRequestResult result;
+    std::lock_guard lk{mtx_};
     auto it = tasks_.find(id);
+
     if (it != tasks_.end()) {
         it->second.first.set_is_complete(false);
         LOG_STREAM(debug) << "Marked " << id.value() << " as not completed.";
+        for (auto const &ch : ChildrenOf(id))
+            Uncomplete(ch);
+        result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        return {ActionResult::Status::ID_NOT_FOUND, id};
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
-    for (auto const &ch : ChildrenOf(id))
-        Uncomplete(ch);
-    return {ActionResult::Status::SUCCESS, id};
+
+    return result;
 }
 
-ActionResult TaskManager::IsPresent(const Core::TaskID &id) const{
+Core::ModelRequestResult TaskManager::CheckTask(const Core::TaskID &id) const {
+    Core::ModelRequestResult result;
+    std::lock_guard lk{mtx_};
+
     if (tasks_.find(id) != tasks_.end())
-        return {ActionResult::Status::SUCCESS, id};
+        result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     else
-        return {ActionResult::Status::ID_NOT_FOUND, id};
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
+
+    return result;
 }
 
 size_t TaskManager::size() const {
+    std::lock_guard lk{mtx_};
     return tasks_.size();
 }
 
-ActionResult TaskManager::AddLabel(const Core::TaskID &id, const std::string &label) {
+Core::ModelRequestResult TaskManager::AddLabel(const Core::TaskID &id, const Core::Label &label) {
+    Core::ModelRequestResult result;
+    std::lock_guard lk{mtx_};
     auto it = tasks_.find(id);
+
     if (it != tasks_.end()) {
         auto labels = it->second.first.labels();
-        if (find(labels.begin(), labels.end(), label) == labels.end()) {
-            it->second.first.add_labels(label);
-            LOG_STREAM(debug) << "Added " << label << "label to " << id.value() << ".";
+        if (std::find(labels.begin(), labels.end(), label) == labels.end()) {
+            it->second.first.mutable_labels()->AddAllocated(std::make_unique<Core::Label>(label).release());
+            LOG_STREAM(debug) << "Added " << label.str() << "label to " << id.value() << ".";
+            result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
         }
     } else {
-        return {ActionResult::Status::ID_NOT_FOUND, id};
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
-    return {ActionResult::Status::SUCCESS, id};
+
+    return result;
 }
 
-ActionResult TaskManager::RemoveLabel(const Core::TaskID &id, const std::string &label) {
+Core::ModelRequestResult TaskManager::RemoveLabel(const Core::TaskID &id, const Core::Label &label) {
+    Core::ModelRequestResult result;
+    std::lock_guard lk{mtx_};
     auto it = tasks_.find(id);
+
     if (it != tasks_.end()) {
         auto labels = it->second.first.mutable_labels();
-        auto label_it = find(labels->begin(), labels->end(), label);
+        auto label_it = std::find(labels->begin(), labels->end(), label);
         if (label_it != labels->end()) {
             it->second.first.mutable_labels()->erase(label_it);
-            LOG_STREAM(debug) << "Removed " << label << "label from " << id.value() << ".";
+            LOG_STREAM(debug) << "Removed " << label.str() << "label from " << id.value() << ".";
+            result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
         }
     } else {
-        return {ActionResult::Status::ID_NOT_FOUND, id};
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
-    return {ActionResult::Status::SUCCESS, id};
+
+    return result;
 }
 
-ActionResult TaskManager::RemoveAllLabels(const Core::TaskID &id) {
+Core::ModelRequestResult TaskManager::RemoveAllLabels(const Core::TaskID &id) {
+    Core::ModelRequestResult result;
+    std::lock_guard lk{mtx_};
     auto it = tasks_.find(id);
+
     if (it != tasks_.end()) {
         it->second.first.clear_labels();
         LOG_STREAM(debug) << "Removed all labels of " << id.value() << ".";
+        result.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
     } else {
-        return {ActionResult::Status::ID_NOT_FOUND, id};
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
     }
-    return {ActionResult::Status::SUCCESS, id};
+
+    return result;
 }
 
 void TaskManager::Replace(const std::vector<Core::TaskEntity> &vec) {
+    std::lock_guard lk{mtx_};
+
     tasks_.clear();
     LOG_STREAM(debug) << "Cleared all tasks.";
 

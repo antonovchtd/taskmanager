@@ -62,11 +62,11 @@ private:
 TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 {
     auto tm = std::make_shared<TaskManager>();
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-              std::shared_ptr<AbstractPrinter>(&mp));
-    EXPECT_CALL(mr, read)
+    auto mr = std::make_shared<MockReader>();
+    auto mp = std::make_shared<MockPrinter>();
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(mr),
+              std::shared_ptr<AbstractPrinter>(mp));
+    EXPECT_CALL(*mr, read)
             .Times(17)
             .WillOnce(Return("add"))
             .WillOnce(Return("test 1"))
@@ -86,7 +86,7 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
             .WillOnce(Return("Y"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(mp, print)
+    EXPECT_CALL(*mp, print)
             .Times(AtLeast(1));
 
     Machine m(tm, f, Factory::State::HOME);
@@ -95,17 +95,17 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(tm->IsPresent(id));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     EXPECT_EQ(tm->getTasks()[0].id(), id);
     EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
 
     id.set_value(2);
-    ASSERT_TRUE(tm->IsPresent(id));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     EXPECT_EQ(tm->getTasks()[1].id(), id);
     EXPECT_FALSE(tm->getTasks()[1].data().is_complete());
 
     id.set_value(3);
-    EXPECT_FALSE(tm->IsPresent(id));
+    EXPECT_FALSE(ToBool(tm->CheckTask(id)));
 
     EXPECT_EQ(4, tm->gen()->state());
 }
@@ -113,11 +113,11 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksCompleteOneDeleteOne)
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
 {
     auto tm = std::make_shared<TaskManager>();
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
-    EXPECT_CALL(*std::dynamic_pointer_cast<MockReader>(f->reader()), read(_))
+    auto mr = std::make_shared<MockReader>();
+    auto mp = std::make_shared<MockPrinter>();
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(mr),
+                             std::shared_ptr<AbstractPrinter>(mp));
+    EXPECT_CALL(*mr, read(_))
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("test"))
@@ -134,7 +134,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
             .WillOnce(Return("complete 1"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(mp, print(_))
+    EXPECT_CALL(*mp, print(_))
             .Times(AtLeast(1));
 
     Machine m(tm, f, Factory::State::HOME);
@@ -144,19 +144,19 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
     // check completeness
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(tm->IsPresent(id));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     EXPECT_EQ(tm->getTasks()[0].id(), id);
     EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
 
     Core::TaskID id2;
     id2.set_value(2);
-    ASSERT_TRUE(tm->IsPresent(id2));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id2)));
     EXPECT_EQ(tm->getTasks()[1].id(), id2);
     EXPECT_TRUE(tm->getTasks()[1].data().is_complete());
 
     Core::TaskID id3;
     id3.set_value(3);
-    ASSERT_TRUE(tm->IsPresent(id3));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id3)));
     EXPECT_EQ(tm->getTasks()[2].id(), id3);
     EXPECT_TRUE(tm->getTasks()[2].data().is_complete());
 
@@ -171,11 +171,11 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksCompleteAll)
 TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
 {
     auto tm = std::make_shared<TaskManager>();
-    MockReader mr;
-    MockPrinter mp;
-    auto f = Factory::create(std::shared_ptr<AbstractReader>(&mr),
-                             std::shared_ptr<AbstractPrinter>(&mp));
-    EXPECT_CALL(mr, read)
+    auto mr = std::make_shared<MockReader>();
+    auto mp = std::make_shared<MockPrinter>();
+    auto f = Factory::create(std::shared_ptr<AbstractReader>(mr),
+                             std::shared_ptr<AbstractPrinter>(mp));
+    EXPECT_CALL(*mr, read)
             .Times(AtLeast(1))
             .WillOnce(Return("add"))
             .WillOnce(Return("task 1"))
@@ -196,7 +196,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
             .WillOnce(Return("l2"))
             .WillOnce(Return("quit"));
 
-    EXPECT_CALL(mp, print)
+    EXPECT_CALL(*mp, print)
             .Times(AtLeast(1));
 
     Machine m(tm, f, Factory::State::HOME);
@@ -207,20 +207,20 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
     // check labels
     Core::TaskID id;
     id.set_value(1);
-    ASSERT_TRUE(tm->IsPresent(id));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     EXPECT_TRUE(tasks[0].data().labels().empty());
 
     Core::TaskID id2;
     id2.set_value(2);
-    ASSERT_TRUE(tm->IsPresent(id2));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id2)));
     EXPECT_EQ(1, tasks[1].data().labels().size());
-    EXPECT_EQ("l2", tasks[1].data().labels()[0]);
+    EXPECT_EQ("l2", tasks[1].data().labels()[0].str());
 
     Core::TaskID id3;
     id3.set_value(3);
-    ASSERT_TRUE(tm->IsPresent(id3));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id3)));
     EXPECT_EQ(1, tasks[2].data().labels().size());
-    EXPECT_EQ("l3", tasks[2].data().labels()[0]);
+    EXPECT_EQ("l3", tasks[2].data().labels()[0].str());
 
     // check parents
     EXPECT_FALSE(tm->getTasks()[0].has_parent());
@@ -230,7 +230,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksLabelTwo)
     EXPECT_EQ(4, tm->gen()->state());
 }
 
-TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
+TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTwoWithConfirm)
 {
     std::vector<std::string> scenario = {"add", "test 1", "1", "21/12", "add", "test 2",
                                          "2", "22/12", "subtask 1", "test 3", "3", "23/12",
@@ -263,11 +263,11 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksDeleteTreeWithConfirm)
 
     Core::TaskID id;
     id.set_value(1);
-    EXPECT_FALSE(tm->IsPresent(id));
+    ASSERT_FALSE(ToBool(tm->CheckTask(id)));
     id.set_value(2);
-    EXPECT_TRUE(tm->IsPresent(id));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id)));
     id.set_value(3);
-    EXPECT_FALSE(tm->IsPresent(id));
+    ASSERT_FALSE(ToBool(tm->CheckTask(id)));
 
     for (int i = 0; i <  prompts.size(); ++i) {
         EXPECT_EQ(prompts[i], prompts_expected[i]);
@@ -315,7 +315,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithBadInputs)
 
     Core::TaskID id;
     id.set_value(1);
-    EXPECT_TRUE(tm->IsPresent(id));
+    EXPECT_TRUE(ToBool(tm->CheckTask(id)));
 
     for (int i = 0; i <  prompts.size(); ++i) {
         EXPECT_EQ(prompts[i], prompts_expected[i]);
@@ -370,7 +370,7 @@ TEST_F(IntegrationTest, shouldCreateTaskWithSubtasksAndShowByID)
     EXPECT_EQ(out[15], "2 – sub, Priority: Medium, Due: Wed Dec 22 00:00:00 2021 [overdue]");
     EXPECT_EQ(out[17], "    3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021 [overdue]");
     EXPECT_EQ(out[19], "3 – subsub, Priority: High, Due: Thu Dec 23 00:00:00 2021 [overdue]");
-    EXPECT_EQ(out[21], "ID 4 was not found.\n");
+    EXPECT_EQ(out[21], "ID was not found.\n");
 
 }
 
@@ -396,17 +396,17 @@ TEST_F(IntegrationTest, shouldCreateThreeTasksInAHeirarcySaveAndLoad)
     id2.set_value(2);
     id3.set_value(3);
 
-    ASSERT_TRUE(tm->IsPresent(id1));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id1)));
     EXPECT_TRUE(tm->getTasks()[0].data().is_complete());
     EXPECT_EQ(tm->getTasks()[0].data().title(), "Task 1");
     EXPECT_FALSE(tm->getTasks()[0].has_parent());
 
-    ASSERT_TRUE(tm->IsPresent(id2));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id2)));
     EXPECT_TRUE(tm->getTasks()[1].data().is_complete());
     EXPECT_EQ(tm->getTasks()[1].data().title(), "Subtask 2");
     EXPECT_EQ(id1, tm->getTasks()[1].parent());
 
-    ASSERT_TRUE(tm->IsPresent(id3));
+    ASSERT_TRUE(ToBool(tm->CheckTask(id3)));
     EXPECT_TRUE(tm->getTasks()[2].data().is_complete());
     EXPECT_EQ(tm->getTasks()[2].data().title(), "Subtask 3");
     EXPECT_EQ(id2, tm->getTasks()[2].parent());

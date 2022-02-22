@@ -3,18 +3,27 @@
 //
 
 #include "GetTaskToShowLabelsAction.h"
+#include "utilities/ModelRequestResultUtils.h"
 
 GetTaskToShowLabelsAction::GetTaskToShowLabelsAction(const std::optional<Core::TaskID> &id) : id_{id} {
 }
 
 ActionResult GetTaskToShowLabelsAction::execute(const std::shared_ptr<ModelInterface> &model) {
+    Core::ModelRequestResult result;
     if (id_) {
-        if (!model->IsPresent(*id_))
-            return {ActionResult::Status::ID_NOT_FOUND, id_};
+        auto check = model->CheckTask(*id_);
+        if (!ToBool(check))
+            return check;
     } else {
-        return {ActionResult::Status::TAKES_ID, id_};
+        result.set_status(Core::ModelRequestResult_Status_TAKES_ID);
+        return result;
     }
 
     std::vector<Core::TaskEntity> tasks = model->getTaskWithSubtasks(*id_);
-    return {ActionResult::Status::SUCCESS, tasks[0]};
+    if (!tasks.empty())
+        return ActionResult(tasks[0]);
+    else {
+        result.set_status(Core::ModelRequestResult_Status_ID_NOT_FOUND);
+        return result;
+    }
 }

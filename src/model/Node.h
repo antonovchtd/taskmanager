@@ -6,7 +6,7 @@
 #define TASKMANAGER_SRC_MODEL_NODE_H_
 
 #include <vector>
-#include "Task.pb.h"
+#include "Core.pb.h"
 #include "utilities/TaskIDUtils.h"
 #include "utilities/NodeUtils.h"
 

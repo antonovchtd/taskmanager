@@ -5,8 +5,6 @@
 #include "GetAllTasksToShowAction.h"
 
 ActionResult GetAllTasksToShowAction::execute(const std::shared_ptr<ModelInterface> &model) {
-
-    auto tasks = model->getTasks();
-
-    return {ActionResult::Status::SUCCESS, tasks};
+    ActionResult result{model->getTasks()};
+    return result;
 }

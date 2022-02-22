@@ -30,8 +30,11 @@ std::unique_ptr<Action> HomeStep::genAction(Context &) {
             return std::make_unique<GetTaskToShowByIDAction>(*id);
         else if (arg.empty())
             return std::make_unique<GetAllTasksToShowAction>();
-        else
-            return std::make_unique<GetTasksToShowByLabelAction>(arg);
+        else {
+            Core::Label label;
+            label.set_str(arg);
+            return std::make_unique<GetTasksToShowByLabelAction>(label);
+        }
     } else if (command_ == "labels") {
         return std::make_unique<GetTaskToShowLabelsAction>(id);
     } else if (command_ == "save") {

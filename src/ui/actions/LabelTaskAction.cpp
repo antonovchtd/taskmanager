@@ -3,9 +3,8 @@
 //
 
 #include "LabelTaskAction.h"
-#include "ui/Context.h"
 
-LabelTaskAction::LabelTaskAction(const Core::TaskID &id, const std::string &label) :
+LabelTaskAction::LabelTaskAction(const Core::TaskID &id, const Core::Label &label) :
                  id_{id}, label_{label} {
 }
 

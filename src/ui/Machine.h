@@ -15,6 +15,7 @@ class Machine {
 public:
     explicit Machine(const std::shared_ptr<ModelInterface> &model);
     Machine(const std::shared_ptr<ModelInterface> &model, const std::shared_ptr<Factory> &f, const Factory::State &s);
+    Machine(const std::shared_ptr<Factory> &f, const Factory::State &s);
 
 public:
     Context run();

@@ -24,7 +24,7 @@ grpc::Status TaskManagerGRPCService::getTasks(grpc::ServerContext* context,
 grpc::Status TaskManagerGRPCService::getTasksByLabel(grpc::ServerContext* context,
                                                      const Core::Label* label,
                                                      Transfer::ManyTaskEntities* result) {
-    *result = ToManyTaskEntities(model_->getTasks(label->label()));
+    *result = ToManyTaskEntities(model_->getTasks(*label));
     return grpc::Status::OK;
 }
 
@@ -35,95 +35,72 @@ grpc::Status TaskManagerGRPCService::getTaskWithSubtasks(grpc::ServerContext* co
     return grpc::Status::OK;
 }
 
-Transfer::ActionResult ToTransferActionResult(const ActionResult &old_result) {
-    Transfer::ActionResult new_result;
-    switch (old_result.status) {
-        case ActionResult::Status::SUCCESS:
-            new_result.set_status(Transfer::ActionResult_Status_SUCCESS);
-            break;
-        case ActionResult::Status::ID_NOT_FOUND:
-            new_result.set_status(Transfer::ActionResult_Status_ID_NOT_FOUND);
-            break;
-        // TODO
-    }
-    switch (old_result.type_id) {
-        case ActionResult::kID:
-            new_result.mutable_id()->CopyFrom(*old_result.id);
-            break;
-        case ActionResult::kEntity:
-            new_result.mutable_tasks()->Add(old_result.tasks.begin(),
-                                            old_result.tasks.end());
-            break;
-    }
-    return new_result;
-}
-
 grpc::Status TaskManagerGRPCService::Add(grpc::ServerContext* context, const Core::Task* task,
-                                         Transfer::ActionResult* result) {
-    *result = ToTransferActionResult(model_->Add(*task));
+                                         Core::ModelRequestResult* result) {
+    *result = model_->Add(*task);
     return grpc::Status::OK;
 }
 
 grpc::Status TaskManagerGRPCService::AddSubtask(grpc::ServerContext* context,
                                                 const Core::TaskEntity* te,
-                                                Transfer::ActionResult* result) {
-    *result = ToTransferActionResult(model_->AddSubtask(te->data(), te->id()));
+                                                Core::ModelRequestResult* result) {
+    *result = model_->AddSubtask(te->data(), te->id());
     return grpc::Status::OK;
 }
 
 grpc::Status TaskManagerGRPCService::Edit(grpc::ServerContext* context,
                                           const Core::TaskEntity* te,
-                                          Transfer::ActionResult* result) {
-    *result = ToTransferActionResult(model_->Edit(te->id(), te->data()));
+                                          Core::ModelRequestResult* result) {
+    *result = model_->Edit(te->id(), te->data());
     return grpc::Status::OK;
 }
 
 grpc::Status TaskManagerGRPCService::Complete(grpc::ServerContext* context,
                                               const Core::TaskID* id,
-                                              Transfer::ActionResult* result) {
-    *result = ToTransferActionResult(model_->Complete(*id));
+                                              Core::ModelRequestResult* result) {
+    *result = model_->Complete(*id);
     return grpc::Status::OK;
 }
 
 grpc::Status TaskManagerGRPCService::Uncomplete(grpc::ServerContext* context,
                                                 const Core::TaskID* id,
-                                                Transfer::ActionResult* result) {
-    *result = ToTransferActionResult(model_->Uncomplete(*id));
+                                                Core::ModelRequestResult* result) {
+    *result = model_->Uncomplete(*id);
     return grpc::Status::OK;
 }
 
 grpc::Status TaskManagerGRPCService::Delete(grpc::ServerContext* context,
                                             const Core::TaskID* id,
-                                            Transfer::ActionResult* result) {
-    *result = ToTransferActionResult(model_->Delete(*id, true));
+                                            Core::ModelRequestResult* result) {
+    *result = model_->Delete(*id, true);
     return grpc::Status::OK;
 }
 
-grpc::Status TaskManagerGRPCService::IsPresent(grpc::ServerContext* context,
+grpc::Status TaskManagerGRPCService::CheckTask(grpc::ServerContext* context,
                                                const Core::TaskID* id,
-                                               Transfer::ActionResult* result) {
-    *result = ToTransferActionResult(model_->IsPresent(*id));
+                                               Core::ModelRequestResult* result) {
+    *result = model_->CheckTask(*id);
     return grpc::Status::OK;
 }
 
-grpc::Status TaskManagerGRPCService::AddLabel(grpc::ServerContext *context,
-                                              const Transfer::IDWithLabel *msg,
-                                              Transfer::ActionResult *result) {
-    *result = ToTransferActionResult(model_->AddLabel(msg->id(), msg->label().label()));
+grpc::Status TaskManagerGRPCService::AddLabel(grpc::ServerContext* context,
+                                              const Transfer::IDWithLabel* msg,
+                                              Core::ModelRequestResult* result) {
+    *result = model_->AddLabel(msg->id(), msg->label());
     return grpc::Status::OK;
 }
 
-grpc::Status TaskManagerGRPCService::ClearLabel(grpc::ServerContext *context,
-                                                const Transfer::IDWithLabel *msg,
-                                                Transfer::ActionResult *result) {
-    *result = ToTransferActionResult(model_->RemoveLabel(msg->id(), msg->label().label()));
+grpc::Status TaskManagerGRPCService::RemoveLabel(grpc::ServerContext* context,
+                                                const Transfer::IDWithLabel* msg,
+                                                Core::ModelRequestResult* result) {
+    *result = model_->RemoveLabel(msg->id(), msg->label());
     return grpc::Status::OK;
 }
 
-grpc::Status TaskManagerGRPCService::ClearLabels(grpc::ServerContext* context,
+grpc::Status TaskManagerGRPCService::RemoveAllLabels(grpc::ServerContext* context,
                                                  const Core::TaskID* id,
-                                                 Transfer::ActionResult* result) {
-    *result = ToTransferActionResult(model_->RemoveAllLabels(*id));
+                                                 Core::ModelRequestResult* result) {
+    *result = model_->RemoveAllLabels(*id);
     return grpc::Status::OK;
 }
 

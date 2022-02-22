@@ -9,13 +9,13 @@
 
 class GetTasksToShowByLabelAction : public Action {
 public:
-    explicit GetTasksToShowByLabelAction(const std::string &label);
+    explicit GetTasksToShowByLabelAction(const Core::Label &label);
 
 public:
     ActionResult execute(const std::shared_ptr<ModelInterface> &) override;
 
 private:
-    std::string label_;
+    Core::Label label_;
 };
 
 

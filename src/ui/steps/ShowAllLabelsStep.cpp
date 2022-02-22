@@ -14,7 +14,7 @@ std::unique_ptr<Action> ShowAllLabelsStep::genAction(Context &context) {
     if (!context.tasks().empty()) {
         auto labels = context.tasks()[0].data().labels();
         for (int i = 0; i < labels.size(); ++i) {
-            os << labels[i];
+            os << labels[i].str();
             if (i < labels.size()-1)
                 os << ", ";
         }

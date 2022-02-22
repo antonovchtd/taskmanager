@@ -10,14 +10,22 @@ LoadFromFileAction::LoadFromFileAction(const std::string &filename) : filename_{
 }
 
 ActionResult LoadFromFileAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    if (filename_.empty())
-        return {ActionResult::Status::TAKES_ARG, std::nullopt};
-    persister_ = std::unique_ptr<Persister>(new FilePersistence{filename_});
+    Core::ModelRequestResult result;
+
+    if (filename_.empty()) {
+        result.set_status(Core::ModelRequestResult_Status_TAKES_ARG);
+        return result;
+    }
+
+    persister_ = std::make_unique<FilePersistence>(filename_);
     std::vector<Core::TaskEntity> data;
     if (persister_->load(data)) {
         model->Replace(data);
-        return {ActionResult::Status::SUCCESS, std::nullopt};
+        result.set_status(Core::ModelRequestResult_Status_SUCCESS);
     }
-    else
-        return {ActionResult::Status::FILE_NOT_FOUND, std::nullopt};
+    else {
+        result.set_status(Core::ModelRequestResult_Status_FILE_NOT_FOUND);
+    }
+
+    return result;
 }

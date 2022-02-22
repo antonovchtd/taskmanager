@@ -6,7 +6,8 @@
 #define TASKMANAGER_SRC_UTILITIES_TASKUTILS_H_
 
 #include <sstream>
-#include "Task.pb.h"
+#include "Core.pb.h"
+#include "LabelUtils.h"
 
 typedef ::google::protobuf::RepeatedPtrField<std::string> repStr;
 
@@ -18,6 +19,12 @@ Core::Task createTask(const std::string &title,
                       const Core::Task::Priority &priority,
                       const time_t &due_date,
                       const std::string &label,
+                      bool is_complete);
+
+Core::Task createTask(const std::string &title,
+                      const Core::Task::Priority &priority,
+                      const time_t &due_date,
+                      const Core::Label &label,
                       bool is_complete);
 }
 std::string to_string(const Core::Task &t);

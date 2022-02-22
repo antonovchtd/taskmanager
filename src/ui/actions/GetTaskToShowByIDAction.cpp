@@ -3,15 +3,16 @@
 //
 
 #include "GetTaskToShowByIDAction.h"
+#include "utilities/ModelRequestResultUtils.h"
 
 GetTaskToShowByIDAction::GetTaskToShowByIDAction(const Core::TaskID &id) : id_{id} {
 }
 
 ActionResult GetTaskToShowByIDAction::execute(const std::shared_ptr<ModelInterface> &model) {
-    if (!model->IsPresent(id_))
-        return {ActionResult::Status::ID_NOT_FOUND, id_};
+    auto check = model->CheckTask(id_);
+    if (!ToBool(check))
+        return check;
 
-    auto tasks = model->getTaskWithSubtasks(id_);
-
-    return {ActionResult::Status::SUCCESS, tasks};
+    ActionResult result{model->getTaskWithSubtasks(id_)};
+    return result;
 }

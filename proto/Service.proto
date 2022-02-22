@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "Task.proto";
+import "Core.proto";
 
 package Transfer;
 
@@ -9,16 +9,16 @@ service TaskManager {
   rpc getTasksByLabel (Core.Label) returns (ManyTaskEntities) {}
   rpc getTaskWithSubtasks (Core.TaskID) returns (ManyTaskEntities) {}
 
-  rpc Add (Core.Task) returns (ActionResult) {}
-  rpc AddSubtask (Core.TaskEntity) returns (ActionResult) {}
-  rpc Edit (Core.TaskEntity) returns (ActionResult) {}
-  rpc Complete (Core.TaskID) returns (ActionResult) {}
-  rpc Uncomplete (Core.TaskID) returns (ActionResult) {}
-  rpc Delete (Core.TaskID) returns (ActionResult) {}
-  rpc IsPresent (Core.TaskID) returns (ActionResult) {}
-  rpc AddLabel (IDWithLabel) returns (ActionResult) {}
-  rpc ClearLabel (IDWithLabel) returns (ActionResult) {}
-  rpc ClearLabels (Core.TaskID) returns (ActionResult) {}
+  rpc Add (Core.Task) returns (Core.ModelRequestResult) {}
+  rpc AddSubtask (Core.TaskEntity) returns (Core.ModelRequestResult) {}
+  rpc Edit (Core.TaskEntity) returns (Core.ModelRequestResult) {}
+  rpc Complete (Core.TaskID) returns (Core.ModelRequestResult) {}
+  rpc Uncomplete (Core.TaskID) returns (Core.ModelRequestResult) {}
+  rpc Delete (Core.TaskID) returns (Core.ModelRequestResult) {}
+  rpc CheckTask (Core.TaskID) returns (Core.ModelRequestResult) {}
+  rpc AddLabel (IDWithLabel) returns (Core.ModelRequestResult) {}
+  rpc RemoveLabel (IDWithLabel) returns (Core.ModelRequestResult) {}
+  rpc RemoveAllLabels (Core.TaskID) returns (Core.ModelRequestResult) {}
 
   rpc Replace (ManyTaskEntities) returns (EmptyMessage) {}
 }
@@ -34,15 +34,4 @@ message EmptyMessage {
 
 message ManyTaskEntities {
   repeated Core.TaskEntity tasks = 1;
-}
-
-message ActionResult {
-  enum Status {
-    SUCCESS = 0;
-    ID_NOT_FOUND = 1;
-  }
-  Status status = 1;
-  Core.TaskID id = 2;
-  Core.TaskEntity task = 3;
-  repeated Core.TaskEntity tasks = 4;
 }

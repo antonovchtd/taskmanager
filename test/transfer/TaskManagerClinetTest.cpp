@@ -7,6 +7,7 @@
 #include "utilities/TaskUtils.h"
 #include "utilities/TaskEntityUtils.h"
 #include "utilities/TaskIDUtils.h"
+#include "utilities/LabelUtils.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -33,22 +34,17 @@ public:
     Core::TaskEntity entity_;
 
     void SetUp() override {
-        task_.set_title("test");
-        task_.set_priority(Core::Task::Priority::Task_Priority_HIGH);
-        task_.set_due_date(time(nullptr));
-        task_.add_labels("label");
+        task_ = Core::createTask("test",
+                                 Core::Task::Priority::Task_Priority_HIGH,
+                                 time(nullptr),
+                                 "label",
+                                 false);
         task_.set_is_complete(false);
         id_.set_value(42);
-        entity_.mutable_id()->CopyFrom(id_);
-        entity_.mutable_data()->CopyFrom(task_);
+        entity_.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+        entity_.set_allocated_data(std::make_unique<Core::Task>(task_).release());
     }
 };
-
-namespace Core {
-bool operator==(const Core::Label &lhs, const Core::Label &rhs) {
-    return rhs.label() == lhs.label();
-}
-}
 
 namespace Transfer {
 bool operator==(const Transfer::IDWithLabel &lhs, const Transfer::IDWithLabel &rhs) {
@@ -91,8 +87,8 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendGetTasksByLabelRequest)
     auto stub = std::make_unique<MockTaskManagerStub>();
     Core::Label label;
     std::string request_label = "request_label";
-    label.set_label(request_label);
-    entity_.mutable_data()->add_labels(request_label);
+    label.set_str(request_label);
+    entity_.mutable_data()->mutable_labels()->AddAllocated(std::make_unique<Core::Label>(label).release());
 
     EXPECT_CALL(*stub, getTasksByLabel(_, label, _))
         .WillOnce(testing::Invoke(
@@ -102,7 +98,7 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendGetTasksByLabelRequest)
                 }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    std::vector<TaskEntity> result = client.getTasks(request_label);
+    std::vector<TaskEntity> result = client.getTasks(label);
     EXPECT_EQ(result.size(), 1);
     EXPECT_EQ(result[0], entity_);
 }
@@ -129,17 +125,15 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendAddRequest)
     auto stub = std::make_unique<MockTaskManagerStub>();
     EXPECT_CALL(*stub, Add(_, task_, _))
         .WillOnce(testing::Invoke(
-                [this] (ClientContext*, const Task &request, Transfer::ActionResult* reply) -> grpc::Status {
-                    reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                    reply->mutable_id()->CopyFrom(id_);
+                [this] (ClientContext*, const Task &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                    reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
                     return grpc::Status::OK;
                 }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.Add(task_);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(result.id->value(), 42);
+    Core::ModelRequestResult result = client.Add(task_);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), id_);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendAddSubtaskRequest)
@@ -150,17 +144,15 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendAddSubtaskRequest)
 
     EXPECT_CALL(*stub, AddSubtask(_, entity_, _))
         .WillOnce(testing::Invoke(
-                [subtask_id] (ClientContext*, const TaskEntity &request, Transfer::ActionResult* reply) -> grpc::Status {
-                    reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                    reply->mutable_id()->CopyFrom(subtask_id);
+                [subtask_id] (ClientContext*, const TaskEntity &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                    reply->set_allocated_id(std::make_unique<Core::TaskID>(subtask_id).release());
                     return grpc::Status::OK;
                 }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.AddSubtask(task_, id_);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(*result.id, subtask_id);
+    Core::ModelRequestResult result = client.AddSubtask(task_, id_);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), subtask_id);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendEditRequest)
@@ -169,17 +161,15 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendEditRequest)
 
     EXPECT_CALL(*stub, Edit(_, entity_, _))
         .WillOnce(testing::Invoke(
-                [this] (ClientContext*, const TaskEntity &request, Transfer::ActionResult* reply) -> grpc::Status {
-                    reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                    reply->mutable_id()->CopyFrom(entity_.id());
+                [this] (ClientContext*, const TaskEntity &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                    reply->set_allocated_id(std::make_unique<Core::TaskID>(entity_.id()).release());
                     return grpc::Status::OK;
                 }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.Edit(id_, task_);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(*result.id, id_);
+    Core::ModelRequestResult result = client.Edit(id_, task_);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), id_);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendCompleteRequest)
@@ -188,17 +178,15 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendCompleteRequest)
 
     EXPECT_CALL(*stub, Complete(_, id_, _))
         .WillOnce(testing::Invoke(
-                [this] (ClientContext*, const TaskID &request, Transfer::ActionResult* reply) -> grpc::Status {
-                    reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                    reply->mutable_id()->CopyFrom(id_);
+                [this] (ClientContext*, const TaskID &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                    reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
                     return grpc::Status::OK;
                 }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.Complete(id_);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(*result.id, id_);
+    Core::ModelRequestResult result = client.Complete(id_);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), id_);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendUncompleteRequest)
@@ -207,17 +195,15 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendUncompleteRequest)
 
     EXPECT_CALL(*stub, Uncomplete(_, id_, _))
         .WillOnce(testing::Invoke(
-                [this] (ClientContext*, const TaskID &request, Transfer::ActionResult* reply) -> grpc::Status {
-                    reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                    reply->mutable_id()->CopyFrom(id_);
+                [this] (ClientContext*, const TaskID &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                    reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
                     return grpc::Status::OK;
                 }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.Uncomplete(id_);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(*result.id, id_);
+    Core::ModelRequestResult result = client.Uncomplete(id_);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), id_);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendDeleteRequest)
@@ -226,101 +212,93 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendDeleteRequest)
 
     EXPECT_CALL(*stub, Delete(_, id_, _))
         .WillOnce(testing::Invoke(
-                [this] (ClientContext*, const TaskID &request, Transfer::ActionResult* reply) -> grpc::Status {
-                    reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                    reply->mutable_id()->CopyFrom(id_);
+                [this] (ClientContext*, const TaskID &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                    reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
                     return grpc::Status::OK;
                 }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.Delete(id_, true);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(*result.id, id_);
+    Core::ModelRequestResult result = client.Delete(id_, true);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), id_);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendIsPresentRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
-    EXPECT_CALL(*stub, IsPresent(_, id_, _))
+    EXPECT_CALL(*stub, CheckTask(_, id_, _))
             .WillOnce(testing::Invoke(
-                    [this] (ClientContext*, const TaskID &request, Transfer::ActionResult* reply) -> grpc::Status {
-                        reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                        reply->mutable_id()->CopyFrom(id_);
+                    [this] (ClientContext*, const TaskID &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                        reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
                         return grpc::Status::OK;
                     }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.IsPresent(id_);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(*result.id, id_);
+    Core::ModelRequestResult result = client.CheckTask(id_);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), id_);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendAddLabelRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     IDWithLabel request;
-    request.mutable_id()->CopyFrom(id_);
-    std::string new_label = "new_label";
-    request.mutable_label()->set_label(new_label);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+    Core::Label new_label;
+    new_label.set_str("new_label");
+    request.set_allocated_label(std::make_unique<Core::Label>(new_label).release());
 
     EXPECT_CALL(*stub, AddLabel(_, request, _))
             .WillOnce(testing::Invoke(
-                    [this] (ClientContext*, const IDWithLabel &request, Transfer::ActionResult* reply) -> grpc::Status {
-                        reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                        reply->mutable_id()->CopyFrom(id_);
+                    [this] (ClientContext*, const IDWithLabel &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                        reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
                         return grpc::Status::OK;
                     }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.AddLabel(id_, new_label);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(*result.id, id_);
+    Core::ModelRequestResult result = client.AddLabel(id_, new_label);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), id_);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendRemoveLabelRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     IDWithLabel request;
-    request.mutable_id()->CopyFrom(id_);
-    std::string label = "label";
-    request.mutable_label()->set_label(label);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+    Core::Label label;
+    label.set_str("label");
+    request.set_allocated_label(std::make_unique<Core::Label>(label).release());
 
-    EXPECT_CALL(*stub, ClearLabel(_, request, _))
+    EXPECT_CALL(*stub, RemoveLabel(_, request, _))
             .WillOnce(testing::Invoke(
-                    [this] (ClientContext*, const IDWithLabel &request, Transfer::ActionResult* reply) -> grpc::Status {
-                        reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                        reply->mutable_id()->CopyFrom(id_);
+                    [this] (ClientContext*, const IDWithLabel &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                        reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
                         return grpc::Status::OK;
                     }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.RemoveLabel(id_, label);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(*result.id, id_);
+    Core::ModelRequestResult result = client.RemoveLabel(id_, label);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), id_);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendRemoveAllLabelsRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
-    EXPECT_CALL(*stub, ClearLabels(_, id_, _))
+    EXPECT_CALL(*stub, RemoveAllLabels(_, id_, _))
             .WillOnce(testing::Invoke(
-                    [this] (ClientContext*, const TaskID &request, Transfer::ActionResult* reply) -> grpc::Status {
-                        reply->set_status(Transfer::ActionResult_Status_SUCCESS);
-                        reply->mutable_id()->CopyFrom(id_);
+                    [this] (ClientContext*, const TaskID &request, Core::ModelRequestResult* reply) -> grpc::Status {
+                        reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
                         return grpc::Status::OK;
                     }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    ActionResult result = client.RemoveAllLabels(id_);
-    EXPECT_EQ(result.status, ActionResult::Status::SUCCESS);
-    ASSERT_EQ(result.type_id, ActionResult::kID);
-    EXPECT_EQ(*result.id, id_);
+    Core::ModelRequestResult result = client.RemoveAllLabels(id_);
+    ASSERT_TRUE(result.has_id());
+    EXPECT_EQ(result.id(), id_);
 }
 
 TEST_F(TaskManagerGRPCClientTest, shouldSendReplaceRequest)

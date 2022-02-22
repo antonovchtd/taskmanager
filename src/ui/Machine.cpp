@@ -14,26 +14,27 @@ Machine::Machine(const std::shared_ptr<ModelInterface> &model, const std::shared
         factory_{f}, initial_step_{s}, model_{model} {
 }
 
+Machine::Machine(const std::shared_ptr<Factory> &f, const Factory::State &s) :
+        factory_{f}, initial_step_{s} {
+}
+
 Context Machine::run() {
     return run(context_);
 }
 
 void updateContext(Context &context, const ActionResult &result) {
-    switch (result.type_id) {
-        case ActionResult::kID:
-            if (result.id)
-                context.setID(result.id);
-            break;
-        case ActionResult::kEntity:
-            context.setTasks(std::vector<Core::TaskEntity>{result.entity});
-            break;
-        case ActionResult::kVector:
-            context.setTasks(result.tasks);
-            if (!result.tasks.empty()) {
-                context.setTask(result.tasks[0].data());
-                context.setID(result.tasks[0].id());
-            }
-            break;
+    if (result.model_result && result.model_result->has_id())
+        context.setID(result.model_result->id());
+
+    if (result.entity)
+        context.setTasks(std::vector<Core::TaskEntity>{*result.entity});
+
+    if (result.tasks) {
+        context.setTasks(*result.tasks);
+        if (!result.tasks->empty()) {
+            context.setTask((*result.tasks)[0].data());
+            context.setID((*result.tasks)[0].id());
+        }
     }
 }
 

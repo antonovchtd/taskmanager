@@ -5,13 +5,13 @@
 #ifndef TASKMANAGER_SRC_MODEL_IDGENERATOR_H_
 #define TASKMANAGER_SRC_MODEL_IDGENERATOR_H_
 
-#include "Task.pb.h"
+#include <atomic>
+#include "Core.pb.h"
 
 class IDGenerator{
 public:
     IDGenerator();
     explicit IDGenerator(int last);
-    IDGenerator(const IDGenerator&) = default;
 
     int state() const;
 
@@ -20,7 +20,7 @@ public:
     virtual ~IDGenerator() = default;
 
 protected:
-    int last_;
+    std::atomic<int> last_;
 };
 
 #endif //TASKMANAGER_SRC_MODEL_IDGENERATOR_H_

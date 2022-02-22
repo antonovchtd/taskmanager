@@ -17,20 +17,20 @@ public:
 
 public:
     std::vector<Core::TaskEntity> getTasks() const override;
-    std::vector<Core::TaskEntity> getTasks(const std::string &label) const override;
+    std::vector<Core::TaskEntity> getTasks(const Core::Label &label) const override;
     std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const override;
 
 public:
-    ActionResult Add(const Core::Task &) override;
-    ActionResult AddSubtask(const Core::Task &, const Core::TaskID &) override;
-    ActionResult Edit(const Core::TaskID &id, const Core::Task &t) override;
-    ActionResult Complete(const Core::TaskID &) override;
-    ActionResult Uncomplete(const Core::TaskID &) override;
-    ActionResult Delete(const Core::TaskID &, bool deleteChildren) override;
-    ActionResult IsPresent(const Core::TaskID &) const override;
-    ActionResult AddLabel(const Core::TaskID &, const std::string &label) override;
-    ActionResult RemoveLabel(const Core::TaskID &, const std::string &label) override;
-    ActionResult RemoveAllLabels(const Core::TaskID &) override;
+    Core::ModelRequestResult Add(const Core::Task &) override;
+    Core::ModelRequestResult AddSubtask(const Core::Task &, const Core::TaskID &) override;
+    Core::ModelRequestResult Edit(const Core::TaskID &id, const Core::Task &t) override;
+    Core::ModelRequestResult Complete(const Core::TaskID &) override;
+    Core::ModelRequestResult Uncomplete(const Core::TaskID &) override;
+    Core::ModelRequestResult Delete(const Core::TaskID &, bool deleteChildren) override;
+    Core::ModelRequestResult CheckTask(const Core::TaskID &) const override;
+    Core::ModelRequestResult AddLabel(const Core::TaskID &, const Core::Label &label) override;
+    Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const Core::Label &label) override;
+    Core::ModelRequestResult RemoveAllLabels(const Core::TaskID &) override;
 
 public:
     void Replace(const std::vector<Core::TaskEntity> &) override;
