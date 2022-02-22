@@ -23,11 +23,11 @@ public:
     explicit TaskManager(const std::shared_ptr<IDGenerator> &generator);
 
 public:
-    std::vector<Core::TaskEntity> getTasks() const override;
-    std::vector<Core::TaskEntity> getTasks(const Core::Label &label) const override;
-    std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const override;
+    std::vector<Core::TaskEntity> getTasks() override;
+    std::vector<Core::TaskEntity> getTasks(const Core::Label &label) override;
+    std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) override;
     std::shared_ptr<IDGenerator> gen() const;
-    size_t size() const;
+    size_t size();
 
 public:
     Core::ModelRequestResult Add(const Core::Task &) override;
@@ -36,7 +36,7 @@ public:
     Core::ModelRequestResult Complete(const Core::TaskID &) override;
     Core::ModelRequestResult Uncomplete(const Core::TaskID &) override;
     Core::ModelRequestResult Delete(const Core::TaskID &id, bool deleteChildren) override;
-    Core::ModelRequestResult CheckTask(const Core::TaskID &id) const override;
+    Core::ModelRequestResult CheckTask(const Core::TaskID &id) override;
     Core::ModelRequestResult AddLabel(const Core::TaskID &, const Core::Label &) override;
     Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const Core::Label &) override;
     Core::ModelRequestResult RemoveAllLabels(const Core::TaskID &) override;
@@ -56,7 +56,7 @@ private:
 private:
     std::map<Core::TaskID, std::pair<Core::Task, Node>> tasks_;
     std::shared_ptr<IDGenerator> gen_;
-    mutable std::recursive_mutex mtx_;
+    std::recursive_mutex mtx_;
 };
 
 

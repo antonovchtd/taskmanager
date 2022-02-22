@@ -48,7 +48,7 @@ public:
 std::random_device rd;     // only used once to initialise (seed) engine
 std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
 
-Core::TaskID getRandomID(const TaskManager &tm) {
+Core::TaskID getRandomID(TaskManager &tm) {
     auto tasks = tm.getTasks();
     auto sz = tasks.size();
     if (sz > 0) {

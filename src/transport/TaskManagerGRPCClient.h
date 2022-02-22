@@ -16,9 +16,9 @@ public:
     explicit TaskManagerGRPCClient(std::unique_ptr<Transfer::TaskManager::StubInterface> stub);
 
 public:
-    std::vector<Core::TaskEntity> getTasks() const override;
-    std::vector<Core::TaskEntity> getTasks(const Core::Label &label) const override;
-    std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const override;
+    std::vector<Core::TaskEntity> getTasks() override;
+    std::vector<Core::TaskEntity> getTasks(const Core::Label &label) override;
+    std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) override;
 
 public:
     Core::ModelRequestResult Add(const Core::Task &) override;
@@ -27,7 +27,7 @@ public:
     Core::ModelRequestResult Complete(const Core::TaskID &) override;
     Core::ModelRequestResult Uncomplete(const Core::TaskID &) override;
     Core::ModelRequestResult Delete(const Core::TaskID &, bool deleteChildren) override;
-    Core::ModelRequestResult CheckTask(const Core::TaskID &) const override;
+    Core::ModelRequestResult CheckTask(const Core::TaskID &) override;
     Core::ModelRequestResult AddLabel(const Core::TaskID &, const Core::Label &label) override;
     Core::ModelRequestResult RemoveLabel(const Core::TaskID &, const Core::Label &label) override;
     Core::ModelRequestResult RemoveAllLabels(const Core::TaskID &) override;

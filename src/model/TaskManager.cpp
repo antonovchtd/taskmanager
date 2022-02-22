@@ -82,7 +82,7 @@ Core::ModelRequestResult TaskManager::AddSubtask(const Core::Task &t, const Core
     return result;
 }
 
-std::vector<Core::TaskEntity> TaskManager::getTasks() const {
+std::vector<Core::TaskEntity> TaskManager::getTasks() {
     std::vector<Core::TaskEntity> vec;
 
     std::lock_guard lk{mtx_};
@@ -98,7 +98,7 @@ std::vector<Core::TaskEntity> TaskManager::getTasks() const {
     return vec;
 }
 
-std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::Label &label) const {
+std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::Label &label) {
     std::vector<Core::TaskEntity> tasks;
 
     std::lock_guard lk{mtx_};
@@ -116,7 +116,7 @@ std::vector<Core::TaskEntity> TaskManager::getTasks(const Core::Label &label) co
     return tasks;
 }
 
-std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskID &id) const {
+std::vector<Core::TaskEntity> TaskManager::getTaskWithSubtasks(const Core::TaskID &id) {
     std::vector<Core::TaskEntity> tasks;
     std::optional<Core::Task> task;
     {
@@ -229,7 +229,7 @@ Core::ModelRequestResult TaskManager::Uncomplete(const Core::TaskID &id) {
     return result;
 }
 
-Core::ModelRequestResult TaskManager::CheckTask(const Core::TaskID &id) const {
+Core::ModelRequestResult TaskManager::CheckTask(const Core::TaskID &id) {
     Core::ModelRequestResult result;
     std::lock_guard lk{mtx_};
 
@@ -241,7 +241,7 @@ Core::ModelRequestResult TaskManager::CheckTask(const Core::TaskID &id) const {
     return result;
 }
 
-size_t TaskManager::size() const {
+size_t TaskManager::size() {
     std::lock_guard lk{mtx_};
     return tasks_.size();
 }

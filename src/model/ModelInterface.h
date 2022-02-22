@@ -27,19 +27,19 @@ public:
      * Returns all tasks in the model.
      * @return std::vector of Core::TaskEntity objects
      */
-    virtual std::vector<Core::TaskEntity> getTasks() const = 0;
+    virtual std::vector<Core::TaskEntity> getTasks() = 0;
     /**
      * Returns all tasks by label, regardless of their position in the hierarchy.
      * @param label Label to filter by, as a Core::Label object.
      * @return std::vector of Core::TaskEntity objects
      */
-    virtual std::vector<Core::TaskEntity> getTasks(const Core::Label &label) const = 0;
+    virtual std::vector<Core::TaskEntity> getTasks(const Core::Label &label) = 0;
     /**
      * Returns task by its ID including all of its subtasks.
      * @param id ID of the task in question as Core::TaskID object.
      * @return std::vector of Core::TaskEntity objects
      */
-    virtual std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) const = 0;
+    virtual std::vector<Core::TaskEntity> getTaskWithSubtasks(const Core::TaskID &id) = 0;
 
 public:
     /**
@@ -92,7 +92,7 @@ public:
      * @param id Core::TaskID object of the Task to look for.
      * @return Core::ModelRequestResult with the Task's ID (if success) or error status (if fail)
      */
-    virtual Core::ModelRequestResult CheckTask(const Core::TaskID &) const = 0;
+    virtual Core::ModelRequestResult CheckTask(const Core::TaskID &) = 0;
     /**
      * Adds label to the list of labels of Task with the given ID.
      * @param id Core::TaskID object of the Task to add label to.

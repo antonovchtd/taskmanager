@@ -16,7 +16,7 @@ std::vector<Core::TaskEntity> ToTaskEntitiesVector(const Transfer::ManyTaskEntit
     return std::vector<Core::TaskEntity>(mte.tasks().begin(), mte.tasks().end());
 }
 
-std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks() const {
+std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks() {
     Transfer::EmptyMessage request;
     Transfer::ManyTaskEntities reply;
     grpc::ClientContext context;
@@ -25,7 +25,7 @@ std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks() const {
     return ToTaskEntitiesVector(reply);
 }
 
-std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks(const Core::Label &label) const {
+std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks(const Core::Label &label) {
     Transfer::ManyTaskEntities reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->getTasksByLabel(&context, label, &reply);
@@ -33,7 +33,7 @@ std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTasks(const Core::Label 
     return ToTaskEntitiesVector(reply);
 }
 
-std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTaskWithSubtasks(const Core::TaskID &request) const {
+std::vector<Core::TaskEntity> TaskManagerGRPCClient::getTaskWithSubtasks(const Core::TaskID &request) {
     Transfer::ManyTaskEntities reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->getTaskWithSubtasks(&context, request, &reply);
@@ -95,7 +95,7 @@ Core::ModelRequestResult TaskManagerGRPCClient::Delete(const Core::TaskID &reque
     return reply;
 }
 
-Core::ModelRequestResult TaskManagerGRPCClient::CheckTask(const Core::TaskID &request) const {
+Core::ModelRequestResult TaskManagerGRPCClient::CheckTask(const Core::TaskID &request) {
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->CheckTask(&context, request, &reply);
