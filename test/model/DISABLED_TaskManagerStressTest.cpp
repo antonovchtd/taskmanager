@@ -122,7 +122,7 @@ std::vector<Core::TaskEntity> runCommand(const Command &command, TaskManager &tm
             tm.Delete(getRandomID(tm), true);
             break;
         case Command::IS_PRESENT:
-            tm.IsPresent(id);
+            tm.CheckTask(id);
             break;
         case Command::LABEL:
             tm.AddLabel(getRandomID(tm), getRandomLabel());

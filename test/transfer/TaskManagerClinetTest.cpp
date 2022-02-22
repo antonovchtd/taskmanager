@@ -41,8 +41,8 @@ public:
                                  false);
         task_.set_is_complete(false);
         id_.set_value(42);
-        entity_.mutable_id()->CopyFrom(id_);
-        entity_.mutable_data()->CopyFrom(task_);
+        entity_.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
+        entity_.set_allocated_data(std::make_unique<Core::Task>(task_).release());
     }
 };
 
@@ -227,7 +227,7 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendIsPresentRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
 
-    EXPECT_CALL(*stub, IsPresent(_, id_, _))
+    EXPECT_CALL(*stub, CheckTask(_, id_, _))
             .WillOnce(testing::Invoke(
                     [this] (ClientContext*, const TaskID &request, Core::ModelRequestResult* reply) -> grpc::Status {
                         reply->set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
@@ -235,7 +235,7 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendIsPresentRequest)
                     }));
 
     TaskManagerGRPCClient client{std::move(stub)};
-    Core::ModelRequestResult result = client.IsPresent(id_);
+    Core::ModelRequestResult result = client.CheckTask(id_);
     ASSERT_TRUE(result.has_id());
     EXPECT_EQ(result.id(), id_);
 }
@@ -244,10 +244,10 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendAddLabelRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     IDWithLabel request;
-    request.mutable_id()->CopyFrom(id_);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
     Core::Label new_label;
     new_label.set_str("new_label");
-    request.mutable_label()->CopyFrom(new_label);
+    request.set_allocated_label(std::make_unique<Core::Label>(new_label).release());
 
     EXPECT_CALL(*stub, AddLabel(_, request, _))
             .WillOnce(testing::Invoke(
@@ -266,10 +266,10 @@ TEST_F(TaskManagerGRPCClientTest, shouldSendRemoveLabelRequest)
 {
     auto stub = std::make_unique<MockTaskManagerStub>();
     IDWithLabel request;
-    request.mutable_id()->CopyFrom(id_);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id_).release());
     Core::Label label;
     label.set_str("label");
-    request.mutable_label()->CopyFrom(label);
+    request.set_allocated_label(std::make_unique<Core::Label>(label).release());
 
     EXPECT_CALL(*stub, RemoveLabel(_, request, _))
             .WillOnce(testing::Invoke(

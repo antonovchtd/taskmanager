@@ -32,8 +32,8 @@ public:
                      Core::ModelRequestResult* result) override;
     grpc::Status Delete(grpc::ServerContext* context, const Core::TaskID* id,
                      Core::ModelRequestResult* result) override;
-    grpc::Status IsPresent(grpc::ServerContext* context, const Core::TaskID* id,
-                     Core::ModelRequestResult* result) override;
+    grpc::Status CheckTask(grpc::ServerContext* context, const Core::TaskID* id,
+                           Core::ModelRequestResult* result) override;
     grpc::Status AddLabel(grpc::ServerContext* context, const Transfer::IDWithLabel* msg,
                      Core::ModelRequestResult* result) override;
     grpc::Status RemoveLabel(grpc::ServerContext* context, const Transfer::IDWithLabel* msg,

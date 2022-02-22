@@ -51,8 +51,8 @@ Core::ModelRequestResult TaskManagerGRPCClient::Add(const Core::Task& request) {
 
 Core::ModelRequestResult TaskManagerGRPCClient::AddSubtask(const Core::Task& task, const Core::TaskID &id) {
     Core::TaskEntity request;
-    request.mutable_id()->CopyFrom(id);
-    request.mutable_data()->CopyFrom(task);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
+    request.set_allocated_data(std::make_unique<Core::Task>(task).release());
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->AddSubtask(&context, request, &reply);
@@ -62,8 +62,8 @@ Core::ModelRequestResult TaskManagerGRPCClient::AddSubtask(const Core::Task& tas
 
 Core::ModelRequestResult TaskManagerGRPCClient::Edit(const Core::TaskID &id, const Core::Task& task) {
     Core::TaskEntity request;
-    request.mutable_id()->CopyFrom(id);
-    request.mutable_data()->CopyFrom(task);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
+    request.set_allocated_data(std::make_unique<Core::Task>(task).release());
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->Edit(&context, request, &reply);
@@ -95,18 +95,18 @@ Core::ModelRequestResult TaskManagerGRPCClient::Delete(const Core::TaskID &reque
     return reply;
 }
 
-Core::ModelRequestResult TaskManagerGRPCClient::IsPresent(const Core::TaskID &request) const {
+Core::ModelRequestResult TaskManagerGRPCClient::CheckTask(const Core::TaskID &request) const {
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
-    grpc::Status status = stub_->IsPresent(&context, request, &reply);
+    grpc::Status status = stub_->CheckTask(&context, request, &reply);
 
     return reply;
 }
 
 Core::ModelRequestResult TaskManagerGRPCClient::AddLabel(const Core::TaskID &id, const Core::Label &label) {
     Transfer::IDWithLabel request;
-    request.mutable_id()->CopyFrom(id);
-    request.mutable_label()->CopyFrom(label);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
+    request.set_allocated_label(std::make_unique<Core::Label>(label).release());
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->AddLabel(&context, request, &reply);
@@ -116,8 +116,8 @@ Core::ModelRequestResult TaskManagerGRPCClient::AddLabel(const Core::TaskID &id,
 
 Core::ModelRequestResult TaskManagerGRPCClient::RemoveLabel(const Core::TaskID &id, const Core::Label &label) {
     Transfer::IDWithLabel request;
-    request.mutable_id()->CopyFrom(id);
-    request.mutable_label()->CopyFrom(label);
+    request.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
+    request.set_allocated_label(std::make_unique<Core::Label>(label).release());
     Core::ModelRequestResult reply;
     grpc::ClientContext context;
     grpc::Status status = stub_->RemoveLabel(&context, request, &reply);

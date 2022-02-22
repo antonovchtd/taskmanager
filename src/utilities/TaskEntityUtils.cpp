@@ -18,15 +18,15 @@ Core::TaskEntity  Core::createTaskEntity(const Core::TaskID &id,
                                         const Core::Task &task,
                                         const Core::TaskID &parent_id) {
     Core::TaskEntity te;
-    te.mutable_id()->CopyFrom(id);
-    te.mutable_data()->CopyFrom(task);
-    te.mutable_parent()->CopyFrom(parent_id);
+    te.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
+    te.set_allocated_data(std::make_unique<Core::Task>(task).release());
+    te.set_allocated_parent(std::make_unique<Core::TaskID>(parent_id).release());
     return te;
 }
 Core::TaskEntity  Core::createTaskEntity(const Core::TaskID &id,
                                          const Core::Task &task) {
     Core::TaskEntity te;
-    te.mutable_id()->CopyFrom(id);
-    te.mutable_data()->CopyFrom(task);
+    te.set_allocated_id(std::make_unique<Core::TaskID>(id).release());
+    te.set_allocated_data(std::make_unique<Core::Task>(task).release());
     return te;
 }

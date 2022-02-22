@@ -15,7 +15,7 @@ service TaskManager {
   rpc Complete (Core.TaskID) returns (Core.ModelRequestResult) {}
   rpc Uncomplete (Core.TaskID) returns (Core.ModelRequestResult) {}
   rpc Delete (Core.TaskID) returns (Core.ModelRequestResult) {}
-  rpc IsPresent (Core.TaskID) returns (Core.ModelRequestResult) {}
+  rpc CheckTask (Core.TaskID) returns (Core.ModelRequestResult) {}
   rpc AddLabel (IDWithLabel) returns (Core.ModelRequestResult) {}
   rpc RemoveLabel (IDWithLabel) returns (Core.ModelRequestResult) {}
   rpc RemoveAllLabels (Core.TaskID) returns (Core.ModelRequestResult) {}
